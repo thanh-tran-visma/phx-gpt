@@ -1,8 +1,9 @@
 name: CI/CD
+
 on:
   push:
     branches:
-      - main 
+      - main
   pull_request:
     branches:
       - main
@@ -18,17 +19,17 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.12' 
+          python-version: '3.12'
 
       - name: Install Make
         run: sudo apt-get install -y make
 
-      - name: Install requirements
+      - name: Install dependencies
         run: pip install -r requirements.txt
 
   test:
     runs-on: ubuntu-latest
-    needs: build 
+    needs: build
 
     steps:
       - name: Check out the code
@@ -39,13 +40,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install requirements
+      - name: Install dependencies
         run: pip install -r requirements.txt
 
       - name: Set environment variables
         run: |
           echo "MODEL_NAME=${{ secrets.MODEL_NAME }}" >> $GITHUB_ENV
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> $GITHUB_ENV
-      
-      - name: Run Unit tests
+
+      - name: Run unit tests
         run: python -m pytest tests/
