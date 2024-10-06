@@ -26,11 +26,6 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
 
-      - name: Set environment variables
-        run: |
-          echo "MODEL_NAME=${{ secrets.MODEL_NAME }}" >> $GITHUB_ENV
-          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> $GITHUB_ENV
-
   test:
     runs-on: ubuntu-latest
     needs: build 
@@ -47,5 +42,10 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
 
+      - name: Set environment variables
+        run: |
+          echo "MODEL_NAME=${{ secrets.MODEL_NAME }}" >> $GITHUB_ENV
+          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> $GITHUB_ENV
+      
       - name: Run Unit tests
         run: python -m pytest tests/
