@@ -1,0 +1,28 @@
+services:
+  app:
+    container_name: bluevi-gpt-app
+    build:
+      context: ./
+      dockerfile: ./infrastructure/Dockerfile
+      target: app
+      args:
+        HF_TOKEN: ${HF_TOKEN}
+        MODEL_NAME: ${MODEL_NAME}
+    restart: on-failure
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - MODEL_NAME=${MODEL_NAME}
+      - BLUEVI_GPT=${BLUEVI_GPT}
+
+  nginx:
+    container_name: bluevi-gpt-web
+    build:
+      context: ./
+      dockerfile: ./infrastructure/Dockerfile
+      target: nginx
+    restart: on-failure
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
