@@ -1,0 +1,40 @@
+name: Docker CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+        ports:
+          - 80:80
+          - 443:443
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build Docker image for app
+      run: docker build --target app -t bluevi-gpt-app .
+
+    - name: Build Docker image for nginx
+      run: docker build --target nginx -t bluevi-gpt-nginx .
+
+    - name: Test App Container
+      run: docker run --rm -d -p 8000:8000 bluevi-gpt-app gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app
+
+    - name: Test Nginx Container
+      run: docker run --rm -d -p 80:80 bluevi-gpt-nginx
