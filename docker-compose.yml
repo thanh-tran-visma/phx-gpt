@@ -13,6 +13,8 @@ services:
       - HF_TOKEN=${HF_TOKEN}
       - MODEL_NAME=${MODEL_NAME}
       - BLUEVI_GPT=${BLUEVI_GPT}
+    ports:
+      - "455:455"
 
   nginx:
     container_name: bluevi-gpt-web
@@ -24,5 +26,4 @@ services:
     depends_on:
       - app
     ports:
-      - "80:80"
-      - "443:443"
+      - "445:443"

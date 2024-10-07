@@ -12,7 +12,7 @@ def client():
         yield client
 
 def test_read_root(client):
-    response = client.get("/")
+    response = client.get("/playground")
     assert response.status_code == HTTPStatus.OK.value
 
 def test_chat_endpoint(client):
