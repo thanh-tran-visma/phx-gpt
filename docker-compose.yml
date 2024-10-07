@@ -9,21 +9,29 @@ services:
         HF_TOKEN: ${HF_TOKEN}
         MODEL_NAME: ${MODEL_NAME}
     restart: on-failure
+    networks:
+      - dotweb.test
     environment:
       - HF_TOKEN=${HF_TOKEN}
       - MODEL_NAME=${MODEL_NAME}
       - BLUEVI_GPT=${BLUEVI_GPT}
     ports:
-      - "455:455"
+      - "445:445" 
+      - "80:80" 
 
   nginx:
-    container_name: bluevi-gpt-web
+    container_name: bluevi-gpt-nginx
     build:
       context: ./
       dockerfile: ./infrastructure/Dockerfile
       target: nginx
     restart: on-failure
+    networks:
+      - dotweb.test
     depends_on:
       - app
-    ports:
-      - "445:443"
+
+networks:
+  dotweb.test:
+    name: dotweb.test
+    external: true

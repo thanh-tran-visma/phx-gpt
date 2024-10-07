@@ -60,3 +60,6 @@ You will need a Hugging Face access token to run this project. You can get your 
 
 By default, the playground can be accessed via: 
 -  https://bluevi-gpt.dotweb.test:445/playground
+
+### Noted
+In case that you use the dev-server, make sure in ~/dwc/dev-server/docker/build/development-domains/development-domains.list exists the line GATEWAY_WEB bluevi-gpt.dotweb.test

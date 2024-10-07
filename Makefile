@@ -19,7 +19,7 @@ install:
 
 # Run the application
 dev:
-	@gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app -b ${BLUEVI_GPT}:8000 --keyfile infrastructure/certs/dotweb.test.key --certfile infrastructure/certs/dotweb.test.crt
+	@gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app -b ${BLUEVI_GPT}:445 --keyfile infrastructure/certs/dotweb.test.key --certfile infrastructure/certs/dotweb.test.crt
 
 # Run the tests
 tests:

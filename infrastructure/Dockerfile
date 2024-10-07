@@ -35,7 +35,7 @@ ENV SSL_CERTIFICATE=/etc/ssl/certs/dotweb.test.crt
 ENV SSL_KEY=/etc/ssl/private/dotweb.test.key
 
 # Command to run the application
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "-b", "0.0.0.0:455", "--certfile", "/etc/ssl/certs/dotweb.test.crt", "--keyfile", "/etc/ssl/private/dotweb.test.key"]
+CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "-b", "0.0.0.0:445", "--certfile", "/etc/ssl/certs/dotweb.test.crt", "--keyfile", "/etc/ssl/private/dotweb.test.key"]
 
 # Final Nginx image
 FROM nginx:1.25.4 AS nginx
@@ -46,6 +46,6 @@ COPY infrastructure/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY infrastructure/nginx/conf.d/ /etc/nginx/conf.d/
 
 EXPOSE 80
-EXPOSE 443
+EXPOSE 445
 
 CMD ["nginx", "-g", "daemon off;"]
