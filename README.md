@@ -59,10 +59,4 @@ You will need a Hugging Face access token to run this project. You can get your 
 ### Playground
 
 By default, the playground can be accessed via: 
- - https://bluevi-gpt.dotweb.test:8000 (local)
- - https://bluevi-gpt.dotweb.test (docker)
-
-### Docs
-By default, the docs can be accessed via: 
- - https://bluevi-gpt.dotweb.test:8000/docs (local)
- - https://bluevi-gpt.dotweb.test/docs (docker)
+ - https://bluevi-gpt.dotweb.test:8443
