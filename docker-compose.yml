@@ -9,6 +9,8 @@ services:
         HF_TOKEN: ${HF_TOKEN}
         MODEL_NAME: ${MODEL_NAME}
     restart: on-failure
+    networks:
+      - dotweb.test
     environment:
       - HF_TOKEN=${HF_TOKEN}
       - MODEL_NAME=${MODEL_NAME}
@@ -23,6 +25,13 @@ services:
     restart: on-failure
     depends_on:
       - app
+    networks:
+      - dotweb.test
     ports:
       - "8080:80"   
       - "8443:443"
+
+networks:
+  dotweb.test:
+    name: dotweb.test
+    external: true
