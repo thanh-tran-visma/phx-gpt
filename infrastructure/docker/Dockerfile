@@ -19,25 +19,12 @@ RUN pip install --no-cache-dir --default-timeout=100 -r requirements.txt
 # Copy the rest of the application code
 COPY . .
 
-# Load and download the model
-ARG HF_TOKEN
-ENV HF_TOKEN=${HF_TOKEN}
-ARG MODEL_NAME
-ENV MODEL_NAME=${MODEL_NAME}
-RUN python -c "from app.model.model import BlueViGptModel; BlueViGptModel().load_model()"
+# Load and download the model using secrets for HF_TOKEN and MODEL_NAME
+RUN --mount=type=secret,id=hf_token \
+    --mount=type=secret,id=model_name \
+    bash -c "HF_TOKEN=$(cat /run/secrets/hf_token) \
+    MODEL_NAME=$(cat /run/secrets/model_name) \
+    python -c 'from app.model.model import BlueViGptModel; BlueViGptModel().load_model()'"
 
 # Command to run the application
 CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "-b", "0.0.0.0:8000"]
-
-# Final Nginx image
-FROM nginx:1.25.4 AS nginx
-
-# Copy SSL certificates
-COPY infrastructure/certs/* /etc/nginx/certs/
-COPY infrastructure/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY infrastructure/nginx/conf.d/ /etc/nginx/conf.d/
-
-EXPOSE 80
-EXPOSE 443
-
-CMD ["nginx", "-g", "daemon off;"]

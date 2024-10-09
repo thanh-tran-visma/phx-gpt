@@ -11,35 +11,34 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    services:
-      docker:
-        image: docker:19.03.12
-        options: --privileged
-        ports:
-          - 80:80
-          - 443:443
-
+    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Set environment variables
-      run: |
-        echo "MODEL_NAME=${{ secrets.MODEL_NAME }}" >> $GITHUB_ENV
-        echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> $GITHUB_ENV
+      # Create secret files from GitHub Secrets
+      - name: Create secret files
+        run: |
+          echo "${{ secrets.HF_TOKEN }}" > hf_token
+          echo "${{ secrets.MODEL_NAME }}" > model_name
 
-    - name: Build Docker image for app
-      run: docker build -f ./infrastructure/Dockerfile --target app -t bluevi-gpt-app --build-arg HF_TOKEN=${{ secrets.HF_TOKEN }} --build-arg MODEL_NAME=${{ secrets.MODEL_NAME }} .
+      # Build the Docker image with secrets
+      - name: Build Docker image
+        run: |
+          docker build \
+            --file ./infrastructure/docker/Dockerfile \
+            --target app \
+            --secret id=hf_token,src=hf_token \
+            --secret id=model_name,src=model_name \
+            --tag gpt_python_local:latest \
+            .
 
-    - name: Build Docker image for nginx
-      run: docker build -f ./infrastructure/Dockerfile --target nginx -t bluevi-gpt-nginx .
-
-    - name: Test App Container
-      run: docker run --rm -d -p 8000:8000 -e HF_TOKEN=${{ secrets.HF_TOKEN }} -e MODEL_NAME=${{ secrets.MODEL_NAME }} bluevi-gpt-app gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app
-
-    - name: Test Nginx Container
-      run: docker run --rm -d -p 80:80 bluevi-gpt-nginx
+      # Clean up secret files
+      - name: Clean up secret files
+        run: |
+          rm -f hf_token model_name

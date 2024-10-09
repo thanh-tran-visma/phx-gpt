@@ -1,28 +1,42 @@
 services:
-  app:
-    container_name: bluevi-gpt-app
+  python:
+    container_name: gpt_python
+    image: dotweb.test/python
     build:
       context: ./
-      dockerfile: ./infrastructure/Dockerfile
+      dockerfile: ./infrastructure/docker/Dockerfile
       target: app
-      args:
-        HF_TOKEN: ${HF_TOKEN}
-        MODEL_NAME: ${MODEL_NAME}
+      secrets:
+        - hf_token
+        - model_name
     restart: on-failure
+    networks:
+      - internal
     environment:
       - HF_TOKEN=${HF_TOKEN}
       - MODEL_NAME=${MODEL_NAME}
       - BLUEVI_GPT=${BLUEVI_GPT}
-
   nginx:
-    container_name: bluevi-gpt-web
-    build:
-      context: ./
-      dockerfile: ./infrastructure/Dockerfile
-      target: nginx
-    restart: on-failure
+    container_name: gpt_web
+    image: dotweb.test/nginx:python
     depends_on:
-      - app
-    ports:
-      - "80:80"
-      - "443:443"
+      - python
+    restart: on-failure
+    networks:
+      - internal
+      - dotweb.test
+    volumes:
+      - .:/app
+
+secrets:
+  hf_token:
+    environment: HF_TOKEN
+  model_name:
+    environment: MODEL_NAME
+
+networks:
+  internal:
+    name: gpt_internal
+  dotweb.test:
+    name: dotweb.test
+    external: true
