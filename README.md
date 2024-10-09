@@ -44,4 +44,5 @@ You will need a Hugging Face access token to run this project. You can get your 
 ### Playground
 
 By default, the playground can be accessed via: 
- - https://gpt.dotweb.test
+ - https://gpt.dotweb.test (docker)
+ - http://0.0.0.0:8000/ (local)
