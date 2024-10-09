@@ -6,9 +6,9 @@ services:
       context: ./
       dockerfile: ./infrastructure/docker/Dockerfile
       target: app
-      args:
-        HF_TOKEN: ${HF_TOKEN}
-        MODEL_NAME: ${MODEL_NAME}
+      secrets:
+        - hf_token
+        - model_name
     restart: on-failure
     networks:
       - internal
@@ -16,7 +16,6 @@ services:
       - HF_TOKEN=${HF_TOKEN}
       - MODEL_NAME=${MODEL_NAME}
       - BLUEVI_GPT=${BLUEVI_GPT}
-
   nginx:
     container_name: gpt_web
     image: dotweb.test/nginx:python
@@ -28,6 +27,12 @@ services:
       - dotweb.test
     volumes:
       - .:/app
+
+secrets:
+  hf_token:
+    environment: HF_TOKEN
+  model_name:
+    environment: MODEL_NAME
 
 networks:
   internal:

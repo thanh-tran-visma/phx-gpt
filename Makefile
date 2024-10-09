@@ -26,11 +26,6 @@ tests:
 	@echo "Running tests..."
 	@$(VENV_DIR)/bin/python -m pytest tests/
 
-# Remove stopped Docker containers
-docker-remove:
-	@echo "Removing stopped Docker containers..."
-	docker-compose down --rmi all  # Removes images as well, use with caution
-
 # Clear cache
 clear-cache:
 	@echo "Removing cache..."

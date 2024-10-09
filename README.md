@@ -41,22 +41,7 @@ You will need a Hugging Face access token to run this project. You can get your 
     make tests
     ```
 
-### Docker
-
-1. **Build the container**
-    ```bash
-    docker-compose build
-    ```
-2. **Run the container**
-    ```bash
-    docker-compose up -d 
-    ```
-3. **Remove the Docker container**
-    ```bash
-    make docker-remove
-    ```
-
 ### Playground
 
 By default, the playground can be accessed via: 
- - https://bluevi-gpt.dotweb.test
+ - https://gpt.dotweb.test
