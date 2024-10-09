@@ -59,4 +59,4 @@ You will need a Hugging Face access token to run this project. You can get your 
 ### Playground
 
 By default, the playground can be accessed via: 
- - https://bluevi-gpt.dotweb.test:8443
+ - https://bluevi-gpt.dotweb.test

@@ -28,16 +28,3 @@ RUN python -c "from app.model.model import BlueViGptModel; BlueViGptModel().load
 
 # Command to run the application
 CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "-b", "0.0.0.0:8000"]
-
-# Final Nginx image
-FROM nginx:1.25.4 AS nginx
-
-# Copy SSL certificates
-COPY infrastructure/certs/* /etc/nginx/certs/
-COPY infrastructure/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY infrastructure/nginx/conf.d/ /etc/nginx/conf.d/
-
-EXPOSE 80
-EXPOSE 443
-
-CMD ["nginx", "-g", "daemon off;"]
