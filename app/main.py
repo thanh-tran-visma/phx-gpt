@@ -9,7 +9,6 @@ blueViGpt = BlueViGptModel()
 @app.on_event("startup")
 async def startup_event():
     app.state.model = blueViGpt
-    blueViGpt.load_model()
 
 @app.on_event("shutdown")
 async def shutdown_event():

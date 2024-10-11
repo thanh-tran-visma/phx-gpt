@@ -21,7 +21,7 @@ def test_load_model(mock_from_pretrained, blue_vi_gpt_model, monkeypatch):
     mock_from_pretrained.assert_called_once()
     called_args, called_kwargs = mock_from_pretrained.call_args
     assert called_kwargs['repo_id'] == "test_model"
-    assert called_kwargs['filename'] == "unsloth.Q4_K_M.gguf"
+    assert called_kwargs['filename'] == "unsloth.Q8_0.gguf"
 
 
 class TestGetResponse:
