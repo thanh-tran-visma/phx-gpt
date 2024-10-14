@@ -43,7 +43,7 @@ dataset = Dataset.from_list(formatted_data)
 print(dataset[:])  # To print all rows
 
 # Save the dataset as a JSON file locally
-json_file_path = "blueVi-GPT-dataset-answer-question.json"
+json_file_path = "datasets/blueVi-GPT-dataset-answer-question.json"
 dataset.to_json(json_file_path)
 
 # Create the Hugging Face dataset repo if it doesn't exist
