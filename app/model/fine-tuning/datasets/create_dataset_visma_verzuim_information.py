@@ -38,7 +38,7 @@ dataset.to_json(json_file_path)
 
 # Create the Hugging Face dataset repo if it doesn't exist
 repo_name = "ThanhTranVisma/blueVi-GPT-dataset-answer-question-visma-verzuim"
-create_repo(repo_name, repo_type="dataset", private=False)
+create_repo(repo_name, repo_type="dataset", private=True)
 
 # Push JSON file to Hugging Face Hub
 api = HfApi()
