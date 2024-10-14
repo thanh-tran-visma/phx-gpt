@@ -1,6 +1,7 @@
 from fastapi import Request, Depends
 from fastapi.responses import JSONResponse
-from app.api import HTTPStatus, Auth
+from app.api import HTTPStatus
+from app.api.auth import Auth
 import gc
 
 async def chat_endpoint(request: Request, token: str = Depends(Auth.get_bearer_token)):
