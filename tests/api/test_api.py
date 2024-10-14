@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from app.api.router import app
+from app.main import app
 from app.model.model import BlueViGptModel
 from app.api.http_status import HTTPStatus
 
@@ -24,4 +24,4 @@ def test_chat_endpoint(client):
     # Assert the presence of expected keys in the response
     assert "response" in json_response
     assert isinstance(json_response["response"], str) 
-    assert json_response["response"] != "" 
+    assert json_response["response"] != ""

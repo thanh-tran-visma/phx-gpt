@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
 from .routes import chat_endpoint
+from .auth import Auth
 
 router = APIRouter()
 
@@ -10,5 +11,5 @@ async def health_check():
 
 # The chat route
 @router.post("/chat")
-async def chat_route(request: Request):
-    return await chat_endpoint(request)
+async def chat_route(request: Request, token: str = Depends(Auth.get_bearer_token)):
+    return await chat_endpoint(request, token)
