@@ -20,25 +20,20 @@ class BlueViGptModel:
 
         llm = Llama.from_pretrained(
             repo_id=model_name,
-            filename="unsloth.Q8_0.gguf",
+            filename="unsloth.Q4_K_M.gguf",
             cache_dir=model_cache_dir
         )
         return llm 
 
-    def get_response(self, user_message):
+    def get_response(self, conversation_history):
         response = self.llm.create_chat_completion(
-            messages=[
-                {
-                    "role": "user",
-                    "content": user_message
-                }
-            ]
+            messages=conversation_history
         )
         if response.get('choices'):
             message_content = response['choices'][0]['message']['content']
             return message_content
         else:
-            return "Sorry, I couldn't generate a response.", 0, 0
+            return "Sorry, I couldn't generate a response."
 
     def get_anonymized_message(self, user_message):
         instruction = (
