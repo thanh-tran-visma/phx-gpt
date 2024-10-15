@@ -26,14 +26,14 @@ class BlueViGptModel:
         return llm 
 
     def get_response(self, conversation_history):
-        response = self.llm.create_chat_completion(
-            messages=conversation_history
-        )
-        if response.get('choices'):
-            message_content = response['choices'][0]['message']['content']
-            return message_content
-        else:
-            return "Sorry, I couldn't generate a response."
+            response = self.llm.create_chat_completion(
+                messages=conversation_history
+            )
+            if response.get('choices'):
+                message_content = response['choices'][0]['message']['content']
+                return message_content
+            else:
+                return "Sorry, I couldn't generate a response."
 
     def get_anonymized_message(self, user_message):
         instruction = (
@@ -54,25 +54,4 @@ class BlueViGptModel:
             message_content = response['choices'][0]['message']['content']
             return message_content
         else:
-            return "Sorry, I couldn't generate an anonymized response."
-
-    def grammar_correction(self, user_message):
-        instruction = (
-            "Grammar correction. Do not provide extra information.\n"
-            f"Correct this: '{user_message}'\n"
-        )
-
-        response = self.llm.create_chat_completion(
-            messages=[
-                {
-                    "role": "user",
-                    "content": instruction
-                }
-            ]
-        )
-
-        if response.get('choices'):
-            message_content = response['choices'][0]['message']['content']
-            return message_content
-        else:
-            return "Sorry, I couldn't correct the prompt."
+            return "Sorry, I couldn't generate an anonymized response.", 0, 0

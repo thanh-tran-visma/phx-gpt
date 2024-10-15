@@ -17,10 +17,10 @@ async def chat_endpoint(request: Request, token: str = Depends(Auth.get_bearer_t
                 status_code=HTTPStatus.BAD_REQUEST.value,
                 content={"response": "No input provided."}
             )
-
-        # Grammar correction and response generation
-        grammar_correction_message = blue_vi_gpt_model.grammar_correction(prompt)
-        bot_response = blue_vi_gpt_model.get_response(grammar_correction_message)
+        conversation_history = [
+            {"role": "user", "content": prompt}
+        ]
+        bot_response = blue_vi_gpt_model.get_response(conversation_history)
 
         return JSONResponse(
             status_code=HTTPStatus.OK.value,

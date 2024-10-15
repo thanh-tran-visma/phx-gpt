@@ -11,11 +11,25 @@ def client():
     with TestClient(app) as client:
         yield client
 
-def test_chat_endpoint(client):
-    # Call the endpoint with a sample message using the updated key 'prompt'
+def test_chat_endpoint_without_token(client):
     response = client.post("/chat", json={"prompt": "test_message"})
 
-    # Assert the response status code is 200
+    # Assert the response status code is 401 because no token is provided
+    assert response.status_code == HTTPStatus.UNAUTHORIZED.value
+
+    # Get the JSON response
+    json_response = response.json()
+
+    # Assert the presence of expected keys in the response
+    assert "detail" in json_response
+    assert json_response["detail"] == "Not authenticated"
+
+def test_chat_endpoint_with_token(client):
+    # Set the Bearer token in the headers
+    headers = {"Authorization": "Bearer 1234"}
+    response = client.post("/chat", json={"prompt": "test_message"}, headers=headers)
+
+    # Assert the response status code is 200 (OK) since the token is provided
     assert response.status_code == HTTPStatus.OK.value
 
     # Get the JSON response
@@ -23,5 +37,5 @@ def test_chat_endpoint(client):
 
     # Assert the presence of expected keys in the response
     assert "response" in json_response
-    assert isinstance(json_response["response"], str) 
+    assert isinstance(json_response["response"], str)
     assert json_response["response"] != ""
