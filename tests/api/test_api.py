@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
-from app.model.model import BlueViGptModel
+from app.llm.llm_model import BlueViGptModel
 from app.api.http_status import HTTPStatus
 
 @pytest.fixture(scope="module")

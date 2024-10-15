@@ -1,7 +1,7 @@
 from unittest.mock import patch, MagicMock
 import os
 import pytest
-from app.model import BlueViGptModel
+from app.llm import BlueViGptModel
 
 @pytest.fixture(scope='class')
 def blue_vi_gpt_model():

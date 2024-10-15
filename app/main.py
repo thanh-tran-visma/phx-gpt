@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.api.router import router
-from app.model.model import BlueViGptModel
+from app.llm.llm_model import BlueViGptModel
 from dotenv import load_dotenv
 
 app = FastAPI()
