@@ -31,12 +31,16 @@ You will need a Hugging Face access token to run this project. You can get your 
     ```
     127.0.0.1 gpt.dotweb.test
     to your /etc/hosts file (Linux/MAC) or C:\Windows\System32\drivers\etc\hosts (Windows)
-   ```
-4. **Run the server**
+    ```
+5. **Run Migration**
+    ```
+    make migrate
+    ```
+6. **Run the server**
     ```bash
     make dev
     ```
-5. **Run the tests**
+7. **Run the tests**
     ```bash
     make tests
     ```

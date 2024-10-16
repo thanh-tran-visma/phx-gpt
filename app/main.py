@@ -1,11 +1,9 @@
 from fastapi import FastAPI
 from app.api.router import router
 from app.llm.llm_model import BlueViGptModel
-from dotenv import load_dotenv
 
 app = FastAPI()
-
-load_dotenv()
+app.include_router(router)
 blueViGpt = BlueViGptModel()
 
 @app.on_event("startup")
@@ -16,11 +14,8 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     pass
-
 def main():
     pass
-
-app.include_router(router)
 
 if __name__ == "__main__":
     main()

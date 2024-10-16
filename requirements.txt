@@ -7,3 +7,6 @@ datasets
 httpx
 gunicorn
 huggingface_hub
+sqlalchemy 
+pymysql
+mysql-connector-python

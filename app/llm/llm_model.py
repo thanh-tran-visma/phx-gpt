@@ -20,7 +20,7 @@ class BlueViGptModel:
 
         llm = Llama.from_pretrained(
             repo_id=model_name,
-            filename="unsloth.Q8_0.gguf",
+            filename="unsloth.Q4_K_M.gguf",
             cache_dir=model_cache_dir
         )
         return llm 
