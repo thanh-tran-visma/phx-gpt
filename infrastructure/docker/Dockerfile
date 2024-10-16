@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     git \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
@@ -28,6 +29,13 @@ RUN --mount=type=secret,id=hf_token \
     bash -c "HF_TOKEN=$(cat /run/secrets/hf_token) \
     MODEL_NAME=$(cat /run/secrets/model_name) \
     python -c 'from app.llm.llm_model import BlueViGptModel; BlueViGptModel().load_model()'"
+
+# Add a custom entrypoint script to wait for MySQL and run migrations
+COPY ./infrastructure/docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Command to run the application and migrations
+ENTRYPOINT ["/entrypoint.sh"]
 
 # Command to run the application
 CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "-b", "0.0.0.0:8000"]

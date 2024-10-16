@@ -16,31 +16,50 @@ You will need a Hugging Face access token to run this project. You can get your 
 ### How to Setup Locally
 
 1. **Clone the Repository**: Clone the repository and navigate to the project folder.
-2. **Create Python env, activate env and install requirements**
+
+2. **Create Python Virtual Environment, Activate it, and Install Requirements**
     ```bash
     make venv
     source env/bin/activate
     make install
     ```
+
 3. **Copy Environment Variables**: Copy the environment variables example file and adjust the Hugging Face token with your own.
     ```bash
     cp .env.example .env
     vim .env
     ```
-4. **Add the**
-    ```
+
+4. **Set Up the Database**
+   - **Create MySQL User and Database**:
+     Make sure to set up the `gpt_db` and create a user (`gpt_user`) with the correct privileges:
+     ```sql
+     CREATE USER 'gpt_user'@'localhost' IDENTIFIED BY 'your_password';
+     GRANT ALL PRIVILEGES ON gpt_db.* TO 'gpt_user'@'localhost';
+     FLUSH PRIVILEGES;
+     ```
+
+5. **Add the Database Host to `/etc/hosts`**:
+    Add the following line to your `/etc/hosts` file (Linux/MAC) or `C:\Windows\System32\drivers\etc\hosts` (Windows):
+    ```bash
     127.0.0.1 gpt.dotweb.test
-    to your /etc/hosts file (Linux/MAC) or C:\Windows\System32\drivers\etc\hosts (Windows)
+    127.0.0.1 gpt_db.dotweb.test
     ```
-5. **Run Migration**
-    ```
+
+6. **Run Migration**:
+    Run the migration to set up the necessary tables and schema:
+    ```bash
     make migrate
     ```
-6. **Run the server**
+
+7. **Run the Server**:
+    Start the application:
     ```bash
     make dev
     ```
-7. **Run the tests**
+
+8. **Run the Tests**:
+    Run the tests to verify everything is working:
     ```bash
     make tests
     ```
