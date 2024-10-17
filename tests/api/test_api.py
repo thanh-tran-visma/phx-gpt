@@ -1,13 +1,10 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
-from app.llm.llm_model import BlueViGptModel
 from app.api.http_status import HTTPStatus
 
 @pytest.fixture(scope="module")
 def client():
-    app.state.model = BlueViGptModel()
-    app.state.model.load_model()
     with TestClient(app) as client:
         yield client
 
