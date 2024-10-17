@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Enum, TIMESTAMP, ForeignKey, Text
 from sqlalchemy.sql import func
-from app.database.database import Base
+from app.database.base import Base
 from sqlalchemy.orm import relationship
 
 class User(Base):
@@ -39,5 +39,5 @@ class Conversation(Base):
 
     # Relationships
     sender = relationship("User", backref="conversations")
-    gpt_sender = relationship("GPT", backref="conversations")
+    gpt_sender = relationship("Gpt", backref="conversations")
     content = relationship("Content", backref="conversations")

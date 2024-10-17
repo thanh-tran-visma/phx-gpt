@@ -1,13 +1,8 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
 import os
-
-# Load environment variables
-load_dotenv()
-
-# Create SQLAlchemy base
-Base = declarative_base()
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+from .base import Base
 
 class Database:
     def __init__(self):
@@ -47,3 +42,14 @@ class Database:
             session.rollback()
         finally:
             session.close()
+
+# Create an instance of the Database class
+database = Database()
+
+# Dependency to get a database session
+def get_db():
+    db = database.Session()
+    try:
+        yield db
+    finally:
+        db.close()

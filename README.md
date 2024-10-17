@@ -47,7 +47,6 @@ You will need a Hugging Face access token to run this project. You can get your 
     ```bash
     alembic upgrade head
     ```
-
 8. **Run the Tests**:
     Run the tests to verify everything is working:
     ```bash

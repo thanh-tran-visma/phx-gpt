@@ -1,2 +1,2 @@
-from .database import Database, Base
-from .migrations import Migrator 
+from .database import Database, get_db
+from .base import Base 

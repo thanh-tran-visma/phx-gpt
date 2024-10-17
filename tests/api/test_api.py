@@ -12,7 +12,7 @@ def client():
         yield client
 
 def test_chat_endpoint_without_token(client):
-    response = client.post("/chat", json={"prompt": "test_message"})
+    response = client.post("/chat/chat", json={"prompt": "test_message"})
 
     # Assert the response status code is 401 because no token is provided
     assert response.status_code == HTTPStatus.UNAUTHORIZED.value
@@ -27,7 +27,7 @@ def test_chat_endpoint_without_token(client):
 def test_chat_endpoint_with_token(client):
     # Set the Bearer token in the headers
     headers = {"Authorization": "Bearer 1234"}
-    response = client.post("/chat", json={"prompt": "test_message"}, headers=headers)
+    response = client.post("/chat/chat", json={"prompt": "test_message"}, headers=headers)
 
     # Assert the response status code is 200 (OK) since the token is provided
     assert response.status_code == HTTPStatus.OK.value

@@ -1,9 +1,13 @@
-from fastapi import Request, Depends
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import JSONResponse
-from app.api import HTTPStatus
 from app.api.auth import Auth
+from app.api import HTTPStatus
 import gc
 
+router = APIRouter()
+
+# Chat endpoint
+@router.post("/chat")
 async def chat_endpoint(request: Request, token: str = Depends(Auth.get_bearer_token)):
     blue_vi_gpt_model = request.app.state.model
     prompt = None
@@ -17,6 +21,7 @@ async def chat_endpoint(request: Request, token: str = Depends(Auth.get_bearer_t
                 status_code=HTTPStatus.BAD_REQUEST.value,
                 content={"response": "No input provided."}
             )
+
         conversation_history = [
             {"role": "user", "content": prompt}
         ]
@@ -32,7 +37,7 @@ async def chat_endpoint(request: Request, token: str = Depends(Auth.get_bearer_t
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
             content={"response": f"An error occurred: {str(e)}"}
         )
-    
+
     finally:
         if prompt is not None:
             del prompt
