@@ -10,4 +10,3 @@ huggingface_hub
 sqlalchemy 
 pymysql
 mysql-connector-python
-alembic
