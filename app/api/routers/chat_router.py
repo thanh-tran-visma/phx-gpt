@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import JSONResponse
-from app.api.auth import Auth
+from app.auth.auth import Auth
 from app.api import HTTPStatus
 import gc
 

@@ -17,7 +17,7 @@ class Auth:
         if not auth_header or not auth_header.startswith("Bearer "):
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED.value,
-                detail="Authorization header missing or incorrect"
+                detail="Not authenticated"
             )
         
         token = auth_header.split("Bearer ")[1]
@@ -25,7 +25,7 @@ class Auth:
         if token != expected_token:
             raise HTTPException(
                 status_code=HTTPStatus.FORBIDDEN.value,
-                detail="Invalid Bearer token"
+                detail="Not authenticated"
             )
         
         return token
