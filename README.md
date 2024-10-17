@@ -45,7 +45,7 @@ You will need a Hugging Face access token to run this project. You can get your 
 
 7. **Migration**:
     ```bash
-    docker-compose run migrate
+    alembic upgrade head
     ```
 
 8. **Run the Tests**:
