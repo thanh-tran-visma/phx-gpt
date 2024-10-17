@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,ConfigDict
 from datetime import datetime
 
 class UserBase(BaseModel):
@@ -6,6 +6,6 @@ class UserBase(BaseModel):
     created_at: datetime
     updated_at: datetime
     
-    class Config:
+    class Config(ConfigDict):
         from_attributes = True 
        
