@@ -1,4 +1,4 @@
-.PHONY: venv install dev tests docker-remove clear-cache
+.PHONY: venv install dev tests docker-remove clear-cache migrate
 
 # Define the virtual environment directory
 VENV_DIR=env
@@ -30,3 +30,8 @@ tests:
 clear-cache:
 	@echo "Removing cache..."
 	find . | grep -E "(__pycache__|\.pyc|\.pyo)" | xargs -r rm -rf
+
+# Migration command
+migrate:
+	export PYTHONPATH=$(pwd)
+	python app/database/migrate.py

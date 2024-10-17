@@ -7,3 +7,4 @@ env
 .pytest_cache/
 model_cache/
 *.json
+datasets/

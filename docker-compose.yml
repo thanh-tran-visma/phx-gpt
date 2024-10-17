@@ -10,12 +10,21 @@ services:
         - hf_token
         - model_name
     restart: on-failure
+    depends_on:
+      - gpt_mysql
     networks:
       - internal
     environment:
       - HF_TOKEN=${HF_TOKEN}
       - MODEL_NAME=${MODEL_NAME}
       - BLUEVI_GPT=${BLUEVI_GPT}
+      - DB_HOST=gpt_mysql  
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=gpt_user
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=3306         
+
+
   nginx:
     container_name: gpt_web
     image: dotweb.test/nginx:python
@@ -28,11 +37,27 @@ services:
     volumes:
       - .:/app
 
-secrets:
-  hf_token:
-    environment: HF_TOKEN
-  model_name:
-    environment: MODEL_NAME
+  gpt_mysql:
+    container_name: gpt_db.dotweb.test
+    image: mysql:8
+    restart: on-failure
+    volumes:
+      - gpt_db_data:/var/lib/gpt_mysql
+    ports:
+      - "3308:3306"
+    networks:
+      - internal
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=gpt_user
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "gpt_user", "-p${DB_PASSWORD}"]
+      interval: 30s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
 networks:
   internal:
@@ -40,3 +65,13 @@ networks:
   dotweb.test:
     name: dotweb.test
     external: true
+
+volumes:
+  gpt_db_data:
+    driver: local
+
+secrets:
+  hf_token:
+    environment: HF_TOKEN
+  model_name:
+    environment: MODEL_NAME
