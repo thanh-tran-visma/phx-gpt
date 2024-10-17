@@ -11,3 +11,4 @@ sqlalchemy
 pymysql
 mysql-connector-python
 alembic
+pytest-mock

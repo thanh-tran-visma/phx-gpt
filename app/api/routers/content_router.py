@@ -8,7 +8,7 @@ from app.schemas.content_schemas import ContentBase
 
 router = APIRouter()
 
-@router.get("/content", response_model=List[ContentBase])
+@router.get("/get-all-contents", response_model=List[ContentBase])
 async def get_all_content(db: Session = Depends(get_db)):
     contents = db.query(Content).all()
     return contents

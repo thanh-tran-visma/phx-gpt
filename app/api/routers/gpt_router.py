@@ -8,7 +8,7 @@ from app.schemas.gpt_schemas import GptBase
 
 router = APIRouter()
 
-@router.get("/gpt", response_model=List[GptBase])
+@router.get("/get-all-gpt", response_model=List[GptBase])
 async def get_all_gpt(db: Session = Depends(get_db)):
     gpts = db.query(Gpt).all()
     return gpts
