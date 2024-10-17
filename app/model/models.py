@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, Enum, TIMESTAMP, ForeignKey, Text
 from sqlalchemy.sql import func
-from database.database import Base
+from app.database.database import Base
+from sqlalchemy.orm import relationship
 
 class User(Base):
     __tablename__ = 'users'
@@ -10,7 +11,7 @@ class User(Base):
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
     updated_at = Column(TIMESTAMP, default=func.current_timestamp(), onupdate=func.current_timestamp())
 
-class GPT(Base):
+class Gpt(Base):
     __tablename__ = 'gpt'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
