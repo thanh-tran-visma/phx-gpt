@@ -14,7 +14,7 @@ def client():
 def test_chat_endpoint_without_token(client):
     response = client.post("/chat/chat", json={"prompt": "test_message"})
 
-    # Assert the response status code is 401 because no token is provided
+    # Assert the response status code is 401 (Unauthorized) because no token is provided
     assert response.status_code == HTTPStatus.UNAUTHORIZED.value
 
     # Get the JSON response
