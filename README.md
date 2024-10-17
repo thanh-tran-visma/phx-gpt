@@ -30,15 +30,6 @@ You will need a Hugging Face access token to run this project. You can get your 
     vim .env
     ```
 
-4. **Set Up the Database**
-   - **Create MySQL User and Database**:
-     Make sure to set up the `gpt_db` and create a user (`gpt_user`) with the correct privileges:
-     ```sql
-     CREATE USER 'gpt_user'@'localhost' IDENTIFIED BY 'your_password';
-     GRANT ALL PRIVILEGES ON gpt_db.* TO 'gpt_user'@'localhost';
-     FLUSH PRIVILEGES;
-     ```
-
 5. **Add the Database Host to `/etc/hosts`**:
     Add the following line to your `/etc/hosts` file (Linux/MAC) or `C:\Windows\System32\drivers\etc\hosts` (Windows):
     ```bash
@@ -46,16 +37,15 @@ You will need a Hugging Face access token to run this project. You can get your 
     127.0.0.1 gpt_db.dotweb.test
     ```
 
-6. **Run Migration**:
-    Run the migration to set up the necessary tables and schema:
+6. **Build docker containers**:
+    We need to use port 445 as well as port 3308 for db, so we will not have conflicts with the DWC-PHX application
     ```bash
-    make migrate
+    docker compose build
     ```
 
-7. **Run the Server**:
-    Start the application:
+7. **Migration**:
     ```bash
-    make dev
+    docker-compose run migrate
     ```
 
 8. **Run the Tests**:
@@ -63,9 +53,3 @@ You will need a Hugging Face access token to run this project. You can get your 
     ```bash
     make tests
     ```
-
-### Playground
-
-By default, the playground can be accessed via: 
- - https://gpt.dotweb.test (docker)
- - http://0.0.0.0:8000/ (local)

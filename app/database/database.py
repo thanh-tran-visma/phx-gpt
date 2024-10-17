@@ -15,7 +15,7 @@ class Database:
                 user=os.getenv('DB_USERNAME'),
                 password=os.getenv('DB_PASSWORD'),
                 database=os.getenv('DB_DATABASE'),
-                port=os.getenv('DB_PORT')
+                port=int(os.getenv("DB_PORT", 3306))
             )
             if self.connection.is_connected():
                 print("Connected to MySQL database")

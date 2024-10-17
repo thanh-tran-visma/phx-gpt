@@ -18,11 +18,12 @@ services:
       - HF_TOKEN=${HF_TOKEN}
       - MODEL_NAME=${MODEL_NAME}
       - BLUEVI_GPT=${BLUEVI_GPT}
-      - DB_HOST=gpt_db
+      - DB_HOST=gpt_mysql  
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=gpt_user
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_PORT=3306
+      - DB_PORT=3306         
+
 
   nginx:
     container_name: gpt_web
@@ -37,7 +38,7 @@ services:
       - .:/app
 
   gpt_mysql:
-    container_name: gpt_db
+    container_name: gpt_db.dotweb.test
     image: mysql:8
     restart: on-failure
     volumes:
