@@ -13,8 +13,7 @@ class Database:
 
     def connect(self):
         # Create connection string for SQLAlchemy
-        db_url = f"mysql+mysqlconnector://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DATABASE')}"
-        
+        db_url = f"mysql+mysqlconnector://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT', '3306')}/{os.getenv('DB_DATABASE')}"
         # Create an engine instance
         self.engine = create_engine(db_url, echo=True)
         
