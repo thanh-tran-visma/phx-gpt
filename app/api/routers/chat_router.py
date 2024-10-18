@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from app.auth.auth import Auth
 from app.api import HTTPStatus
 import gc
 
@@ -8,7 +7,7 @@ router = APIRouter()
 
 # Chat endpoint
 @router.post("/")
-async def chat_endpoint(request: Request, token: str = Depends(Auth.get_bearer_token)):
+async def chat_endpoint(request: Request):
     blue_vi_gpt_model = request.app.state.model
     prompt = None
 

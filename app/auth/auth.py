@@ -1,35 +1,34 @@
-import os
-from fastapi import Request, HTTPException
-from app.api import HTTPStatus
+from fastapi import HTTPException, Request
+from starlette.responses import JSONResponse
 
 class Auth:
     @staticmethod
     def get_bearer_token(request: Request):
-        expected_token = os.getenv("BEARER_TOKEN")
-        
-        # Ensure the expected token is set
-        if expected_token is None:
+        # Get Authorization header
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            # If Authorization header is missing, raise 401 Unauthorized
             raise HTTPException(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-                detail="Not authenticated"
+                status_code=401, 
+                detail="Not authenticated: Missing Authorization header"
             )
         
-        auth_header = request.headers.get("Authorization")
-        
-        # If Authorization header is missing or not a Bearer token, raise 401 Unauthorized
-        if not auth_header or not auth_header.startswith("Bearer "):
+        # Extract the token from the "Bearer <token>" format
+        if not authorization.startswith("Bearer "):
+            # If it's not in the expected "Bearer <token>" format, raise 401
             raise HTTPException(
-                status_code=HTTPStatus.UNAUTHORIZED.value,
-                detail="Not authenticated"
+                status_code=401, 
+                detail="Not authenticated: Invalid Authorization format"
             )
         
-        token = auth_header.split("Bearer ")[1]
-        
-        # If token does not match the expected token, raise 403 Forbidden
-        if token != expected_token:
+        # Extract token part
+        token = authorization.split("Bearer ")[1]
+        if not token:
+            # If token is empty, raise 401
             raise HTTPException(
-                status_code=HTTPStatus.FORBIDDEN.value,
-                detail="Not authenticated"
+                status_code=401, 
+                detail="Not authenticated: Token is missing"
             )
         
+        # If token is valid, return it (you could add validation logic here)
         return token

@@ -7,7 +7,6 @@ from app.api.routers.chat_router import router as chat_router
 
 router = APIRouter()
 
-# Include individual routers
 router.include_router(user_router, prefix="/users", tags=["users"])
 router.include_router(gpt_router, prefix="/gpt", tags=["gpt"])
 router.include_router(content_router, prefix="/content", tags=["content"])
