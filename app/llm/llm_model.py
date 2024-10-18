@@ -1,25 +1,20 @@
-import os
 from llama_cpp import Llama
-from dotenv import load_dotenv
 from huggingface_hub import login
+from app.config.env_config import MODEL_NAME, HF_TOKEN
 
 class BlueViGptModel:
     def __init__(self):
-        load_dotenv()
         self.llm = self.load_model()
 
     def load_model(self):
-        model_name = os.getenv("MODEL_NAME")
         model_cache_dir =  "./model_cache"
-        hf_token = os.getenv("HF_TOKEN")
-
-        if hf_token:
-            login(hf_token)
+        if HF_TOKEN:
+            login(HF_TOKEN)
         else:
             raise ValueError("HF_TOKEN environment variable is not set.")
 
         llm = Llama.from_pretrained(
-            repo_id=model_name,
+            repo_id=MODEL_NAME,
             filename="unsloth.Q8_0.gguf",
             cache_dir=model_cache_dir
         )

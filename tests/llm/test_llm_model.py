@@ -1,5 +1,4 @@
 from unittest.mock import patch, MagicMock
-import os
 import pytest
 from app.llm import BlueViGptModel
 

@@ -1,9 +1,6 @@
 import os
 from fastapi import HTTPException, Request
-from dotenv import load_dotenv
-
-# Load environment variables from the .env file
-load_dotenv()
+from app.config.env_config import BEARER_TOKEN
 
 class Auth:
     @staticmethod
@@ -61,10 +58,6 @@ class Auth:
         """
         Validate the token by comparing it with the BEARER_TOKEN from the environment.
         """
-        # Get the JWT_TOKEN from environment variables
-        expected_token = os.getenv("BEARER_TOKEN")
-        
-        # Compare the incoming token with the expected token from .env
-        if token == expected_token:
+        if token == BEARER_TOKEN:
             return True
         return False

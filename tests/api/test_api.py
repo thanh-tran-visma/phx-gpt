@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import patch
 from app.main import app
-from app.api.http_status import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 
 @pytest.fixture(scope="module")
 def client():

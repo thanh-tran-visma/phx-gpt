@@ -1,4 +1,4 @@
-import os
+from app.config.env_config import DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_DATABASE
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
@@ -14,7 +14,7 @@ class Database:
         """Establish a connection to the database."""
         if self.engine is None:
             # Create connection string for SQLAlchemy
-            db_url = f"mysql+mysqlconnector://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT', '3306')}/{os.getenv('DB_DATABASE')}"
+            db_url = f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DATABASE}"
             # Create an engine instance
             self.engine = create_engine(db_url, echo=True)
             

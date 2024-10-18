@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from app.api import HTTPStatus
+from app.types.enum import HTTPStatus
 import gc
 
 router = APIRouter()
