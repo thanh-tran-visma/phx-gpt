@@ -45,6 +45,7 @@ HF_TOKEN = EnvConfig.get("HF_TOKEN")
 MODEL_NAME = EnvConfig.get("MODEL_NAME")
 BLUEVI_GPT = EnvConfig.get("BLUEVI_GPT")
 BEARER_TOKEN = EnvConfig.get("BEARER_TOKEN")
+API_URL = EnvConfig.get("API_URL")
 
 DB_HOST = EnvConfig.get("DB_HOST", "localhost")
 DB_PORT = EnvConfig.get_int("DB_PORT", 3306)

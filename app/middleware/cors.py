@@ -1,10 +1,11 @@
 import logging
 from starlette.middleware.cors import CORSMiddleware
+from app.config.env_config import API_URL
 
 class CORSConfig:
     def __init__(self, app):
         self.app = app
-        self._origins = ["*"]
+        self._origins = API_URL
 
     def add_cors_middleware(self):
         """
