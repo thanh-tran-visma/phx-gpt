@@ -7,7 +7,7 @@ import gc
 router = APIRouter()
 
 # Chat endpoint
-@router.post("/chat")
+@router.post("/")
 async def chat_endpoint(request: Request, token: str = Depends(Auth.get_bearer_token)):
     blue_vi_gpt_model = request.app.state.model
     prompt = None
