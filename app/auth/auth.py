@@ -7,11 +7,11 @@ class Auth:
     def get_bearer_token(request: Request):
         expected_token = os.getenv("BEARER_TOKEN")
         
-        # Ensure the expected token exists
+        # Ensure the expected token is set
         if expected_token is None:
             raise HTTPException(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-                detail="Bearer token is not configured"
+                detail="Not authenticated"
             )
         
         auth_header = request.headers.get("Authorization")
