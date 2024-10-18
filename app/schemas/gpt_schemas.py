@@ -6,5 +6,4 @@ class GptBase(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config(ConfigDict):
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

@@ -6,5 +6,4 @@ class ContentBase(BaseModel):
     content: str
     created_at: datetime
 
-    class Config(ConfigDict):
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
