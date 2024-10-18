@@ -1,23 +1,20 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from .routes import chat_endpoint
+from fastapi import APIRouter
+from app.api.routers.user_router import router as user_router
+from app.api.routers.gpt_router import router as gpt_router
+from app.api.routers.content_router import router as content_router
+from app.api.routers.conversation_router import router as conversation_router
+from app.api.routers.chat_router import router as chat_router
 
-app = FastAPI()
-
-# Serve static files
-app.mount("/src", StaticFiles(directory="src"), name="static")
-templates = Jinja2Templates(directory="src")
-
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse(request, "index.html", {"key": "value"})
+router = APIRouter()
 
 # Health check endpoint
-@app.get("/health")
+@router.get("/health")
 async def health_check():
     return {"status": "ok"}
 
-# The chat route
-app.post("/chat")(chat_endpoint)
+# Include individual routers
+router.include_router(user_router, prefix="/users", tags=["users"])
+router.include_router(gpt_router, prefix="/gpt", tags=["gpt"])
+router.include_router(content_router, prefix="/content", tags=["content"])
+router.include_router(conversation_router, prefix="/conversations", tags=["conversations"])
+router.include_router(chat_router, prefix="/chat", tags=["chat"])

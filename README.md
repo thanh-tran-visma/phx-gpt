@@ -16,33 +16,43 @@ You will need a Hugging Face access token to run this project. You can get your 
 ### How to Setup Locally
 
 1. **Clone the Repository**: Clone the repository and navigate to the project folder.
-2. **Create Python env, activate env and install requirements**
+
+2. **Create Python Virtual Environment, Activate it, and Install Requirements**
     ```bash
     make venv
     source env/bin/activate
     make install
     ```
+
 3. **Copy Environment Variables**: Copy the environment variables example file and adjust the Hugging Face token with your own.
     ```bash
     cp .env.example .env
     vim .env
     ```
-4. **Add the**
-    ```
-    127.0.0.1 bluevi-gpt.dotweb.test
-    to your /etc/hosts file (Linux/MAC) or C:\Windows\System32\drivers\etc\hosts (Windows)
-   ```
-4. **Run the server**
+
+5. **Add the Database Host to `/etc/hosts`**:
+    Add the following line to your `/etc/hosts` file (Linux/MAC) or `C:\Windows\System32\drivers\etc\hosts` (Windows):
     ```bash
-    make dev
+    127.0.0.1 gpt.dotweb.test
+    127.0.0.1 gpt_db.dotweb.test
     ```
-5. **Run the tests**
+
+6. **Build docker containers**:
+    We need to use port 445 as well as port 3308 for db, so we will not have conflicts with the DWC-PHX application
+    ```bash
+    docker compose build
+    ```
+
+7. **Migration**:
+    ```bash
+    alembic upgrade head
+    ```
+    FOR UPDATING DATABASE
+    ```bash
+    alembic revision --autogenerate -m "your-message"
+    ```
+8. **Run the Tests**:
+    Run the tests to verify everything is working:
     ```bash
     make tests
     ```
-
-### Playground
-
-By default, the playground can be accessed via: 
- - https://gpt.dotweb.test (docker)
- - http://0.0.0.0:8000/ (local)

@@ -47,6 +47,7 @@ jobs:
         run: |
           echo "MODEL_NAME=${{ secrets.MODEL_NAME }}" >> $GITHUB_ENV
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> $GITHUB_ENV
+          echo "BEARER_TOKEN=${{ secrets.BEARER_TOKEN }}" >> $GITHUB_ENV
 
       - name: Run unit tests
         run: python -m pytest tests/

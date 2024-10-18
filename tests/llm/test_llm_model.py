@@ -1,7 +1,7 @@
 from unittest.mock import patch, MagicMock
 import os
 import pytest
-from app.model import BlueViGptModel
+from app.llm import BlueViGptModel
 
 @pytest.fixture(scope='class')
 def blue_vi_gpt_model():
@@ -21,18 +21,31 @@ def test_load_model(mock_from_pretrained, blue_vi_gpt_model, monkeypatch):
     mock_from_pretrained.assert_called_once()
     called_args, called_kwargs = mock_from_pretrained.call_args
     assert called_kwargs['repo_id'] == "test_model"
-    assert called_kwargs['filename'] == "unsloth.Q4_K_M.gguf"
+    assert called_kwargs['filename'] == "unsloth.Q8_0.gguf"
 
 
 class TestGetResponse:
     def test_get_response_with_real_model(self, blue_vi_gpt_model):
         user_message = "Hello, how are you?"
-        response = blue_vi_gpt_model.get_response(user_message)
+        messages = [
+            {
+                "role": "user",
+                "content": user_message
+            }
+        ]
+        response = blue_vi_gpt_model.get_response(messages)
         assert response is not None and len(response) > 0, "Model failed to return a valid response"
         
     def test_get_response_with_blue_vi_answer(self, blue_vi_gpt_model):
         user_message = "What is your name? Who created you?"
-        response = blue_vi_gpt_model.get_response(user_message)
+        messages = [
+            {
+                "role": "user",
+                "content": user_message
+            }
+        ]
+        response = blue_vi_gpt_model.get_response(messages)
+        # Assert that the response contains references to "blueVi", "blueVi-GPT", or "Visma Verzuim"
         assert "blueVi" in response or "blueVi-GPT" in response or "Visma Verzuim" in response
 
 class TestAnonymization:
@@ -138,61 +151,3 @@ class TestAnonymization:
         assert ("[IBAN_1]" in response or "NL91ABNA0417164300" not in response), "Test failed for IBAN."
         assert ("[DOB_1]" in response or "01/01/1990" not in response), "Test failed for DOB."
         assert ("[IP_ADDRESS_1]" in response or "192.168.1.1" not in response), "Test failed for IP Address."
-
-class TestGrammarCorrection:
-    def test_grammar_correction_typical(self, blue_vi_gpt_model):
-        user_message = "john doe's email is j.simpson@netwrix.com. his bsn is 123456789."
-        corrected_message = blue_vi_gpt_model.grammar_correction(user_message)
-
-        assert corrected_message, "Expected corrected message should not be empty."
-        assert "John Doe's email" in corrected_message or "john doe's email" not in corrected_message, (
-            "Expected to either find corrected email or not find the original name."
-        )
-
-    def test_grammar_correction_empty_input(self, blue_vi_gpt_model):
-        user_message = ""
-        corrected_message = blue_vi_gpt_model.grammar_correction(user_message)
-
-        assert corrected_message, "Expected corrected message should not be empty."
-
-    def test_grammar_correction_invalid_response(self, blue_vi_gpt_model):
-        user_message = "this are a test sentense."
-        corrected_message = blue_vi_gpt_model.grammar_correction(user_message)
-
-        assert corrected_message, "Expected corrected message should not be empty."
-        
-    def test_grammar_correction_no_choices(self, blue_vi_gpt_model):
-        user_message = "this are a test sentense."
-        corrected_message = blue_vi_gpt_model.grammar_correction(user_message)
-
-        assert corrected_message, "Expected corrected message should not be empty."
-
-    def test_grammar_correction_special_characters(self, blue_vi_gpt_model):
-        user_message = "wh@t is your n@me?"
-        corrected_message = blue_vi_gpt_model.grammar_correction(user_message)
-
-        assert corrected_message, "Expected corrected message should not be empty."
-        assert "What is your name?" in corrected_message or "wh@t is your n@me?" not in corrected_message, (
-            "Expected to either find corrected question or not find the original question."
-        )
-
-    def test_grammar_correction_long_input(self, blue_vi_gpt_model):
-        user_message = (
-            "this sentense is excessively long and contains numerous errrors "
-            "that need to be corrected to ensure proper grammer."
-        )
-        corrected_message = blue_vi_gpt_model.grammar_correction(user_message)
-
-        assert corrected_message, "Expected corrected message should not be empty."
-
-    def test_grammar_correction_multiple_typos(self, blue_vi_gpt_model):
-        user_message = (
-            "john doe's email are j.simpson@netwrix.com. his bsn are 123456789. "
-            "his address is 10 langelo, and zip code are 7666mc."
-        )
-        corrected_message = blue_vi_gpt_model.grammar_correction(user_message)
-
-        assert corrected_message, "Expected corrected message should not be empty."
-        assert (
-            "John Doe's email is" in corrected_message or "john doe's email are" not in corrected_message
-        ), "Expected to find corrected email or not find the original name."

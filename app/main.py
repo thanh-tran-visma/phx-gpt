@@ -1,22 +1,18 @@
 from fastapi import FastAPI
-from app.api import app
-from app.model.model import BlueViGptModel
-from dotenv import load_dotenv
+from app.api.router import router
+from app.llm.llm_model import BlueViGptModel
+from contextlib import asynccontextmanager
 
-load_dotenv()
-blueViGpt = BlueViGptModel()
-
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup event
+    blueViGpt = BlueViGptModel()
     app.state.model = blueViGpt
     blueViGpt.load_model()
-
-@app.on_event("shutdown")
-async def shutdown_event():
+    yield
+    # Shutdown event (currently no specific shutdown actions)
     pass
 
-def main():
-    pass
+app = FastAPI(lifespan=lifespan)
 
-if __name__ == "__main__":
-    main()
+app.include_router(router)
