@@ -14,7 +14,7 @@ class BlueViGptModel:
         hf_token = os.getenv("HF_TOKEN")
 
         if hf_token:
-            login(hf_token, add_to_git_credential=False)
+            login(hf_token)
         else:
             raise ValueError("HF_TOKEN environment variable is not set.")
 
