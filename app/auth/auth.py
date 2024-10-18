@@ -1,10 +1,24 @@
+import os
 from fastapi import HTTPException, Request
-from starlette.responses import JSONResponse
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file
+load_dotenv()
 
 class Auth:
     @staticmethod
-    def get_bearer_token(request: Request):
-        # Get Authorization header
+    def is_token_valid(request: Request):
+        """
+        Validates the token provided in the Authorization header.
+        Returns True if the token is valid, otherwise raises an HTTP 401 Unauthorized error.
+        """
+        if not isinstance(request, Request):
+            raise HTTPException(
+                status_code=400, 
+                detail="Invalid request object"
+            )
+
+        # Get the Authorization header
         authorization = request.headers.get("Authorization")
         if not authorization:
             # If Authorization header is missing, raise 401 Unauthorized
@@ -30,5 +44,27 @@ class Auth:
                 detail="Not authenticated: Token is missing"
             )
         
-        # If token is valid, return it (you could add validation logic here)
-        return token
+        # Validate the token using the JWT_TOKEN from the environment variables
+        if not Auth.validate_token(token):
+            # If token is invalid, raise 401 Unauthorized
+            raise HTTPException(
+                status_code=401, 
+                detail="Not authenticated: Invalid token"
+            )
+        
+        # If token is valid, return True
+        return True
+
+    #TODO: JWT
+    @staticmethod
+    def validate_token(token: str) -> bool:
+        """
+        Validate the token by comparing it with the BEARER_TOKEN from the environment.
+        """
+        # Get the JWT_TOKEN from environment variables
+        expected_token = os.getenv("BEARER_TOKEN")
+        
+        # Compare the incoming token with the expected token from .env
+        if token == expected_token:
+            return True
+        return False

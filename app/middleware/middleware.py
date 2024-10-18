@@ -7,8 +7,14 @@ from app.auth.auth import Auth
 
 class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        if request.url.path.startswith("/docs") or request.url.path.startswith("/redoc") or request.url.path.startswith("/openapi.json"):
+            response = await call_next(request)
+            return response
+        
         try:
-            token = Auth.get_bearer_token(request)
+            if not Auth.is_token_valid(request):
+                raise HTTPException(status_code=401, detail="Unauthorized access")
+            
             response = await call_next(request)
             return response
 
@@ -16,7 +22,7 @@ class CustomMiddleware(BaseHTTPMiddleware):
             if e.status_code == 401:
                 logging.warning(f"Unauthorized access attempt: {request.client}")
                 return JSONResponse(
-                    content={"detail": "Unauthorized"},
+                    content={"detail": "Unauthorized access"},
                     status_code=401
                 )
             raise e
