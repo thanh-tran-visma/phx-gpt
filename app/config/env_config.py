@@ -48,6 +48,6 @@ BEARER_TOKEN = EnvConfig.get("BEARER_TOKEN")
 
 DB_HOST = EnvConfig.get("DB_HOST", "localhost")
 DB_PORT = EnvConfig.get_int("DB_PORT", 3306)
-DB_DATABASE = EnvConfig.get("DB_DATABASE", "gpt_db")
-DB_USERNAME = EnvConfig.get("DB_USERNAME", "root")
+DB_DATABASE = EnvConfig.get("DB_DATABASE")
+DB_USERNAME = EnvConfig.get("DB_USERNAME")
 DB_PASSWORD = EnvConfig.get("DB_PASSWORD", "")
