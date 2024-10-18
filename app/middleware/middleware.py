@@ -8,6 +8,7 @@ from app.auth.auth import Auth
 class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         unauthorized_status_code = HTTPStatus.UNAUTHORIZED.value
+        internal_server_error_status_code = HTTPStatus.INTERNAL_SERVER_ERROR.value
         
         # Skip token validation for docs, redoc, and openapi.json
         if request.url.path.startswith("/docs") or request.url.path.startswith("/redoc") or request.url.path.startswith("/openapi.json"):
@@ -36,5 +37,5 @@ class CustomMiddleware(BaseHTTPMiddleware):
             logging.error(f"Unexpected error occurred: {str(e)}")
             return JSONResponse(
                 content={"detail": "Internal Server Error"},
-                status_code=500
+                status_code=internal_server_error_status_code
             )
