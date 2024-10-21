@@ -12,7 +12,8 @@ class Auth:
         """
         if not isinstance(request, Request):
             raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST.value, detail="Invalid request object"
+                status_code=HTTPStatus.BAD_REQUEST.value,
+                detail="Invalid request object",
             )
 
         # Get the Authorization header
@@ -36,11 +37,13 @@ class Auth:
         token = authorization.split("Bearer ")[1]
         if not token:
             raise HTTPException(
-                status_code=HTTPStatus.UNAUTHORIZED.value, detail="Not authenticated: Token is missing"
+                status_code=HTTPStatus.UNAUTHORIZED.value,
+                detail="Not authenticated: Token is missing",
             )
         if not Auth.validate_token(token):
             raise HTTPException(
-                status_code=HTTPStatus.UNAUTHORIZED.value, detail="Not authenticated: Invalid token"
+                status_code=HTTPStatus.UNAUTHORIZED.value,
+                detail="Not authenticated: Invalid token",
             )
 
         # If token is valid, return True
