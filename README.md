@@ -56,3 +56,19 @@ You will need a Hugging Face access token to run this project. You can get your 
     ```bash
     make tests
     ```
+
+
+## Linting
+
+To ensure code quality and adherence to style guidelines, we use `flake8` and `black`. Follow these steps to run the linters:
+
+1. **Run Flake8**:
+   `flake8` checks your code for style guide enforcement. To run `flake8`, execute the following command:
+    ```bash
+    make lint
+    ```
+
+2. **To format the code automatically, run**:
+    ```bash
+    make lint-fix
+    ```
