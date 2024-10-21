@@ -1,7 +1,6 @@
 from app.config.env_config import DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_DATABASE
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
 from .base import Base
 
 class Database:

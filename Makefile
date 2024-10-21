@@ -30,8 +30,3 @@ tests:
 clear-cache:
 	@echo "Removing cache..."
 	find . | grep -E "(__pycache__|\.pyc|\.pyo)" | xargs -r rm -rf
-
-# Migration command
-migrate:
-	export PYTHONPATH=$(pwd)
-	python app/database/migrate.py

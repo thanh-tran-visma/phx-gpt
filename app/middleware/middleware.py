@@ -8,15 +8,15 @@ from app.auth.auth import Auth
 class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Skip token validation for docs, redoc, and openapi.json
-        if request.url.path.startswith("/docs") or request.url.path.startswith("/redoc") or request.url.path.startswith("/openapi.json"):
+        if request.url.path.startswith(("/docs", "/redoc", "/openapi.json")):
             response = await call_next(request)
             return response
-        
+
         try:
             # Validate token
             if not Auth.is_token_valid(request):
                 raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED.value, detail="Unauthorized access")
-            
+
             # Proceed with the request
             response = await call_next(request)
             return response

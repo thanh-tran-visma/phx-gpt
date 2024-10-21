@@ -6,11 +6,11 @@ from contextlib import asynccontextmanager
 
 # Context manager to handle the lifespan (startup and shutdown)
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_app: FastAPI):
     # Startup event
-    blueViGpt = BlueViGptModel()
-    app.state.model = blueViGpt
-    blueViGpt.load_model()  # Load your model
+    blue_vi_gpt = BlueViGptModel()
+    app.state.model = blue_vi_gpt
+    blue_vi_gpt.load_model()  # Load your model
     yield
     # Shutdown event (currently no specific shutdown actions)
     pass

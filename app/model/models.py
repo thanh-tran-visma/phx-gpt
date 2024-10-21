@@ -3,41 +3,24 @@ from sqlalchemy.sql import func
 from app.database.base import Base
 from sqlalchemy.orm import relationship
 
-class User(Base):
-    __tablename__ = 'users'
-    
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    role = Column(Enum('user'), nullable=False)
-    created_at = Column(TIMESTAMP, default=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, default=func.current_timestamp(), onupdate=func.current_timestamp())
-
-class Gpt(Base):
-    __tablename__ = 'gpt'
-    
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    role = Column(Enum('gpt'), nullable=False)
-    created_at = Column(TIMESTAMP, default=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, default=func.current_timestamp(), onupdate=func.current_timestamp())
-
-class Content(Base):
-    __tablename__ = 'content'
-    
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    content = Column(Text, nullable=False)
-    created_at = Column(TIMESTAMP, default=func.current_timestamp())
-
 class Conversation(Base):
     __tablename__ = 'conversations'
-    
+
     id = Column(Integer, primary_key=True, autoincrement=True)
-    thread_id = Column(Integer, nullable=False)
-    sender_id = Column(Integer, ForeignKey('users.id'))
-    gpt_sender_id = Column(Integer, ForeignKey('gpt.id'))
-    content_id = Column(Integer, ForeignKey('content.id'))
+    user_id = Column(Integer, nullable=False)
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
     end_at = Column(TIMESTAMP, nullable=True)
 
-    # Relationships
-    sender = relationship("User", backref="conversations")
-    gpt_sender = relationship("Gpt", backref="conversations")
-    content = relationship("Content", backref="conversations")
+    messages = relationship("Message", back_populates="conversation")
+
+
+class Message(Base):
+    __tablename__ = 'messages'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    conversation_id = Column(Integer, ForeignKey('conversations.id'), nullable=False)
+    content = Column(Text, nullable=False)
+    message_type = Column(Enum('prompt', 'response'), nullable=False)
+    created_at = Column(TIMESTAMP, default=func.current_timestamp())
+
+    conversation = relationship("Conversation", back_populates="messages")

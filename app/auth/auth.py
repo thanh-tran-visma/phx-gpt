@@ -52,7 +52,6 @@ class Auth:
         # If token is valid, return True
         return True
 
-    #TODO: JWT
     @staticmethod
     def validate_token(token: str) -> bool:
         """
