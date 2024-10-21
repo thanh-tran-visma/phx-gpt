@@ -1,44 +1,40 @@
 from fastapi import Request, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 import logging
 from app.types.enum import HTTPStatus
 from app.auth.auth import Auth
+from typing import Callable
 
 
 class CustomMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Response]
+    ) -> Response:
         # Skip token validation for docs, redoc, and openapi.json
         if request.url.path.startswith(("/docs", "/redoc", "/openapi.json")):
-            response = await call_next(request)
-            return response
+            return call_next(request)
 
+        # Validate token
         try:
-            # Validate token
-            if not Auth.is_token_valid(request):
-                raise HTTPException(
-                    status_code=HTTPStatus.UNAUTHORIZED.value,
-                    detail="Unauthorized access",
-                )
-
-            # Proceed with the request
-            response = await call_next(request)
-            return response
-
+            Auth.is_token_valid(request)
         except HTTPException as e:
-            if e.status_code == HTTPStatus.UNAUTHORIZED.value:
-                logging.warning(
-                    f"Unauthorized access attempt: {request.client}"
-                )
-                return JSONResponse(
-                    content={"detail": "Unauthorized access"},
-                    status_code=HTTPStatus.UNAUTHORIZED.value,
-                )
-            raise e
-
+            logging.warning(
+                f"Unauthorized access attempt from {request.client} for {request.url.path}: {e.detail}"
+            )
+            return JSONResponse(
+                content={"detail": e.detail},
+                status_code=e.status_code,
+            )
         except Exception as e:
-            logging.error(f"Unexpected error occurred: {str(e)}")
+            logging.error(
+                f"Unexpected error occurred: {str(e)} at {request.url.path}"
+            )
             return JSONResponse(
                 content={"detail": "Internal Server Error"},
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
             )
+
+        # Proceed with the request if token is valid
+        response = call_next(request)
+        return response

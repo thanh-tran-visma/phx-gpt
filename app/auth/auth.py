@@ -1,5 +1,6 @@
 from fastapi import HTTPException, Request
 from app.config.env_config import BEARER_TOKEN
+from app.types.enum.http_status import HTTPStatus
 
 
 class Auth:
@@ -11,7 +12,7 @@ class Auth:
         """
         if not isinstance(request, Request):
             raise HTTPException(
-                status_code=400, detail="Invalid request object"
+                status_code=HTTPStatus.BAD_REQUEST.value, detail="Invalid request object"
             )
 
         # Get the Authorization header
@@ -19,31 +20,27 @@ class Auth:
         if not authorization:
             # If Authorization header is missing, raise 401 Unauthorized
             raise HTTPException(
-                status_code=401,
-                detail="Not authenticated: Missing Authorization header",
+                status_code=HTTPStatus.UNAUTHORIZED.value,
+                detail="Unauthenticated: Missing Authorization header",
             )
 
         # Extract the token from the "Bearer <token>" format
         if not authorization.startswith("Bearer "):
             # If it's not in the expected "Bearer <token>" format, raise 401
             raise HTTPException(
-                status_code=401,
+                status_code=HTTPStatus.UNAUTHORIZED.value,
                 detail="Not authenticated: Invalid Authorization format",
             )
 
         # Extract token part
         token = authorization.split("Bearer ")[1]
         if not token:
-            # If token is empty, raise 401
             raise HTTPException(
-                status_code=401, detail="Not authenticated: Token is missing"
+                status_code=HTTPStatus.UNAUTHORIZED.value, detail="Not authenticated: Token is missing"
             )
-
-        # Validate the token using the JWT_TOKEN from the environment variables
         if not Auth.validate_token(token):
-            # If token is invalid, raise 401 Unauthorized
             raise HTTPException(
-                status_code=401, detail="Not authenticated: Invalid token"
+                status_code=HTTPStatus.UNAUTHORIZED.value, detail="Not authenticated: Invalid token"
             )
 
         # If token is valid, return True

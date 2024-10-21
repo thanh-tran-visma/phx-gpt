@@ -7,10 +7,10 @@ from contextlib import asynccontextmanager
 
 # Context manager to handle the lifespan (startup and shutdown)
 @asynccontextmanager
-async def lifespan(_app: FastAPI):
+async def lifespan(_app_: FastAPI):
     # Startup event
     blue_vi_gpt = BlueViGptModel()
-    app.state.model = blue_vi_gpt
+    _app_.state.model = blue_vi_gpt
     blue_vi_gpt.load_model()  # Load your model
     yield
     # Shutdown event (currently no specific shutdown actions)
@@ -21,6 +21,7 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 # Add custom middleware
+# noinspection PyTypeChecker
 app.add_middleware(CustomMiddleware)
 
 # Include your app router
