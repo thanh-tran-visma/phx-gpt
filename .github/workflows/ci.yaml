@@ -27,12 +27,28 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run flake8
+  lint:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Flake8
         run: |
           echo "Running Flake8..."
           flake8 .  # Run flake8 on the project
 
-      - name: Run black (check mode)
+      - name: Run Black (check mode)
         run: |
           echo "Running Black..."
           black --check .  # Check for black formatting without applying changes
