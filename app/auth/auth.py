@@ -10,7 +10,9 @@ class Auth:
         Returns True if the token is valid, otherwise raises an HTTP 401 Unauthorized error.
         """
         if not isinstance(request, Request):
-            raise HTTPException(status_code=400, detail="Invalid request object")
+            raise HTTPException(
+                status_code=400, detail="Invalid request object"
+            )
 
         # Get the Authorization header
         authorization = request.headers.get("Authorization")

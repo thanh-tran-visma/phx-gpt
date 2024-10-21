@@ -151,7 +151,9 @@ class TestAnonymization:
         assert (
             "[ADDRESS_1]" in response or "10 Langelo" not in response
         ), "Test failed for Address."
-        assert "[ZIP_1]" in response or "7666MC" not in response, "Test failed for ZIP."
+        assert (
+            "[ZIP_1]" in response or "7666MC" not in response
+        ), "Test failed for ZIP."
         assert (
             "[MASTERCARD_1]" in response or "5258704108753590" not in response
         ), "Test failed for MasterCard."

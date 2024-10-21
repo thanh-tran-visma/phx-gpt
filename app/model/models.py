@@ -19,7 +19,9 @@ class Message(Base):
     __tablename__ = "messages"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    conversation_id = Column(Integer, ForeignKey("conversations.id"), nullable=False)
+    conversation_id = Column(
+        Integer, ForeignKey("conversations.id"), nullable=False
+    )
     content = Column(Text, nullable=False)
     message_type = Column(Enum("prompt", "response"), nullable=False)
     created_at = Column(TIMESTAMP, default=func.current_timestamp())

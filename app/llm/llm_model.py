@@ -15,12 +15,16 @@ class BlueViGptModel:
             raise ValueError("HF_TOKEN environment variable is not set.")
 
         llm = Llama.from_pretrained(
-            repo_id=MODEL_NAME, filename="unsloth.Q8_0.gguf", cache_dir=model_cache_dir
+            repo_id=MODEL_NAME,
+            filename="unsloth.Q8_0.gguf",
+            cache_dir=model_cache_dir,
         )
         return llm
 
     def get_response(self, conversation_history):
-        response = self.llm.create_chat_completion(messages=conversation_history)
+        response = self.llm.create_chat_completion(
+            messages=conversation_history
+        )
         if response.get("choices"):
             message_content = response["choices"][0]["message"]["content"]
             return message_content

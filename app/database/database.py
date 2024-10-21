@@ -31,10 +31,13 @@ class Database:
 
             print("Connected to MySQL database using SQLAlchemy")
 
-    def close(self):
+    @staticmethod
+    def close():
         """Close the database connection."""
         # No need to manage connection explicitly, as sessions are created and closed in execute_query
-        print("No direct connection to close. Session management is handled by execute_query.")
+        print(
+            "No direct connection to close. Session management is handled by execute_query."
+        )
 
     def execute_query(self, query, params=None):
         """Execute a SQL query and return the result."""

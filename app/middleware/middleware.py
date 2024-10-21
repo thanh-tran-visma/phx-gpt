@@ -27,7 +27,9 @@ class CustomMiddleware(BaseHTTPMiddleware):
 
         except HTTPException as e:
             if e.status_code == HTTPStatus.UNAUTHORIZED.value:
-                logging.warning(f"Unauthorized access attempt: {request.client}")
+                logging.warning(
+                    f"Unauthorized access attempt: {request.client}"
+                )
                 return JSONResponse(
                     content={"detail": "Unauthorized access"},
                     status_code=HTTPStatus.UNAUTHORIZED.value,

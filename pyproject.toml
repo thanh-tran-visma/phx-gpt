@@ -1,0 +1,6 @@
+[tool.black]
+skip-string-normalization = true
+exclude = '''
+/(env|.*\.ini|site-packages|migrations)/
+'''
+line-length = 79
