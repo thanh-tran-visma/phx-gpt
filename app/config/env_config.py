@@ -4,12 +4,13 @@ from dotenv import load_dotenv
 # Load environment variables only once
 load_dotenv()
 
+
 class EnvConfig:
     @staticmethod
     def get(key: str, default=None):
         """
         Retrieve the value of an environment variable.
-        
+
         :param key: The environment variable name.
         :param default: The default value if the environment variable is not found.
         :return: The value of the environment variable, or default if not found.
@@ -20,26 +21,31 @@ class EnvConfig:
     def get_int(key: str, default=None):
         """
         Retrieve the value of an environment variable and convert it to an integer.
-        
+
         :param key: The environment variable name.
         :param default: The default value if the environment variable is not found.
         :return: The integer value of the environment variable, or default if not found.
         """
-        return int(os.getenv(key, default)) if os.getenv(key, default) is not None else None
+        return (
+            int(os.getenv(key, default))
+            if os.getenv(key, default) is not None
+            else None
+        )
 
     @staticmethod
     def get_bool(key: str, default=False):
         """
         Retrieve the value of an environment variable and convert it to a boolean.
-        
+
         :param key: The environment variable name.
         :param default: The default value if the environment variable is not found.
         :return: The boolean value of the environment variable, or default if not found.
         """
         value = os.getenv(key, default)
         if isinstance(value, str):
-            return value.lower() in ['true', '1', 't', 'y', 'yes']
+            return value.lower() in ["true", "1", "t", "y", "yes"]
         return bool(value)
+
 
 HF_TOKEN = EnvConfig.get("HF_TOKEN")
 MODEL_NAME = EnvConfig.get("MODEL_NAME")

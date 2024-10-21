@@ -4,6 +4,7 @@ from app.llm.llm_model import BlueViGptModel
 from app.middleware.middleware import CustomMiddleware
 from contextlib import asynccontextmanager
 
+
 # Context manager to handle the lifespan (startup and shutdown)
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -14,6 +15,7 @@ async def lifespan(_app: FastAPI):
     yield
     # Shutdown event (currently no specific shutdown actions)
     pass
+
 
 # Create FastAPI app with lifespan context
 app = FastAPI(lifespan=lifespan)

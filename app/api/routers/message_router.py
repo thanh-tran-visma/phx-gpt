@@ -7,6 +7,7 @@ from app.schemas.message_schemas import MessageBase
 
 router = APIRouter()
 
+
 @router.get("/get-all-messages", response_model=List[MessageBase])
 async def get_all_content(db: Session = Depends(get_db)):
     contents = db.query(Message).all()

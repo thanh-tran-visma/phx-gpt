@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
+
 class MessageBase(BaseModel):
     id: int
     conversation_id: int
