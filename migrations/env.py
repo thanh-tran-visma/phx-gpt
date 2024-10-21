@@ -30,7 +30,7 @@ def get_database_url():
         raise ValueError("One or more required environment variables are missing")
 
     try:
-        db_port = int(db_port)  # Ensure DB_PORT is converted to an integer
+        db_port = int(db_port)
     except ValueError:
         raise ValueError(f"Invalid DB_PORT value: {db_port}")
 
