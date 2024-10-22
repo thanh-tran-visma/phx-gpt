@@ -18,3 +18,5 @@ infrastructure/docker/Dockerfile
 docker-compose*.y*ml
 
 **/*.md
+
+*.json

@@ -14,6 +14,7 @@ services:
       - gpt_mysql
     networks:
       - internal
+      - dotweb.test
     environment:
       - HF_TOKEN=${HF_TOKEN}
       - MODEL_NAME=${MODEL_NAME}
@@ -23,7 +24,6 @@ services:
       - DB_USERNAME=gpt_user
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_PORT=3306         
-
 
   nginx:
     container_name: gpt_web
