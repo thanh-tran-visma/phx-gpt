@@ -10,3 +10,8 @@ router.include_router(
     conversation_router, prefix="/conversations", tags=["conversations"]
 )
 router.include_router(chat_router, prefix="/chat", tags=["chat"])
+
+
+@router.get("/health")
+async def health_check():
+    return {"status": "ok"}

@@ -11,19 +11,13 @@ class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Response]
     ) -> Response:
-        # Skip token validation for docs, redoc, openapi.json, and health checks
-        if request.url.path.startswith(
-            ("/docs", "/redoc", "/openapi.json")
-        ):
+
+        if request.url.path.startswith(("/docs", "/redoc", "/openapi.json")):
             return await call_next(request)
 
-        # Validate token
         try:
             Auth.is_token_valid(request)
         except HTTPException as e:
-            logging.warning(
-                f"Unauthorized access attempt from {request.client} for {request.url.path}: {e.detail}"
-            )
             return JSONResponse(
                 content={"detail": e.detail},
                 status_code=e.status_code,
@@ -37,6 +31,5 @@ class CustomMiddleware(BaseHTTPMiddleware):
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
             )
 
-        # Proceed with the request if token is valid
         response = await call_next(request)
         return response

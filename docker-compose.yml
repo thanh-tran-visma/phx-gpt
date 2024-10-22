@@ -22,7 +22,7 @@ services:
       - BEARER_TOKEN=${BEARER_TOKEN}
       - DB_HOST=gpt_mysql  
       - DB_DATABASE=${DB_DATABASE}
-      - DB_USERNAME=root
+      - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_PORT=${DB_PORT}
 

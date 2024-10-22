@@ -1,3 +1,4 @@
+import logging
 from fastapi import HTTPException, Request
 from app.config.config_env import BEARER_TOKEN
 from app.types.enum.http_status import HTTPStatus
@@ -18,8 +19,8 @@ class Auth:
 
         # Get the Authorization header
         authorization = request.headers.get("Authorization")
+
         if not authorization:
-            # If Authorization header is missing, raise 401 Unauthorized
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED.value,
                 detail="Unauthenticated: Missing Authorization header",
@@ -27,7 +28,6 @@ class Auth:
 
         # Extract the token from the "Bearer <token>" format
         if not authorization.startswith("Bearer "):
-            # If it's not in the expected "Bearer <token>" format, raise 401
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED.value,
                 detail="Not authenticated: Invalid Authorization format",
@@ -35,11 +35,13 @@ class Auth:
 
         # Extract token part
         token = authorization.split("Bearer ")[1]
+
         if not token:
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED.value,
                 detail="Not authenticated: Token is missing",
             )
+
         if not Auth.validate_token(token):
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED.value,
