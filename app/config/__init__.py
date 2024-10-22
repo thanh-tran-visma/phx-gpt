@@ -1,4 +1,4 @@
-from .env_config import (
+from .config_env import (
     HF_TOKEN,
     HF_TOKEN,
     MODEL_NAME,

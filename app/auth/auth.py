@@ -1,5 +1,5 @@
 from fastapi import HTTPException, Request
-from app.config.env_config import BEARER_TOKEN
+from app.config.config_env import BEARER_TOKEN
 from app.types.enum.http_status import HTTPStatus
 
 

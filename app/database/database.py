@@ -1,4 +1,4 @@
-from app.config.env_config import (
+from app.config.config_env import (
     DB_USERNAME,
     DB_PASSWORD,
     DB_HOST,

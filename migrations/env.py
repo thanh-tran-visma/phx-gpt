@@ -3,7 +3,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 from app.model.models import *
-from app.config.env_config import DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
+from app.config.config_env import DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
 
 
 # Set the Alembic Config object

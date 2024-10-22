@@ -1,6 +1,6 @@
 from llama_cpp import Llama
 from huggingface_hub import login
-from app.config.env_config import MODEL_NAME, HF_TOKEN
+from app.config.config_env import MODEL_NAME, HF_TOKEN
 
 
 class BlueViGptModel:
