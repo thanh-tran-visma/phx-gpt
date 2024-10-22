@@ -68,7 +68,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install testing dependencies
-        run: pip install pytest
+        run: pip install pytest llama_cpp fastapi
 
       - name: Set environment variables
         run: |
