@@ -11,9 +11,9 @@ class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Response]
     ) -> Response:
-        # Skip token validation for docs, redoc, and openapi.json
-        if request.url.path.startswith(("/docs", "/redoc", "/openapi.json")):
-            return call_next(request)
+        # Skip token validation for docs, redoc, openapi.json, and health checks
+        if request.url.path.startswith(("/docs", "/redoc", "/openapi.json", "/health")):
+            return await call_next(request)
 
         # Validate token
         try:
@@ -36,5 +36,5 @@ class CustomMiddleware(BaseHTTPMiddleware):
             )
 
         # Proceed with the request if token is valid
-        response = call_next(request)
+        response = await call_next(request)
         return response
