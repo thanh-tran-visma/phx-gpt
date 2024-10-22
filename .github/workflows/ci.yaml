@@ -68,7 +68,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install fastapi pytest huggingface-hub llama-cpp-python
+        run: pip install fastapi pytest huggingface-hub llama-cpp-python httpx
 
       - name: Set environment variables
         run: |
