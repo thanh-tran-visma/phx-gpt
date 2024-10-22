@@ -31,25 +31,27 @@ You will need a Hugging Face access token to run this project. You can get your 
     ```
 
 4. **Add the Database Host to `/etc/hosts`**:
-    Add the following line to your `/etc/hosts` file (Linux/MAC) or `C:\Windows\System32\drivers\etc\hosts` (Windows):
+    * Add the following line to your `/etc/hosts` file (Linux/MAC) or `C:\Windows\System32\drivers\etc\hosts` (Windows):
     ```bash
     127.0.0.1 gpt.dotweb.test
     127.0.0.1 gpt_db.dotweb.test
     ```
-
+   
 5. **Build docker containers**:
-    We need to use port 445 as well as port 3308 for db, so we will not have conflicts with the DWC-PHX application
+    * We need to use port 445 as well as port 3308 for db, so we will not have conflicts with the DWC-PHX application
     ```bash
     docker compose build
     ```
-
+   
 6. **Migration**:
+    * Create a new database migration script
     ```bash
-    alembic upgrade head
+    alembic revision --autogenerate -m "init-db"
     ```
-    FOR UPDATING DATABASE
-    ```bash
-    alembic revision --autogenerate -m "your-message"
+   
+   * Run migration
+   ```bash
+    alembic upgrade head
     ```
 7. **Run the Tests**:
     Run the tests to verify everything is working:
@@ -62,7 +64,7 @@ You will need a Hugging Face access token to run this project. You can get your 
 To ensure code quality and adherence to style guidelines, we use `flake8` and `black`. Follow these steps to run the linters:
 
 1. **Run Flake8**:
-   `flake8` checks your code for style guide enforcement. To run `flake8`, execute the following command:
+   * `flake8` checks your code for style guide enforcement. To run `flake8`, execute the following command:
     ```bash
     make lint
     ```

@@ -19,11 +19,12 @@ services:
       - HF_TOKEN=${HF_TOKEN}
       - MODEL_NAME=${MODEL_NAME}
       - BLUEVI_GPT=${BLUEVI_GPT}
+      - BEARER_TOKEN=${BEARER_TOKEN}
       - DB_HOST=gpt_mysql  
       - DB_DATABASE=${DB_DATABASE}
-      - DB_USERNAME=gpt_user
+      - DB_USERNAME=root
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_PORT=3306         
+      - DB_PORT=${DB_PORT}
 
   nginx:
     container_name: gpt_web

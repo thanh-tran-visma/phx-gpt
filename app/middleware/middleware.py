@@ -13,7 +13,7 @@ class CustomMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         # Skip token validation for docs, redoc, openapi.json, and health checks
         if request.url.path.startswith(
-            ("/docs", "/redoc", "/openapi.json", "/health")
+            ("/docs", "/redoc", "/openapi.json")
         ):
             return await call_next(request)
 

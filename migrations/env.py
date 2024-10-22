@@ -36,7 +36,7 @@ def get_database_url():
     except ValueError:
         raise ValueError(f"Invalid DB_PORT value: {db_port}")
 
-    return f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{db_port}/{DB_DATABASE}”"
+    return f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{db_port}/{DB_DATABASE}"
 
 # Set SQLAlchemy connection URL dynamically using environment variables
 config.set_section_option("alembic", "sqlalchemy.url", get_database_url())
