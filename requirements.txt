@@ -1,20 +1,19 @@
 uvicorn[standard]
-fastapi[all]~=0.115.2
+fastapi[all] ~= 0.115.2
 llama-cpp-python
-python-dotenv~=1.0.1
-pytest~=8.3.3
+python-dotenv ~= 1.0.1
+pytest ~= 8.3.3
 datasets
 httpx
 gunicorn
 huggingface_hub
-sqlalchemy~=2.0.36
+sqlalchemy ~= 2.0.36
 pymysql
 mysql-connector-python
-alembic~=1.13.3
+alembic ~= 1.13.3
 pytest-mock
-huggingface-hub~=0.26.0
-pydantic~=2.9.2
-starlette~=0.40.0
+huggingface-hub ~= 0.26.0
+pydantic ~= 2.9.2
+starlette ~= 0.40.0
 flake8
 black
-starlette
