@@ -30,20 +30,20 @@ You will need a Hugging Face access token to run this project. You can get your 
     vim .env
     ```
 
-5. **Add the Database Host to `/etc/hosts`**:
+4. **Add the Database Host to `/etc/hosts`**:
     Add the following line to your `/etc/hosts` file (Linux/MAC) or `C:\Windows\System32\drivers\etc\hosts` (Windows):
     ```bash
     127.0.0.1 gpt.dotweb.test
     127.0.0.1 gpt_db.dotweb.test
     ```
 
-6. **Build docker containers**:
+5. **Build docker containers**:
     We need to use port 445 as well as port 3308 for db, so we will not have conflicts with the DWC-PHX application
     ```bash
     docker compose build
     ```
 
-7. **Migration**:
+6. **Migration**:
     ```bash
     alembic upgrade head
     ```
@@ -51,12 +51,11 @@ You will need a Hugging Face access token to run this project. You can get your 
     ```bash
     alembic revision --autogenerate -m "your-message"
     ```
-8. **Run the Tests**:
+7. **Run the Tests**:
     Run the tests to verify everything is working:
     ```bash
     make tests
     ```
-
 
 ## Linting
 
