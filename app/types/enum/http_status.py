@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class HTTPStatus(Enum):
     OK = 200
     CREATED = 201

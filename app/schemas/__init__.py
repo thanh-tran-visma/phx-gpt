@@ -1,4 +1,2 @@
-from .user_schemas import UserBase
-from .gpt_schemas import GptBase
-from .content_schemas import ContentBase
+from .message_schemas import MessageBase
 from .conversation_schemas import ConversationBase
