@@ -127,15 +127,7 @@ class TestAnonymization:
 
     def test_get_anonymized_multiple_fields(self, blue_vi_gpt_model):
         user_message = (
-            "John Doe's email is J.Simpson@netwrix.com. "
-            "His BSN is 123456789. "
-            "His home address is 10 Langelo. "
-            "His ZIP code is 7666MC. "
-            "His MasterCard number is 5258704108753590. "
-            "His Visa number is 4563-7568-5698-4587. "
-            "His IBAN number is NL91ABNA0417164300. "
-            "His date of birth is 01/01/1990. "
-            "His IP address is 192.168.1.1."
+            "John Doe's email is J.Simpson@netwrix.com. His BSN is 123456789. His home address is 10 Langelo. His ZIP code is 7666MC. His MasterCard number is 5258704108753590. His Visa number is 4563-7568-5698-4587. His IBAN number is NL91ABNA0417164300. His date of birth is 01/01/1990. His IP address is 192.168.1.1."
         )
         response = blue_vi_gpt_model.get_anonymized_message(user_message)
         assert (
