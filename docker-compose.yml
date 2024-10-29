@@ -19,6 +19,7 @@ services:
       - HF_TOKEN=${HF_TOKEN}
       - MODEL_NAME=${MODEL_NAME}
       - BLUEVI_GPT=${BLUEVI_GPT}
+      - GGUF_MODEL=${GGUF_MODEL}
       - BEARER_TOKEN=${BEARER_TOKEN}
       - DB_HOST=gpt_mysql  
       - DB_DATABASE=${DB_DATABASE}
