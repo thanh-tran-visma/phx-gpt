@@ -36,6 +36,7 @@ jobs:
             --target app \
             --secret id=hf_token,src=hf_token \
             --secret id=model_name,src=model_name \
+            --secret id=gguf_model,src=gguf_model \
             --tag gpt_python_local:latest \
             .
 
