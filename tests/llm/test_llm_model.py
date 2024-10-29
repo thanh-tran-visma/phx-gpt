@@ -1,7 +1,7 @@
 from unittest.mock import patch, MagicMock
 import pytest
 from app.llm import BlueViGptModel
-from app.config.config_env import GGUF_MODEL
+from app.config.config_env import GGUF_MODEL, MODEL_NAME
 
 
 @pytest.fixture(scope="class")
@@ -11,18 +11,16 @@ def blue_vi_gpt_model():
 
 # Mock test for loading the model
 @patch("llama_cpp.Llama.from_pretrained")
-def test_load_model(mock_from_pretrained, blue_vi_gpt_model, monkeypatch):
-    monkeypatch.setenv("MODEL_NAME", "test_model")
+def test_load_model(mock_from_pretrained, blue_vi_gpt_model):
     mock_model = MagicMock()
     mock_from_pretrained.return_value = mock_model
-
     test_model = blue_vi_gpt_model.load_model()
 
     assert test_model == mock_model
     # Check only relevant arguments
     mock_from_pretrained.assert_called_once()
     called_args, called_kwargs = mock_from_pretrained.call_args
-    assert called_kwargs["repo_id"] == "test_model"
+    assert called_kwargs["repo_id"] == MODEL_NAME
     assert called_kwargs["filename"] == GGUF_MODEL
 
 
