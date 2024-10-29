@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from app.types.enum import HTTPStatus
 import gc
+from app.types.llm_types import Message
 
 router = APIRouter()
 
@@ -22,11 +23,13 @@ async def chat_endpoint(request: Request):
                 content={"response": "No input provided."},
             )
 
-        conversation_history = [{"role": "user", "content": prompt}]
+        # Create conversation history using Message instances
+        conversation_history = [Message(role="user", content=prompt)]
         bot_response = blue_vi_gpt_model.get_response(conversation_history)
 
         return JSONResponse(
-            status_code=HTTPStatus.OK.value, content={"response": bot_response}
+            status_code=HTTPStatus.OK.value,
+            content={"response": bot_response.content},
         )
 
     except Exception as e:
