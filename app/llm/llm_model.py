@@ -1,7 +1,7 @@
 import logging
 from llama_cpp import Llama
 from huggingface_hub import login
-from app.config.config_env import MODEL_NAME, HF_TOKEN
+from app.config.config_env import MODEL_NAME, HF_TOKEN, GGUF_MODEL
 
 
 class BlueViGptModel:
@@ -18,7 +18,7 @@ class BlueViGptModel:
 
         llm = Llama.from_pretrained(
             repo_id=MODEL_NAME,
-            filename="unsloth.Q4_K_M.gguf",
+            filename=GGUF_MODEL,
             cache_dir=model_cache_dir,
         )
         return llm

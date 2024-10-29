@@ -1,6 +1,7 @@
 from unittest.mock import patch, MagicMock
 import pytest
 from app.llm import BlueViGptModel
+from app.config.config_env import GGUF_MODEL
 
 
 @pytest.fixture(scope="class")
@@ -22,7 +23,7 @@ def test_load_model(mock_from_pretrained, blue_vi_gpt_model, monkeypatch):
     mock_from_pretrained.assert_called_once()
     called_args, called_kwargs = mock_from_pretrained.call_args
     assert called_kwargs["repo_id"] == "test_model"
-    assert called_kwargs["filename"] == "unsloth.Q8_0.gguf"
+    assert called_kwargs["filename"] == GGUF_MODEL
 
 
 class TestGetResponse:
@@ -35,7 +36,7 @@ class TestGetResponse:
         ), "Model failed to return a valid response"
 
     def test_get_response_with_blue_vi_answer(self, blue_vi_gpt_model):
-        user_message = "What is your name? Who created you?"
+        user_message = "You are blueVi-GPT. what is your name?"
         messages = [{"role": "user", "content": user_message}]
         response = blue_vi_gpt_model.get_response(messages)
         # Assert that the response contains references to "blueVi", "blueVi-GPT", or "Visma Verzuim"
