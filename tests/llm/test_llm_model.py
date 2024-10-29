@@ -34,7 +34,7 @@ class TestGetResponse:
         ), "Model failed to return a valid response"
 
     def test_get_response_with_blue_vi_answer(self, blue_vi_gpt_model):
-        user_message = "You are blueVi-GPT. what is your name?"
+        user_message = "who are you?"
         messages = [{"role": "user", "content": user_message}]
         response = blue_vi_gpt_model.get_response(messages)
         # Assert that the response contains references to "blueVi", "blueVi-GPT", or "Visma Verzuim"
