@@ -27,6 +27,33 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+  lint:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+
+      - name: Install linting dependencies
+        run: pip install flake8 black
+
+      - name: Run Flake8
+        run: |
+          echo "Running Flake8..."
+          flake8 .
+
+      - name: Run Black (check mode)
+        run: |
+          echo "Running Black..."
+          black --check .
+
+
   test:
     runs-on: ubuntu-latest
     needs: build
@@ -48,6 +75,7 @@ jobs:
           echo "MODEL_NAME=${{ secrets.MODEL_NAME }}" >> $GITHUB_ENV
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> $GITHUB_ENV
           echo "BEARER_TOKEN=${{ secrets.BEARER_TOKEN }}" >> $GITHUB_ENV
+          echo "GGUF_MODEL=${{ secrets.GGUF_MODEL }}" >> $GITHUB_ENV
 
       - name: Run unit tests
         run: python -m pytest tests/

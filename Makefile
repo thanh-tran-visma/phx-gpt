@@ -1,4 +1,4 @@
-.PHONY: venv install dev tests docker-remove clear-cache migrate
+.PHONY: venv install dev tests docker-remove clear-cache lint
 
 # Define the virtual environment directory
 VENV_DIR=env
@@ -31,7 +31,12 @@ clear-cache:
 	@echo "Removing cache..."
 	find . | grep -E "(__pycache__|\.pyc|\.pyo)" | xargs -r rm -rf
 
-# Migration command
-migrate:
-	export PYTHONPATH=$(pwd)
-	python app/database/migrate.py
+# Lint the project using flake8
+lint:
+	@echo "Running Flake8 linter..."
+	@$(VENV_DIR)/bin/flake8 .
+
+# Automatically fix linting issues using black
+lint-fix:
+	@echo "Fixing linting issues with black..."
+	@$(VENV_DIR)/bin/black .

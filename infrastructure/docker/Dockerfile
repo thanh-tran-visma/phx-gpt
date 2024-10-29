@@ -1,19 +1,24 @@
-# Stage 1: Build bluevi-gpt app
 FROM python:3.11-slim AS app
-USER root
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     git \
     curl \
+    python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /app
-# Copy requirements and install dependencies
+
+# Create a virtual environment
+RUN python -m venv /opt/venv
+
+# Install dependencies in the virtual environment
+RUN /opt/venv/bin/pip install --upgrade pip
 COPY requirements.txt .
-RUN pip install --no-cache-dir --default-timeout=100 -r requirements.txt
+RUN /opt/venv/bin/pip install --no-cache-dir --default-timeout=100 -r requirements.txt
 
 # Remove cache
 RUN find . | grep -E "(__pycache__|\.pyc|\.pyo)" | xargs -r rm -rf
@@ -24,9 +29,11 @@ COPY . .
 # Load and download the model using secrets for HF_TOKEN and MODEL_NAME
 RUN --mount=type=secret,id=hf_token \
     --mount=type=secret,id=model_name \
+    --mount=type=secret,id=gguf_model \
     bash -c "HF_TOKEN=$(cat /run/secrets/hf_token) \
     MODEL_NAME=$(cat /run/secrets/model_name) \
-    python -c 'from app.llm.llm_model import BlueViGptModel; BlueViGptModel().load_model()'"
+    GGUF_MODEL=$(cat /run/secrets/gguf_model) \
+    /opt/venv/bin/python -c 'from app.llm.llm_model import BlueViGptModel; BlueViGptModel().load_model()'"
 
-# Command to run the application
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "-b", "0.0.0.0:8000"]
+# Command to run the application using the virtual environment
+CMD ["/opt/venv/bin/gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "-b", "0.0.0.0:8000"]

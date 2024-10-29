@@ -1,57 +1,84 @@
-import os
-from llama_cpp import Llama
-from dotenv import load_dotenv
+import logging
+from llama_cpp import Llama, ChatCompletionRequestUserMessage
 from huggingface_hub import login
+from app.config.config_env import MODEL_NAME, HF_TOKEN, GGUF_MODEL
+from app.types.llm_types import Message, Response
+from typing import List
+
 
 class BlueViGptModel:
     def __init__(self):
-        load_dotenv()
         self.llm = self.load_model()
 
-    def load_model(self):
-        model_name = os.getenv("MODEL_NAME")
-        model_cache_dir =  "./model_cache"
-        hf_token = os.getenv("HF_TOKEN")
-
-        if hf_token:
-            login(hf_token)
+    @staticmethod
+    def load_model():
+        model_cache_dir = "./model_cache"
+        if HF_TOKEN:
+            login(HF_TOKEN)
         else:
             raise ValueError("HF_TOKEN environment variable is not set.")
 
         llm = Llama.from_pretrained(
-            repo_id=model_name,
-            filename="unsloth.Q8_0.gguf",
-            cache_dir=model_cache_dir
+            repo_id=MODEL_NAME,
+            filename=GGUF_MODEL,
+            cache_dir=model_cache_dir,
         )
-        return llm 
+        return llm
 
-    def get_response(self, conversation_history):
-            response = self.llm.create_chat_completion(
-                messages=conversation_history
-            )
-            if response.get('choices'):
-                message_content = response['choices'][0]['message']['content']
-                return message_content
-            else:
-                return "Sorry, I couldn't generate a response."
-
-    def get_anonymized_message(self, user_message):
-        instruction = (
-            "Anonymize the data:\n"
-            f"{user_message}\n"
-        )
-
-        response = self.llm.create_chat_completion(
-            messages=[
-                {
-                    "role": "user",
-                    "content": instruction
-                }
+    def get_response(self, conversation_history: List[Message]) -> Response:
+        try:
+            # Create messages in the required format
+            mapped_messages: List[ChatCompletionRequestUserMessage] = [
+                ChatCompletionRequestUserMessage(
+                    role="user", content=msg.content
+                )  # Use "user" as a literal
+                for msg in conversation_history
             ]
-        )
 
-        if response.get('choices'):
-            message_content = response['choices'][0]['message']['content']
-            return message_content
-        else:
-            return "Sorry, I couldn't generate an anonymized response.", 0, 0
+            response = self.llm.create_chat_completion(
+                messages=mapped_messages
+            )
+
+            choices = response.get("choices")
+            if isinstance(choices, list) and len(choices) > 0:
+                message_content = choices[0]["message"]["content"]
+                return Response(content=message_content)
+
+            else:
+                return Response("Sorry, I couldn't generate a response.")
+
+        except Exception as e:
+            logging.error(f"Error generating response: {e}")
+            return Response(
+                "Sorry, an error occurred while generating a response."
+            )
+
+    def get_anonymized_message(self, user_message: str) -> Response:
+        instruction = f"Anonymize the data:\n{user_message}\n"
+
+        try:
+            response = self.llm.create_chat_completion(
+                messages=[
+                    ChatCompletionRequestUserMessage(
+                        role="user", content=instruction
+                    )
+                ]  # Use "user" as a literal
+            )
+            choices = response.get("choices")
+            if isinstance(choices, list) and len(choices) > 0:
+                message_content = choices[0]["message"]["content"]
+                return Response(content=message_content)
+            else:
+                return Response(
+                    "Sorry, I couldn't generate an anonymized response.",
+                    0,
+                    0,
+                )
+
+        except Exception as e:
+            logging.error(f"Error generating anonymized message: {e}")
+            return Response(
+                "Sorry, an error occurred while generating an anonymized response.",
+                0,
+                0,
+            )

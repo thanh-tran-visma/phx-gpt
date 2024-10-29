@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from app.auth.auth import Auth
-from app.api import HTTPStatus
+from app.types.enum import HTTPStatus
 import gc
+from app.types.llm_types import Message
 
 router = APIRouter()
 
+
 # Chat endpoint
-@router.post("/chat")
-async def chat_endpoint(request: Request, token: str = Depends(Auth.get_bearer_token)):
+@router.post("/")
+async def chat_endpoint(request: Request):
     blue_vi_gpt_model = request.app.state.model
     prompt = None
 
@@ -19,23 +20,22 @@ async def chat_endpoint(request: Request, token: str = Depends(Auth.get_bearer_t
         if not prompt:
             return JSONResponse(
                 status_code=HTTPStatus.BAD_REQUEST.value,
-                content={"response": "No input provided."}
+                content={"response": "No input provided."},
             )
 
-        conversation_history = [
-            {"role": "user", "content": prompt}
-        ]
+        # Create conversation history using Message instances
+        conversation_history = [Message(role="user", content=prompt)]
         bot_response = blue_vi_gpt_model.get_response(conversation_history)
 
         return JSONResponse(
             status_code=HTTPStatus.OK.value,
-            content={"response": bot_response}
+            content={"response": bot_response.content},
         )
 
     except Exception as e:
         return JSONResponse(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-            content={"response": f"An error occurred: {str(e)}"}
+            content={"response": f"An error occurred: {str(e)}"},
         )
 
     finally:

@@ -26,6 +26,7 @@ jobs:
         run: |
           echo "${{ secrets.HF_TOKEN }}" > hf_token
           echo "${{ secrets.MODEL_NAME }}" > model_name
+          echo "${{ secrets.GGUF_MODEL }}" > gguf_model
 
       # Build the Docker image with secrets
       - name: Build Docker image
@@ -35,10 +36,11 @@ jobs:
             --target app \
             --secret id=hf_token,src=hf_token \
             --secret id=model_name,src=model_name \
+            --secret id=gguf_model,src=gguf_model \
             --tag gpt_python_local:latest \
             .
 
       # Clean up secret files
       - name: Clean up secret files
         run: |
-          rm -f hf_token model_name
+          rm -f hf_token model_name gguf_model

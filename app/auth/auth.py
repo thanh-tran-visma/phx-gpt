@@ -1,35 +1,60 @@
-import os
-from fastapi import Request, HTTPException
-from app.api import HTTPStatus
+from fastapi import HTTPException, Request
+from app.config.config_env import BEARER_TOKEN
+from app.types.enum.http_status import HTTPStatus
+
 
 class Auth:
     @staticmethod
-    def get_bearer_token(request: Request):
-        expected_token = os.getenv("BEARER_TOKEN")
-        
-        # Ensure the expected token is set
-        if expected_token is None:
+    def is_token_valid(request: Request):
+        """
+        Validates the token provided in the Authorization header.
+        Returns True if the token is valid, otherwise raises an HTTP 401 Unauthorized error.
+        """
+        if not isinstance(request, Request):
             raise HTTPException(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-                detail="Not authenticated"
+                status_code=HTTPStatus.BAD_REQUEST.value,
+                detail="Invalid request object",
             )
-        
-        auth_header = request.headers.get("Authorization")
-        
-        # If Authorization header is missing or not a Bearer token, raise 401 Unauthorized
-        if not auth_header or not auth_header.startswith("Bearer "):
+
+        # Get the Authorization header
+        authorization = request.headers.get("Authorization")
+
+        if not authorization:
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED.value,
-                detail="Not authenticated"
+                detail="Unauthenticated: Missing Authorization header",
             )
-        
-        token = auth_header.split("Bearer ")[1]
-        
-        # If token does not match the expected token, raise 403 Forbidden
-        if token != expected_token:
+
+        # Extract the token from the "Bearer <token>" format
+        if not authorization.startswith("Bearer "):
             raise HTTPException(
-                status_code=HTTPStatus.FORBIDDEN.value,
-                detail="Not authenticated"
+                status_code=HTTPStatus.UNAUTHORIZED.value,
+                detail="Not authenticated: Invalid Authorization format",
             )
-        
-        return token
+
+        # Extract token part
+        token = authorization.split("Bearer ")[1]
+
+        if not token:
+            raise HTTPException(
+                status_code=HTTPStatus.UNAUTHORIZED.value,
+                detail="Not authenticated: Token is missing",
+            )
+
+        if not Auth.validate_token(token):
+            raise HTTPException(
+                status_code=HTTPStatus.UNAUTHORIZED.value,
+                detail="Not authenticated: Invalid token",
+            )
+
+        # If token is valid, return True
+        return True
+
+    @staticmethod
+    def validate_token(token: str) -> bool:
+        """
+        Validate the token by comparing it with the BEARER_TOKEN from the environment.
+        """
+        if token == BEARER_TOKEN:
+            return True
+        return False

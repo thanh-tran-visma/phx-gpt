@@ -1,50 +1,49 @@
 from dotenv import load_dotenv
-load_dotenv()
-
-import os
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 from alembic import context
-from app.database.base import Base
+from app.model.models import *
+from app.config.config_env import DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
 
-# This is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
+
+# Set the Alembic Config object
 config = context.config
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
+
+# Interpret the config file for Python logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Add your model's MetaData object here for 'autogenerate' support
-# This ensures that Alembic has access to your models' metadata for autogeneration
-target_metadata = Base.metadata 
+target_metadata = Base.metadata
 
 # Fetching the database URL from environment variables
-# (You can also use a library like `dotenv` to load these variables from a `.env` file)
 def get_database_url():
-    db_username = os.getenv("DB_USERNAME")
-    db_password = os.getenv("DB_PASSWORD")
-    db_host = os.getenv("DB_HOST")
-    db_port = os.getenv("DB_PORT")  # Removed the default value
-    db_name = os.getenv("DB_DATABASE")
+    if (
+        not DB_USERNAME
+        or not DB_PASSWORD
+        or not DB_HOST
+        or not DB_DATABASE
+    ):
+        raise ValueError(
+            "One or more required environment variables are missing"
+        )
 
-    if not db_username or not db_password or not db_host or not db_port or not db_name:
-        raise ValueError("One or more required environment variables are missing")
+    # Use default port 3306 if DB_PORT is not provided
+    db_port = DB_PORT if DB_PORT else 3306
 
     try:
-        db_port = int(db_port)  # Ensure DB_PORT is converted to an integer
+        db_port = int(db_port)
     except ValueError:
         raise ValueError(f"Invalid DB_PORT value: {db_port}")
 
-    return f"mysql+mysqlconnector://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}"
+    return f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{db_port}/{DB_DATABASE}"
 
 # Set SQLAlchemy connection URL dynamically using environment variables
-config.set_section_option('alembic', 'sqlalchemy.url', get_database_url())
+config.set_section_option("alembic", "sqlalchemy.url", get_database_url())
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
-    url = get_database_url()  # Fetch the URL from environment variables
+    url = get_database_url()
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -63,7 +62,6 @@ def run_migrations_online() -> None:
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
-
     with connectable.connect() as connection:
         context.configure(
             connection=connection, target_metadata=target_metadata
@@ -71,7 +69,6 @@ def run_migrations_online() -> None:
 
         with context.begin_transaction():
             context.run_migrations()
-
 
 if context.is_offline_mode():
     run_migrations_offline()

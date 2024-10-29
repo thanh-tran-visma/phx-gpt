@@ -1,0 +1,3 @@
+[flake8]
+ignore = E501, W503
+exclude = env, model_cache, **/__init__.py, migrations
