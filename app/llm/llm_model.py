@@ -31,7 +31,7 @@ class BlueViGptModel:
             mapped_messages: List[ChatCompletionRequestUserMessage] = [
                 ChatCompletionRequestUserMessage(
                     role="user", content=msg.content
-                )  # Use "user" as a literal
+                )
                 for msg in conversation_history
             ]
 
@@ -62,7 +62,7 @@ class BlueViGptModel:
                     ChatCompletionRequestUserMessage(
                         role="user", content=instruction
                     )
-                ]  # Use "user" as a literal
+                ]
             )
             choices = response.get("choices")
             if isinstance(choices, list) and len(choices) > 0:
