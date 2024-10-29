@@ -3,7 +3,7 @@ from llama_cpp import Llama, ChatCompletionRequestUserMessage
 from huggingface_hub import login
 from app.config.config_env import MODEL_NAME, HF_TOKEN, GGUF_MODEL
 from app.types.llm_types import Message, Response
-from typing import List, Union
+from typing import List
 
 
 class BlueViGptModel:
