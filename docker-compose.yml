@@ -9,6 +9,7 @@ services:
       secrets:
         - hf_token
         - model_name
+        - gguf_model
     restart: on-failure
     depends_on:
       - gpt_mysql
