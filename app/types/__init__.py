@@ -1,2 +1,3 @@
 from .dataset import DatasetEntry
-from .llm_types import Message, Response
+from .llm_user import Prompt
+from .llm_assistant import Response

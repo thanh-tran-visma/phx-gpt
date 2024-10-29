@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from app.types.enum import HTTPStatus
 import gc
-from app.types.llm_types import Message
+from app.types.llm_user import Prompt
 
 router = APIRouter()
 
@@ -24,7 +24,7 @@ async def chat_endpoint(request: Request):
             )
 
         # Create conversation history using Message instances
-        conversation_history = [Message(role="user", content=prompt)]
+        conversation_history = [Prompt(role="user", content=prompt)]
         bot_response = blue_vi_gpt_model.get_response(conversation_history)
 
         return JSONResponse(

@@ -2,7 +2,8 @@ import logging
 from llama_cpp import Llama, ChatCompletionRequestUserMessage
 from huggingface_hub import login
 from app.config.config_env import MODEL_NAME, HF_TOKEN, GGUF_MODEL
-from app.types.llm_types import Message, Response
+from app.types.llm_user import Prompt
+from app.types.llm_assistant import Response
 from typing import List
 
 
@@ -25,13 +26,11 @@ class BlueViGptModel:
         )
         return llm
 
-    def get_response(self, conversation_history: List[Message]) -> Response:
+    def get_response(self, conversation_history: List[Prompt]) -> Response:
         try:
-            # Create messages in the required format
             mapped_messages: List[ChatCompletionRequestUserMessage] = [
                 ChatCompletionRequestUserMessage(
-                    role=msg.role,
-                    content=msg.content
+                    role=msg.role, content=msg.content
                 )
                 for msg in conversation_history
             ]

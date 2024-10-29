@@ -20,9 +20,6 @@ RUN /opt/venv/bin/pip install --upgrade pip
 COPY requirements.txt .
 RUN /opt/venv/bin/pip install --no-cache-dir --default-timeout=100 -r requirements.txt
 
-# Remove cache
-RUN find . | grep -E "(__pycache__|\.pyc|\.pyo)" | xargs -r rm -rf
-
 # Copy the rest of the application code
 COPY . .
 
