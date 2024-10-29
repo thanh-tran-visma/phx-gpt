@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Literal
 
 
 @dataclass
 class Message:
-    role: str
+    role: Literal["user"]
     content: str
 
 

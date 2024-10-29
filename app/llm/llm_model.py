@@ -30,7 +30,8 @@ class BlueViGptModel:
             # Create messages in the required format
             mapped_messages: List[ChatCompletionRequestUserMessage] = [
                 ChatCompletionRequestUserMessage(
-                    role="user", content=msg.content
+                    role=msg.role,
+                    content=msg.content
                 )
                 for msg in conversation_history
             ]

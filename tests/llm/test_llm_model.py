@@ -49,6 +49,7 @@ class TestGetResponse:
             or "Visma Verzuim" in response.content
         ), "Response does not mention the expected terms"
 
+
 class TestAnonymization:
     def test_get_anonymized_name(self, blue_vi_gpt_model):
         user_message = "John Doe's email is J.Simpson@netwrix.com."
@@ -91,8 +92,7 @@ class TestAnonymization:
         response = blue_vi_gpt_model.get_anonymized_message(user_message)
 
         assert (
-            "[ZIP_1]" in response.content
-            or "7666MC" not in response.content
+            "[ZIP_1]" in response.content or "7666MC" not in response.content
         ), "Test failed: Either '[ZIP_1]' token not found or original ZIP code is present."
 
     def test_get_anonymized_mastercard(self, blue_vi_gpt_model):
@@ -171,8 +171,7 @@ class TestAnonymization:
             or "10 Langelo" not in response.content
         ), "Test failed for Address."
         assert (
-            "[ZIP_1]" in response.content
-            or "7666MC" not in response.content
+            "[ZIP_1]" in response.content or "7666MC" not in response.content
         ), "Test failed for ZIP."
         assert (
             "[MASTERCARD_1]" in response.content
