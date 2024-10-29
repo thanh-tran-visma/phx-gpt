@@ -77,3 +77,5 @@ secrets:
     environment: HF_TOKEN
   model_name:
     environment: MODEL_NAME
+  gguf_model:
+    environment: GGUF_MODEL
