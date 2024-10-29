@@ -32,20 +32,6 @@ class EnvConfig:
             else None
         )
 
-    @staticmethod
-    def get_bool(key: str, default=False):
-        """
-        Retrieve the value of an environment variable and convert it to a boolean.
-
-        :param key: The environment variable name.
-        :param default: The default value if the environment variable is not found.
-        :return: The boolean value of the environment variable, or default if not found.
-        """
-        value = os.getenv(key, default)
-        if isinstance(value, str):
-            return value.lower() in ["true", "1", "t", "y", "yes"]
-        return bool(value)
-
 
 HF_TOKEN = EnvConfig.get("HF_TOKEN")
 MODEL_NAME = EnvConfig.get("MODEL_NAME")
