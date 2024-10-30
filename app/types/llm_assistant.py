@@ -3,7 +3,7 @@ from typing import Optional
 
 
 @dataclass
-class Response:
+class GptResponse:
     content: str
     tokens_used: Optional[int] = None
     prompt_length: Optional[int] = None

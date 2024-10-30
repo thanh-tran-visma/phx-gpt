@@ -3,6 +3,6 @@ from typing import Literal
 
 
 @dataclass
-class Prompt:
+class UserPrompt:
     role: Literal["user"]
     content: str

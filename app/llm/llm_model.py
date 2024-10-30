@@ -2,8 +2,8 @@ import logging
 from llama_cpp import Llama, ChatCompletionRequestUserMessage
 from huggingface_hub import login
 from app.config.config_env import MODEL_NAME, HF_TOKEN, GGUF_MODEL
-from app.types.llm_user import Prompt
-from app.types.llm_assistant import Response
+from app.types.llm_user import UserPrompt
+from app.types.llm_assistant import GptResponse
 from typing import List
 
 
@@ -24,9 +24,13 @@ class BlueViGptModel:
             filename=GGUF_MODEL,
             cache_dir=model_cache_dir,
         )
+        logging.info("Model loaded successfully.")
         return llm
 
-    def get_response(self, conversation_history: List[Prompt]) -> Response:
+    def get_response(
+        self, conversation_history: List[UserPrompt]
+    ) -> GptResponse:
+        """Generate a response from the model based on conversation history."""
         try:
             mapped_messages: List[ChatCompletionRequestUserMessage] = [
                 ChatCompletionRequestUserMessage(
@@ -38,22 +42,23 @@ class BlueViGptModel:
             response = self.llm.create_chat_completion(
                 messages=mapped_messages
             )
-
             choices = response.get("choices")
             if isinstance(choices, list) and len(choices) > 0:
                 message_content = choices[0]["message"]["content"]
-                return Response(content=message_content)
-
+                logging.info("Response generated successfully.")
+                return GptResponse(content=message_content)
             else:
-                return Response("Sorry, I couldn't generate a response.")
+                logging.warning("No choices returned in response.")
+                return GptResponse("Sorry, I couldn't generate a response.")
 
         except Exception as e:
             logging.error(f"Error generating response: {e}")
-            return Response(
+            return GptResponse(
                 "Sorry, an error occurred while generating a response."
             )
 
-    def get_anonymized_message(self, user_message: str) -> Response:
+    def get_anonymized_message(self, user_message: str) -> GptResponse:
+        """Anonymize the user message."""
         instruction = f"Anonymize the data:\n{user_message}\n"
 
         try:
@@ -67,18 +72,18 @@ class BlueViGptModel:
             choices = response.get("choices")
             if isinstance(choices, list) and len(choices) > 0:
                 message_content = choices[0]["message"]["content"]
-                return Response(content=message_content)
+                logging.info("Anonymized message generated successfully.")
+                return GptResponse(content=message_content)
             else:
-                return Response(
-                    "Sorry, I couldn't generate an anonymized response.",
-                    0,
-                    0,
+                logging.warning(
+                    "No choices returned in anonymization response."
+                )
+                return GptResponse(
+                    "Sorry, I couldn't generate an anonymized response."
                 )
 
         except Exception as e:
             logging.error(f"Error generating anonymized message: {e}")
-            return Response(
-                "Sorry, an error occurred while generating an anonymized response.",
-                0,
-                0,
+            return GptResponse(
+                "Sorry, an error occurred while generating an anonymized response."
             )
