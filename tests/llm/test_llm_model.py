@@ -29,7 +29,7 @@ class TestGetResponse:
     def test_get_response_with_real_model(self, blue_vi_gpt_model):
         user_message = "Hello, how are you?"
         messages = [UserPrompt(role="user", content=user_message)]
-        response = blue_vi_gpt_model.get_response(messages)
+        response = blue_vi_gpt_model.get_chat_response(messages)
 
         assert (
             response is not None
@@ -40,7 +40,7 @@ class TestGetResponse:
     def test_get_response_with_blue_vi_answer(self, blue_vi_gpt_model):
         user_message = "who are you?"
         messages = [UserPrompt(role="user", content=user_message)]
-        response = blue_vi_gpt_model.get_response(messages)
+        response = blue_vi_gpt_model.get_chat_response(messages)
 
         # Assert that the response content contains references to "blueVi", "blueVi-GPT", or "Visma Verzuim"
         assert (
