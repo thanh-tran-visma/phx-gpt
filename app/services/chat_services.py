@@ -7,7 +7,6 @@ from app.types.enum import Role, MessageType
 # Set up logging
 logger = logging.getLogger(__name__)
 
-
 class ChatService:
     def __init__(self, db: Session, model):
         self.db_manager = DatabaseManager(db)
@@ -15,57 +14,71 @@ class ChatService:
 
     async def handle_chat(self, request: Request) -> dict:
         logger.info("Handling chat request")
-        body = await request.json()
-        prompt = body.get("prompt", "").strip()
-        user_id = body.get("user_id")
-        conversation_id = body.get("conversation_id")
+        try:
+            body = await request.json()
+            prompt = body.get("prompt", "").strip()
+            user_id = body.get("user_id")
+            conversation_id = body.get("conversation_id")
 
-        if not user_id or not prompt:
-            return {
-                "status": "error",
-                "response": "User ID or prompt not provided.",
-            }
-
-        user = self.db_manager.create_user_if_not_exists(user_id)
-
-        if conversation_id is None:
-            conversation = self.db_manager.create_conversation(user_id=user.id)
-            if conversation is None:
+            if not user_id or not prompt:
+                logger.warning("User ID or prompt not provided.")
                 return {
                     "status": "error",
-                    "response": "Failed to create a conversation.",
+                    "response": "User ID or prompt not provided.",
                 }
-            conversation_id = conversation.id
 
-        embedding_vector = self.model.embed(prompt)
+            user = self.db_manager.create_user_if_not_exists(user_id)
 
-        self.db_manager.create_message_with_vector(
-            conversation_id=conversation_id,
-            content=prompt,
-            message_type=MessageType.PROMPT,
-            role=Role.USER,
-            embedding_vector=embedding_vector,
-        )
+            if conversation_id is None:
+                conversation = self.db_manager.create_conversation(user_id=user.id)
+                if conversation is None:
+                    logger.error("Failed to create a conversation.")
+                    return {
+                        "status": "error",
+                        "response": "Failed to create a conversation.",
+                    }
+                conversation_id = conversation.id
 
-        history = self.db_manager.get_conversation_vector_history(
-            conversation_id, max_tokens=2048
-        )
-        total_tokens = sum(len(msg.content.split()) for msg in history) + len(
-            prompt.split()
-        )
-        while total_tokens > 2048 and history:
-            history.pop(0)
-            total_tokens = sum(
-                len(msg.content.split()) for msg in history
-            ) + len(prompt.split())
+            embedding_vector = self.model.embed(prompt)
 
-        bot_response = self.model.get_chat_response(history)
-        self.db_manager.create_message_with_vector(
-            conversation_id=conversation_id,
-            content=bot_response.content,
-            message_type=MessageType.RESPONSE,
-            role=Role.ASSISTANT,
-            embedding_vector=self.model.embed(bot_response.content),
-        )
+            self.db_manager.create_message_with_vector(
+                conversation_id=conversation_id,
+                content=prompt,
+                message_type=MessageType.PROMPT,
+                role=Role.USER,
+                embedding_vector=embedding_vector,
+            )
 
-        return {"status": "success", "response": bot_response.content}
+            history = self.db_manager.get_conversation_vector_history(
+                conversation_id, max_tokens=2048
+            )
+            total_tokens = sum(len(msg.content.split()) for msg in history) + len(
+                prompt.split()
+            )
+            while total_tokens > 2048 and history:
+                history.pop(0)
+                total_tokens = sum(
+                    len(msg.content.split()) for msg in history
+                ) + len(prompt.split())
+
+            bot_response = self.model.get_chat_response(history)
+
+            # Assuming bot_response is a dict, access the content correctly
+            bot_response_content = bot_response.get("content", "") if isinstance(bot_response, dict) else ""
+
+            self.db_manager.create_message_with_vector(
+                conversation_id=conversation_id,
+                content=bot_response_content,
+                message_type=MessageType.RESPONSE,
+                role=Role.ASSISTANT,
+                embedding_vector=self.model.embed(bot_response_content),
+            )
+
+            return {"status": "success", "response": bot_response_content}
+
+        except Exception as e:
+            logger.error(f"Error while processing chat request: {str(e)}")
+            return {
+                "status": "error",
+                "response": f"An error occurred: {str(e)}",
+            }

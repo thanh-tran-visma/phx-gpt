@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Depends
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
+import logging
 
 from app.database import get_db
 from app.services import ChatService
@@ -9,12 +10,13 @@ from app.types.enum import HTTPStatus
 
 router = APIRouter()
 
+# Set up logging
+logger = logging.getLogger(__name__)
 
 # Define Pydantic models for request and response
 class ChatResponse(BaseModel):
     status: str
     response: str
-
 
 @router.post(
     "/chat",
@@ -40,6 +42,7 @@ async def chat_endpoint(
         return ChatResponse(status="success", response=chat_result)
 
     except Exception as e:
+        logger.error(f"Error in chat endpoint: {str(e)}")
         return JSONResponse(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
             content={"response": f"An error occurred: {str(e)}"},
