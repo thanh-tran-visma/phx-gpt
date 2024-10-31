@@ -24,13 +24,7 @@ RUN /opt/venv/bin/pip install --no-cache-dir --default-timeout=100 -r requiremen
 COPY . .
 
 # Load and download the model using secrets for HF_TOKEN and MODEL_NAME
-RUN --mount=type=secret,id=hf_token \
-    --mount=type=secret,id=model_name \
-    --mount=type=secret,id=gguf_model \
-    bash -c "HF_TOKEN=$(cat /run/secrets/hf_token) \
-    MODEL_NAME=$(cat /run/secrets/model_name) \
-    GGUF_MODEL=$(cat /run/secrets/gguf_model) \
-    /opt/venv/bin/python -c 'from app.llm.llm_model import BlueViGptModel; BlueViGptModel().load_model()'"
+
 
 # Command to run the application using the virtual environment
 CMD ["/opt/venv/bin/gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "-b", "0.0.0.0:8000"]
