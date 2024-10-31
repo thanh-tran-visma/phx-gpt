@@ -2,7 +2,8 @@ from unittest.mock import patch, MagicMock
 import pytest
 from app.llm import BlueViGptModel
 from app.config.config_env import GGUF_MODEL, MODEL_NAME
-from app.types.llm_user import UserPrompt
+from app.model.models import Message
+from app.types.enum import Role
 
 
 @pytest.fixture(scope="class")
@@ -28,7 +29,7 @@ def test_load_model(mock_from_pretrained, blue_vi_gpt_model):
 class TestGetResponse:
     def test_get_response_with_real_model(self, blue_vi_gpt_model):
         user_message = "Hello, how are you?"
-        messages = [UserPrompt(role="user", content=user_message)]
+        messages = [Message(role=Role.USER, content=user_message)]  # Using Message directly
         response = blue_vi_gpt_model.get_chat_response(messages)
 
         assert (
@@ -38,8 +39,8 @@ class TestGetResponse:
         ), "Model failed to return a valid response"
 
     def test_get_response_with_blue_vi_answer(self, blue_vi_gpt_model):
-        user_message = "who are you?"
-        messages = [UserPrompt(role="user", content=user_message)]
+        user_message = "what is your name?"
+        messages = [Message(role=Role.USER, content=user_message)]
         response = blue_vi_gpt_model.get_chat_response(messages)
 
         # Assert that the response content contains references to "blueVi", "blueVi-GPT", or "Visma Verzuim"

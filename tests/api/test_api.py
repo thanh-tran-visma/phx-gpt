@@ -13,7 +13,7 @@ def client():
 
 # Test without a token should return a 401 Unauthorized and 'detail' in the response
 def test_chat_endpoint_without_token(client):
-    response = client.post("/chat/", json={"prompt": "test_message"})
+    response = client.post("bluevi-gpt/chat", json={"prompt": "test_message"})
     # Assert the response status code is 401 since the token is missing
     assert response.status_code == HTTPStatus.UNAUTHORIZED.value
     json_response = response.json()
@@ -31,7 +31,7 @@ def test_chat_endpoint_with_mocked_token(mock_validate_token, client):
     # Prepare the headers with a mocked token
     headers = {"Authorization": "Bearer mocked_token"}
     response = client.post(
-        "/chat/", json={"prompt": "test_message"}, headers=headers
+        "bluevi-gpt/chat", json={"prompt": "test_message"}, headers=headers
     )
     # Assert the response status code is 200 since the token is valid
     assert response.status_code == HTTPStatus.OK.value

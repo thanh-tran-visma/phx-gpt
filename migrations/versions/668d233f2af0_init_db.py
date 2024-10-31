@@ -37,7 +37,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('conversation_id', sa.Integer(), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
-    sa.Column('message_type', sa.Enum('prompt', 'response'), nullable=False),
+    sa.Column('message_type.py', sa.Enum('prompt', 'response'), nullable=False),
     sa.Column('role', sa.Enum('user', 'assistant'), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=True),
     sa.ForeignKeyConstraint(['conversation_id'], ['conversations.id'], ),

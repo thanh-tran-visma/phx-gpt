@@ -2,7 +2,7 @@ import logging
 from sqlalchemy.orm import Session
 from fastapi import Request
 from app.database import DatabaseManager  # Assuming you have this imported
-from app.types.enum import Role
+from app.types.enum import Role, MessageType
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ class ChatService:
         self.db_manager.create_message_with_vector(
             conversation_id=conversation_id,
             content=prompt,
-            message_type="prompt",
+            message_type=MessageType.PROMPT,
             role=Role.USER,
             embedding_vector=embedding_vector,
         )
@@ -63,7 +63,7 @@ class ChatService:
         self.db_manager.create_message_with_vector(
             conversation_id=conversation_id,
             content=bot_response.content,
-            message_type="response",
+            message_type=MessageType.RESPONSE,
             role=Role.ASSISTANT,
             embedding_vector=self.model.embed(bot_response.content),
         )
