@@ -29,7 +29,9 @@ def test_load_model(mock_from_pretrained, blue_vi_gpt_model):
 class TestGetResponse:
     def test_get_response_with_real_model(self, blue_vi_gpt_model):
         user_message = "Hello, how are you?"
-        messages = [Message(role=Role.USER, content=user_message)]  # Using Message directly
+        messages = [
+            Message(role=Role.USER, content=user_message)
+        ]  # Using Message directly
         response = blue_vi_gpt_model.get_chat_response(messages)
 
         assert (
