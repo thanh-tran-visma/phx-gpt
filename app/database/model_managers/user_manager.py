@@ -1,10 +1,7 @@
-import logging
-from sqlalchemy.exc import IntegrityError
+from typing import Optional
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 from app.model import User
-
-# Set up logging
-logger = logging.getLogger(__name__)
 
 
 class UserManager:
@@ -20,9 +17,8 @@ class UserManager:
             try:
                 self.db.commit()
                 self.db.refresh(user)
-            except IntegrityError as e:
+            except IntegrityError:
                 self.db.rollback()
-                logger.error(f"IntegrityError while creating user: {e}")
                 user = self.db.query(User).filter(User.id == user_id).first()
         return user
 
@@ -31,17 +27,17 @@ class UserManager:
         try:
             user = self.db.query(User).filter(User.id == user_id).first()
             if user is None:
-                logger.warning(f"User ID {user_id} not found. Cannot delete.")
                 return False
 
             self.db.delete(user)
             self.db.commit()
             return True
-        except IntegrityError as e:
+        except IntegrityError:
             self.db.rollback()
-            logger.error(f"IntegrityError while deleting user: {e}")
             return False
-        except Exception as e:
+        except SQLAlchemyError:
             self.db.rollback()
-            logger.error(f"Error deleting user: {e}")
             return False
+
+    def get_user(self, user_id: int) -> Optional[User]:
+        return self.db.query(User).filter(User.id == user_id).first()

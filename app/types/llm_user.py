@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from typing import Literal
+
+from app.types.enum import Role
 
 
 @dataclass
 class UserPrompt:
-    role: Literal["user"]
+    role: Role.USER
     content: str

@@ -1,10 +1,6 @@
-import logging
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.model import MessageVector
-
-# Set up logging
-logger = logging.getLogger(__name__)
 
 
 class VectorManager:

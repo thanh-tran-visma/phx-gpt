@@ -1,12 +1,8 @@
-import logging
 from typing import List, Optional
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import SQLAlchemyError
 from app.model import Message, MessageVector
-from app.types.llm_user import UserPrompt
-
-# Set up logging
-logger = logging.getLogger(__name__)
 
 
 class MessageManager:
@@ -19,6 +15,7 @@ class MessageManager:
         content: str,
         message_type: str,
         embedding_vector: List[float],
+        role: str,
     ) -> Optional[Message]:
         """Create a new message along with its embedding vector."""
         if (
@@ -26,13 +23,13 @@ class MessageManager:
             or not isinstance(embedding_vector, list)
             or not all(isinstance(i, float) for i in embedding_vector)
         ):
-            logger.error("Invalid embedding vector provided.")
-            return None
+            return None  # Invalid embedding vector provided
 
         message = Message(
             conversation_id=conversation_id,
             content=content,
             message_type=message_type,
+            role=role,
         )
         self.db.add(message)
         try:
@@ -45,10 +42,12 @@ class MessageManager:
             self.db.commit()  # Commit both message and vector together if possible
             self.db.refresh(message_vector)
             return message
-        except Exception as e:
+        except IntegrityError:
             self.db.rollback()
-            logger.error(f"Error creating message with vector: {e}")
-            return None
+            return None  # Handle integrity errors
+        except SQLAlchemyError:
+            self.db.rollback()
+            return None  # Handle other SQLAlchemy errors
 
     def get_messages_by_conversation(
         self, conversation_id: int

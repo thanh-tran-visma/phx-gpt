@@ -5,7 +5,7 @@ from sqlalchemy import (
     TIMESTAMP,
     ForeignKey,
     Text,
-    Float,
+    JSON,  # Use JSON type for embedding_vector
 )
 from sqlalchemy.sql import func
 from app.database.base import Base
@@ -42,6 +42,7 @@ class Message(Base):
     )
     content = Column(Text, nullable=False)
     message_type = Column(Enum("prompt", "response"), nullable=False)
+    role = Column(Enum("user", "assistant"), nullable=False)
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
 
     conversation = relationship("Conversation", back_populates="messages")
@@ -57,5 +58,7 @@ class MessageVector(Base):
     message_id = Column(
         Integer, ForeignKey('messages.id'), index=True
     )  # Ensure this points to the correct foreign key
-    embedding_vector = Column(Float, nullable=False)
+    embedding_vector = Column(
+        JSON, nullable=False
+    )  # Using JSON type for embedding vector
     message = relationship("Message", back_populates="vector")

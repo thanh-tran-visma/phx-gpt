@@ -5,11 +5,10 @@ from typing import List, Optional
 from llama_cpp import (
     Llama,
     ChatCompletionRequestUserMessage,
-    CreateEmbeddingResponse,
 )
 from huggingface_hub import login
 from app.config.config_env import MODEL_NAME, HF_TOKEN, GGUF_MODEL
-from app.types.llm_user import UserPrompt
+from app.model import Message
 from app.types.llm_assistant import GptResponse
 
 
@@ -26,21 +25,35 @@ class LLMEmbedding:
     def load_embedding_model(model_path: str) -> Llama:
         """Load the Llama model for generating embeddings."""
         try:
-            llm = Llama(model_path=model_path, embedding=True, n_ctx=4096)
+            llm = Llama(model_path=model_path, embedding=True, n_ctx=2048)
             return llm
         except Exception as e:
+            logging.error(f"Error loading embedding model: {e}")
             raise
 
-    def get_embedding(self, text: str) -> Optional[CreateEmbeddingResponse]:
-        """Generate embeddings for the input text."""
+    def embed(self, text: str) -> Optional[List[float]]:
+        """Generate embeddings for the input text and flatten if nested."""
         try:
-            embedding_response = self.llm.create_embedding(text)
-            if embedding_response:
+            embedding_response = self.llm.embed(text)
+            if isinstance(embedding_response, list) and isinstance(
+                embedding_response[0], list
+            ):
+                # Flatten the nested list
+                embedding_vector = embedding_response[0]
+                if all(isinstance(x, float) for x in embedding_vector):
+                    return embedding_vector
+            elif isinstance(embedding_response, list) and all(
+                isinstance(x, float) for x in embedding_response
+            ):
                 return embedding_response
-            else:
-                return None
+
+            logging.error(
+                f"Invalid embedding vector received for text '{text}': {embedding_response}"
+            )
         except Exception as e:
-            return None
+            logging.error(f"Error generating embedding: {e}")
+
+        return None
 
     @staticmethod
     def get_model_path(base_dir: str) -> str:
@@ -59,11 +72,13 @@ class LLMEmbedding:
             )
             return os.path.join(hash_folder, model_file)
         except StopIteration:
+            logging.error("Model file not found in snapshots directory")
             raise ValueError("Model file not found in snapshots directory")
 
 
 class BlueViGptModel:
     def __init__(self):
+        """Initialize BlueViGptModel with main model and embedding model."""
         self.llm = self.load_model()
         self.embedding_model = LLMEmbedding()
 
@@ -81,37 +96,27 @@ class BlueViGptModel:
                 repo_id=MODEL_NAME,
                 filename=GGUF_MODEL,
                 cache_dir=model_cache_dir,
-                embeddings=True,
-                n_ctx=2048,
             )
             return llm
         except Exception as e:
             logging.error(f"Error loading the model: {e}")
             raise
 
+    def embed(self, text: str) -> Optional[List[float]]:
+        """Generate embeddings using the embedding model."""
+        return self.get_embedding(text)
+
     def get_embedding(self, text: str) -> Optional[List[float]]:
         """Generate embeddings using the embedding model."""
-        embedding_response = self.embedding_model.get_embedding(text)
+        embedding_vector = self.embedding_model.embed(text)
 
-        if embedding_response and "data" in embedding_response:
-            embedding_vector = embedding_response["data"][0].get("embedding")
-
-            # Ensure embedding_vector is a list of floats
-            if isinstance(embedding_vector, list) and all(
-                isinstance(x, float) for x in embedding_vector
-            ):
-                return embedding_vector
-
-            logging.error(
-                f"Invalid embedding vector received for text '{text}': {embedding_vector}"
-            )
-        else:
-            logging.error(f"Failed to get valid embedding for text: {text}")
+        if embedding_vector:
+            return embedding_vector
 
         return None
 
     def get_chat_response(
-        self, conversation_history: List[UserPrompt]
+        self, conversation_history: List[Message]
     ) -> GptResponse:
         """Generate a response from the model based on conversation history."""
         try:
@@ -155,32 +160,5 @@ class BlueViGptModel:
                 f"Unexpected error while generating chat response: {e}"
             )
             return GptResponse(
-                "Sorry, an unexpected error occurred while generating a response."
-            )
-
-    def get_anonymized_message(self, user_message: str) -> GptResponse:
-        """Anonymize the user message."""
-        instruction = f"Anonymize the data:\n{user_message}\n"
-
-        try:
-            response = self.llm.create_chat_completion(
-                messages=[
-                    ChatCompletionRequestUserMessage(
-                        role="user", content=instruction
-                    )
-                ]
-            )
-            choices = response.get("choices")
-            if isinstance(choices, list) and len(choices) > 0:
-                message_content = choices[0]["message"]["content"]
-                return GptResponse(content=message_content)
-            else:
-                return GptResponse(
-                    "Sorry, I couldn't generate an anonymized response."
-                )
-
-        except Exception as e:
-            logging.error(f"Error generating anonymized message: {e}")
-            return GptResponse(
-                "Sorry, an error occurred while generating an anonymized response."
+                "Sorry, something went wrong while generating a response."
             )

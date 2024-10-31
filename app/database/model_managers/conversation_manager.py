@@ -1,12 +1,7 @@
-import logging
 from typing import Optional
-
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 from app.model import Conversation, User
-
-# Set up logging
-logger = logging.getLogger(__name__)
 
 
 class ConversationManager:
@@ -16,13 +11,8 @@ class ConversationManager:
     def create_conversation(self, user_id: int) -> Optional[Conversation]:
         """Create a new conversation for the given user ID."""
         try:
-            user = (
-                self.db.query(User).filter(User.id == user_id).first()
-            )  # Check if user exists in the database
+            user = self.db.query(User).filter(User.id == user_id).first()
             if user is None:
-                logger.warning(
-                    f"User ID {user_id} not found. Cannot create conversation."
-                )
                 return None  # Return None if user doesn't exist
 
             conversation = Conversation(user_id=user.id)
@@ -30,14 +20,12 @@ class ConversationManager:
             self.db.commit()
             self.db.refresh(conversation)
             return conversation
-        except IntegrityError as e:
+        except IntegrityError:
             self.db.rollback()
-            logger.error(f"IntegrityError while creating conversation: {e}")
-            return None
-        except Exception as e:
+            return None  # Handle integrity errors
+        except SQLAlchemyError:
             self.db.rollback()
-            logger.error(f"Error creating conversation: {e}")
-            return None
+            return None  # Handle other SQLAlchemy errors
 
     def delete_conversation(self, conversation_id: int) -> None:
         """Delete a conversation by ID."""
@@ -51,12 +39,9 @@ class ConversationManager:
                 self.db.delete(conversation)
                 self.db.commit()
             else:
-                logger.warning(
-                    f"Attempted to delete non-existing conversation ID: {conversation_id}"
-                )
-        except IntegrityError as e:
+                return None  # Return None if the conversation doesn't exist
+        except IntegrityError:
             self.db.rollback()
-            logger.error(f"IntegrityError while deleting conversation: {e}")
-        except Exception as e:
+        except SQLAlchemyError:
             self.db.rollback()
-            logger.error(f"Error deleting conversation: {e}")
+            return None  # Handle other SQLAlchemy errors

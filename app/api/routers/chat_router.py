@@ -1,4 +1,3 @@
-import logging
 from fastapi import APIRouter, Request, Depends
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -7,10 +6,6 @@ from starlette.responses import JSONResponse
 from app.database import get_db
 from app.services import ChatService
 from app.types.enum import HTTPStatus
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -21,9 +16,13 @@ class ChatResponse(BaseModel):
     response: str
 
 
-@router.post("/chat", response_model=ChatResponse, responses={HTTPStatus.INTERNAL_SERVER_ERROR.value: {"model": dict}})
+@router.post(
+    "/chat",
+    response_model=ChatResponse,
+    responses={HTTPStatus.INTERNAL_SERVER_ERROR.value: {"model": dict}},
+)
 async def chat_endpoint(
-        request: Request, db: Session = Depends(get_db)
+    request: Request, db: Session = Depends(get_db)
 ) -> ChatResponse | JSONResponse:
     blue_vi_gpt_model = request.app.state.model
     chat_service = ChatService(db, blue_vi_gpt_model)
@@ -33,12 +32,14 @@ async def chat_endpoint(
 
         # Ensure that chat_result contains a valid string for response
         if isinstance(chat_result, dict):
-            return ChatResponse(status=chat_result.get("status"), response=chat_result.get("response"))
+            return ChatResponse(
+                status=chat_result.get("status"),
+                response=chat_result.get("response"),
+            )
 
         return ChatResponse(status="success", response=chat_result)
 
     except Exception as e:
-        logger.error(f"An error occurred: {str(e)}")
         return JSONResponse(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
             content={"response": f"An error occurred: {str(e)}"},

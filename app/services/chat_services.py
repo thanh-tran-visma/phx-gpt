@@ -1,19 +1,20 @@
 import logging
-from fastapi import Request
 from sqlalchemy.orm import Session
-from app.database import DatabaseManager
+from fastapi import Request
+from app.database import DatabaseManager  # Assuming you have this imported
+from app.types.enum import Role
 
 # Set up logging
 logger = logging.getLogger(__name__)
 
 
 class ChatService:
-    def __init__(self, db: Session, model) -> None:
-        self.db = db
-        self.model = model
+    def __init__(self, db: Session, model):
         self.db_manager = DatabaseManager(db)
+        self.model = model
 
     async def handle_chat(self, request: Request) -> dict:
+        logger.info("Handling chat request")
         body = await request.json()
         prompt = body.get("prompt", "").strip()
         user_id = body.get("user_id")
@@ -25,9 +26,10 @@ class ChatService:
                 "response": "User ID or prompt not provided.",
             }
 
-        # Create or retrieve conversation
+        user = self.db_manager.create_user_if_not_exists(user_id)
+
         if conversation_id is None:
-            conversation = self.db_manager.create_conversation(user_id=user_id)
+            conversation = self.db_manager.create_conversation(user_id=user.id)
             if conversation is None:
                 return {
                     "status": "error",
@@ -35,33 +37,19 @@ class ChatService:
                 }
             conversation_id = conversation.id
 
-        # Generate embedding for the current prompt
-        embedding_vector = self.model.get_embedding(prompt)
+        embedding_vector = self.model.embed(prompt)
 
-        # Log the embedding vector for debugging
-        logger.info(embedding_vector)
-
-        if embedding_vector is None:
-            self.db_manager.delete_conversation(conversation_id)
-            return {
-                "status": "error",
-                "response": "Failed to generate a valid embedding. Conversation deleted.",
-            }
-
-        # Create the message with its vector
         self.db_manager.create_message_with_vector(
             conversation_id=conversation_id,
             content=prompt,
             message_type="prompt",
+            role=Role.USER,
             embedding_vector=embedding_vector,
         )
 
-        # Retrieve message history
         history = self.db_manager.get_conversation_vector_history(
             conversation_id, max_tokens=2048
         )
-        logger.info(history)
-
         total_tokens = sum(len(msg.content.split()) for msg in history) + len(
             prompt.split()
         )
@@ -71,19 +59,13 @@ class ChatService:
                 len(msg.content.split()) for msg in history
             ) + len(prompt.split())
 
-        # Get bot response
         bot_response = self.model.get_chat_response(history)
-
-        # Save bot response message
         self.db_manager.create_message_with_vector(
             conversation_id=conversation_id,
             content=bot_response.content,
             message_type="response",
-            embedding_vector=(
-                bot_response.embedding
-                if hasattr(bot_response, 'embedding')
-                else None
-            ),
+            role=Role.ASSISTANT,
+            embedding_vector=self.model.embed(bot_response.content),
         )
 
         return {"status": "success", "response": bot_response.content}
