@@ -13,10 +13,12 @@ router = APIRouter()
 # Set up logging
 logger = logging.getLogger(__name__)
 
+
 # Define Pydantic models for request and response
 class ChatResponse(BaseModel):
     status: str
     response: str
+
 
 @router.post(
     "/chat",

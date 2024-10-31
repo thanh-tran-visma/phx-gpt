@@ -7,6 +7,7 @@ from app.types.enum import Role, MessageType
 # Set up logging
 logger = logging.getLogger(__name__)
 
+
 class ChatService:
     def __init__(self, db: Session, model):
         self.db_manager = DatabaseManager(db)
@@ -30,7 +31,9 @@ class ChatService:
             user = self.db_manager.create_user_if_not_exists(user_id)
 
             if conversation_id is None:
-                conversation = self.db_manager.create_conversation(user_id=user.id)
+                conversation = self.db_manager.create_conversation(
+                    user_id=user.id
+                )
                 if conversation is None:
                     logger.error("Failed to create a conversation.")
                     return {
@@ -52,9 +55,9 @@ class ChatService:
             history = self.db_manager.get_conversation_vector_history(
                 conversation_id, max_tokens=2048
             )
-            total_tokens = sum(len(msg.content.split()) for msg in history) + len(
-                prompt.split()
-            )
+            total_tokens = sum(
+                len(msg.content.split()) for msg in history
+            ) + len(prompt.split())
             while total_tokens > 2048 and history:
                 history.pop(0)
                 total_tokens = sum(
@@ -64,7 +67,11 @@ class ChatService:
             bot_response = self.model.get_chat_response(history)
 
             # Assuming bot_response is a dict, access the content correctly
-            bot_response_content = bot_response.get("content", "") if isinstance(bot_response, dict) else ""
+            bot_response_content = (
+                bot_response.get("content", "")
+                if isinstance(bot_response, dict)
+                else ""
+            )
 
             self.db_manager.create_message_with_vector(
                 conversation_id=conversation_id,
