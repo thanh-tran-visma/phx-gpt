@@ -7,13 +7,13 @@ This project involves training or fine-tuning the **Llama-3.1-8B** model.
 ## Hugging Face Model
 
 - **Inference Model**: [Llama3.1-8B-blueVi-GPT](https://huggingface.co/ThanhTranVisma/Llama3.1-8B-blueVi-GPT)
-- **Lora (For continue training**[ThanhTranVisma/Llama3.1-8B-blueVi-GPT-lora](https://huggingface.co/ThanhTranVisma/Llama3.1-8B-blueVi-GPT-lora)
+- **Lora**: [Llama3.1-8B-blueVi-GPT-lora](https://huggingface.co/ThanhTranVisma/Llama3.1-8B-blueVi-GPT-lora)
 
 ## Hugging Face Access Token Required
 
 You will need a Hugging Face access token to run this project. You can get your token at [Hugging Face Tokens](https://huggingface.co/settings/tokens).
 
-### How to Setup Locally
+### How to Set up Locally
 
 1. **Clone the Repository**: Clone the repository and navigate to the project folder.
 
