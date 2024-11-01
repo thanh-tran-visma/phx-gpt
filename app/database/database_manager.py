@@ -1,18 +1,11 @@
-import logging
 from typing import Optional, List
-
 from sqlalchemy.orm import Session
-
 from app.database.model_managers import (
     UserManager,
     MessageManager,
     ConversationManager,
 )
 from app.model import User, Message, Conversation
-
-# Set up logging
-logger = logging.getLogger(__name__)
-
 
 class DatabaseManager:
     def __init__(self, db: Session) -> None:
@@ -21,14 +14,14 @@ class DatabaseManager:
         self.message_manager = MessageManager(db)
         self.conversation_manager = ConversationManager(db)
 
+    def user_exists(self: Session, user_id: int) -> bool:
+        return self.query(User).filter(User.id == user_id).count() > 0
+    
     def create_user_if_not_exists(self, user_id: int) -> User:
         """Create a user if they do not already exist."""
         user = self.user_manager.get_user(user_id)
         if not user:
             user = self.user_manager.create_user_if_not_exists(user_id)
-            logger.info(f"User created: {user_id}")
-        else:
-            logger.info(f"User already exists: {user_id}")
         return user
 
     def create_conversation(self, user_id: int) -> Optional[Conversation]:
@@ -56,5 +49,3 @@ class DatabaseManager:
             conversation_id
         )
 
-    def user_exists(self: Session, user_id: int) -> bool:
-        return self.query(User).filter(User.id == user_id).count() > 0

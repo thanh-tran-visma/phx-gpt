@@ -23,7 +23,7 @@ class MessageManager:
             or not isinstance(embedding_vector, list)
             or not all(isinstance(i, float) for i in embedding_vector)
         ):
-            return None  # Invalid embedding vector provided
+            return None
 
         message = Message(
             conversation_id=conversation_id,
