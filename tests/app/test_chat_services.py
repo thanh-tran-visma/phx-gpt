@@ -73,7 +73,9 @@ async def test_handle_chat_conversation_creation(chat_service):
         user_id=1
     )
     assert response['status'] == HTTPStatus.OK.value
-    assert response['response'] == "Hello, how can I help you?"  # Check the actual response
+    assert (
+        response['response'] == "Hello, how can I help you?"
+    )  # Check the actual response
 
 
 @pytest.mark.asyncio

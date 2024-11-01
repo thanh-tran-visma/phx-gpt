@@ -45,5 +45,9 @@ class DatabaseManager:
             conversation_id, content, message_type, embedding_vector, role
         )
 
-    async def get_conversation_vector_history(self, conversation_id: int) -> List[Message]:
-        return await self.message_manager.get_messages_by_conversation(conversation_id)
+    async def get_conversation_vector_history(
+        self, conversation_id: int
+    ) -> List[Message]:
+        return await self.message_manager.get_messages_by_conversation(
+            conversation_id
+        )
