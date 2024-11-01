@@ -11,10 +11,12 @@ router = APIRouter()
 @router.post(
     "/chat",
     response_model=ChatResponse,
-    responses={HTTPStatus.INTERNAL_SERVER_ERROR.value: {"model": ChatResponse}},
+    responses={
+        HTTPStatus.INTERNAL_SERVER_ERROR.value: {"model": ChatResponse}
+    },
 )
 async def chat_endpoint(
-        request: Request, db: Session = Depends(get_db)
+    request: Request, db: Session = Depends(get_db)
 ) -> ChatResponse:
     blue_vi_gpt_model = request.app.state.model
     chat_service = ChatService(db, blue_vi_gpt_model)
@@ -24,10 +26,14 @@ async def chat_endpoint(
         chat_result = await chat_service.handle_chat(request)
         if isinstance(chat_result, dict):
             # Extract response if dict was returned
-            chat_result = chat_result.get("response", "Error: No response found.")
+            chat_result = chat_result.get(
+                "response", "Error: No response found."
+            )
 
         # Ensure we return a ChatResponse object with consistent types
-        return ChatResponse(status=HTTPStatus.OK.value, response=str(chat_result))
+        return ChatResponse(
+            status=HTTPStatus.OK.value, response=str(chat_result)
+        )
 
     except Exception as e:
         return ChatResponse(

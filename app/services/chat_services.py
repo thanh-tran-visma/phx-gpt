@@ -4,15 +4,12 @@ from app.database import DatabaseManager
 from app.types import GptResponse, UserPrompt
 from app.types.enum import Role, MessageType, HTTPStatus
 
+
 class ChatService:
     def __init__(self, db: Session, model):
         self.db_manager = DatabaseManager(db)
         self.model = model
-        self.userPrompt = UserPrompt(
-            prompt='',
-            user_id=-1,
-            conversation_id=-1
-        )
+        self.userPrompt = UserPrompt(prompt='', user_id=-1, conversation_id=-1)
 
     async def handle_chat(self, request: Request) -> dict:
         try:
@@ -27,10 +24,14 @@ class ChatService:
                     "response": "User ID or prompt not provided.",
                 }
 
-            user = self.db_manager.create_user_if_not_exists(self.userPrompt.user_id)
+            user = self.db_manager.create_user_if_not_exists(
+                self.userPrompt.user_id
+            )
 
             if self.userPrompt.conversation_id is None:
-                conversation = self.db_manager.create_conversation(user_id=user.id)
+                conversation = self.db_manager.create_conversation(
+                    user_id=user.id
+                )
                 if conversation is None:
                     return {
                         "status": HTTPStatus.NOT_FOUND.value,
@@ -48,12 +49,17 @@ class ChatService:
                 embedding_vector=embedding_vector,
             )
 
-
-            history = self.db_manager.get_conversation_vector_history(self.userPrompt.conversation_id, max_tokens=2048)
-            total_tokens = sum(len(msg.content.split()) for msg in history) + len(self.userPrompt.prompt.split())
+            history = self.db_manager.get_conversation_vector_history(
+                self.userPrompt.conversation_id, max_tokens=2048
+            )
+            total_tokens = sum(
+                len(msg.content.split()) for msg in history
+            ) + len(self.userPrompt.prompt.split())
             while total_tokens > 2048 and history:
                 history.pop(0)
-                total_tokens = sum(len(msg.content.split()) for msg in history) + len(self.userPrompt.prompt.split())
+                total_tokens = sum(
+                    len(msg.content.split()) for msg in history
+                ) + len(self.userPrompt.prompt.split())
 
             bot_response: GptResponse = self.model.get_chat_response(history)
             response_embedding_vector = self.model.embed(bot_response.content)
@@ -65,7 +71,10 @@ class ChatService:
                 role=Role.ASSISTANT,
                 embedding_vector=response_embedding_vector,
             )
-            return {"status": HTTPStatus.OK.value, "response": bot_response.content}
+            return {
+                "status": HTTPStatus.OK.value,
+                "response": bot_response.content,
+            }
 
         except Exception as e:
             return {

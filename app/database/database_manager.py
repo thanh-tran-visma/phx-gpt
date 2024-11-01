@@ -7,6 +7,7 @@ from app.database.model_managers import (
 )
 from app.model import User, Message, Conversation
 
+
 class DatabaseManager:
     def __init__(self, db: Session) -> None:
         self.db: Session = db
@@ -16,7 +17,7 @@ class DatabaseManager:
 
     def user_exists(self: Session, user_id: int) -> bool:
         return self.query(User).filter(User.id == user_id).count() > 0
-    
+
     def create_user_if_not_exists(self, user_id: int) -> User:
         """Create a user if they do not already exist."""
         user = self.user_manager.get_user(user_id)
@@ -48,4 +49,3 @@ class DatabaseManager:
         return self.message_manager.get_messages_by_conversation(
             conversation_id
         )
-
