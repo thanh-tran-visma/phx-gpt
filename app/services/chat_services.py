@@ -3,6 +3,11 @@ from fastapi import Request
 from app.database import DatabaseManager
 from app.types import GptResponse, UserPrompt
 from app.types.enum import Role, MessageType, HTTPStatus
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class ChatService:
@@ -18,18 +23,39 @@ class ChatService:
             self.userPrompt.user_id = body.get("user_id")
             self.userPrompt.conversation_id = body.get("conversation_id")
 
-            if not self.userPrompt.user_id or not self.userPrompt.prompt:
+            # Type checks
+            if (
+                not isinstance(self.userPrompt.user_id, int)
+                or self.userPrompt.user_id <= 0
+            ):
                 return {
                     "status": HTTPStatus.NOT_FOUND.value,
-                    "response": "User ID or prompt not provided.",
+                    "response": "Invalid User ID provided.",
                 }
 
-            user = self.db_manager.create_user_if_not_exists(
+            if (
+                not isinstance(self.userPrompt.prompt, str)
+                or not self.userPrompt.prompt
+            ):
+                return {
+                    "status": HTTPStatus.NOT_FOUND.value,
+                    "response": "Prompt must be a non-empty string.",
+                }
+
+            if self.userPrompt.conversation_id is not None and not isinstance(
+                self.userPrompt.conversation_id, int
+            ):
+                return {
+                    "status": HTTPStatus.NOT_FOUND.value,
+                    "response": "Invalid Conversation ID provided.",
+                }
+
+            user = await self.db_manager.create_user_if_not_exists(
                 self.userPrompt.user_id
             )
 
             if self.userPrompt.conversation_id is None:
-                conversation = self.db_manager.create_conversation(
+                conversation = await self.db_manager.create_conversation(
                     user_id=user.id
                 )
                 if conversation is None:
@@ -39,9 +65,10 @@ class ChatService:
                     }
                 self.userPrompt.conversation_id = conversation.id
 
-            embedding_vector = self.model.embed(self.userPrompt.prompt)
+            embedding_vector = await self.model.embed(self.userPrompt.prompt)
+            print(f"Embedding vector: {embedding_vector}")
 
-            self.db_manager.create_message_with_vector(
+            await self.db_manager.create_message_with_vector(
                 conversation_id=self.userPrompt.conversation_id,
                 content=self.userPrompt.prompt,
                 message_type=MessageType.PROMPT,
@@ -49,8 +76,8 @@ class ChatService:
                 embedding_vector=embedding_vector,
             )
 
-            history = self.db_manager.get_conversation_vector_history(
-                self.userPrompt.conversation_id, max_tokens=2048
+            history = await self.db_manager.get_conversation_vector_history(
+                self.userPrompt.conversation_id
             )
             total_tokens = sum(
                 len(msg.content.split()) for msg in history
@@ -61,10 +88,14 @@ class ChatService:
                     len(msg.content.split()) for msg in history
                 ) + len(self.userPrompt.prompt.split())
 
-            bot_response: GptResponse = self.model.get_chat_response(history)
-            response_embedding_vector = self.model.embed(bot_response.content)
+            bot_response: GptResponse = await self.model.get_chat_response(
+                history
+            )
+            response_embedding_vector = await self.model.embed(
+                bot_response.content
+            )
 
-            self.db_manager.create_message_with_vector(
+            await self.db_manager.create_message_with_vector(
                 conversation_id=self.userPrompt.conversation_id,
                 content=bot_response.content,
                 message_type=MessageType.RESPONSE,
@@ -77,6 +108,7 @@ class ChatService:
             }
 
         except Exception as e:
+            print(f"An error occurred: {str(e)}")  # Debugging line
             return {
                 "status": HTTPStatus.INTERNAL_SERVER_ERROR.value,
                 "response": f"An error occurred: {str(e)}",

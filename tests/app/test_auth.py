@@ -12,7 +12,7 @@ def client():
 
 
 # Test without a token should return a 401 Unauthorized and 'detail' in the response
-def test_chat_endpoint_without_token(client):
+def test_auth_without_token(client):
     response = client.get("/docs")
     # Assert the response status code is 401 since the token is missing
     assert response.status_code == HTTPStatus.UNAUTHORIZED.value
@@ -25,7 +25,7 @@ def test_chat_endpoint_without_token(client):
 
 
 @patch("app.auth.Auth.validate_token")
-def test_chat_endpoint_with_mocked_token(mock_validate_token, client):
+def test_auth_with_mocked_token(mock_validate_token, client):
     # Simulate valid token
     mock_validate_token.return_value = True
     # Prepare the headers with a mocked token

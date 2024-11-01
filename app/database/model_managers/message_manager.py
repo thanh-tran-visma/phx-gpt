@@ -49,12 +49,12 @@ class MessageManager:
             self.db.rollback()
             return None  # Handle other SQLAlchemy errors
 
-    def get_messages_by_conversation(
+    async def get_messages_by_conversation(
         self, conversation_id: int
     ) -> List[Message]:
         """Retrieve all messages for a given conversation."""
         return (
-            self.db.query(Message)
+            await self.db.query(Message)
             .filter(Message.conversation_id == conversation_id)
             .all()
         )

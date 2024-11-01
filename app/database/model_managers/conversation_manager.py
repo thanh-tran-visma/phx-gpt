@@ -13,7 +13,7 @@ class ConversationManager:
         try:
             user = self.db.query(User).filter(User.id == user_id).first()
             if user is None:
-                return None  # Return None if user doesn't exist
+                return None
 
             conversation = Conversation(user_id=user.id)
             self.db.add(conversation)
@@ -22,10 +22,10 @@ class ConversationManager:
             return conversation
         except IntegrityError:
             self.db.rollback()
-            return None  # Handle integrity errors
+            return None
         except SQLAlchemyError:
             self.db.rollback()
-            return None  # Handle other SQLAlchemy errors
+            return None
 
     def delete_conversation(self, conversation_id: int) -> None:
         """Delete a conversation by ID."""

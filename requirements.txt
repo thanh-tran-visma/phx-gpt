@@ -18,3 +18,4 @@ starlette ~= 0.40.0
 flake8
 black
 sqlalchemy-stubs
+pytest-asyncio
