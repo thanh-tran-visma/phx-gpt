@@ -1,27 +1,4 @@
-from fastapi import FastAPI
-from app.api.router import router
-from app.llm.llm_model import BlueViGptModel
-from app.middleware.middleware import CustomMiddleware
-from contextlib import asynccontextmanager
+from app.app_instance import create_app
 
 
-# Context manager to handle the lifespan (startup and shutdown)
-@asynccontextmanager
-async def lifespan(_app_: FastAPI):
-    # Startup event
-    blue_vi_gpt = BlueViGptModel()
-    _app_.state.model = blue_vi_gpt
-    yield
-    # Shutdown event (currently no specific shutdown actions)
-    pass
-
-
-# Create FastAPI app with lifespan context
-app = FastAPI(lifespan=lifespan)
-
-# Add custom middleware
-# noinspection PyTypeChecker
-app.add_middleware(CustomMiddleware)
-
-# Include your app router
-app.include_router(router)
+app = create_app()

@@ -39,9 +39,9 @@ class ConversationManager:
                 self.db.delete(conversation)
                 self.db.commit()
             else:
-                return None  # Return None if the conversation doesn't exist
+                return None
         except IntegrityError:
             self.db.rollback()
         except SQLAlchemyError:
             self.db.rollback()
-            return None  # Handle other SQLAlchemy errors
+            return None

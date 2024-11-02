@@ -1,1 +1,1 @@
-from .models import Conversation, Message, User, MessageVector
+from .models import Conversation, Message, User, HistoryVector

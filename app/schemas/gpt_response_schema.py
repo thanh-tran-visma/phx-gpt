@@ -1,9 +1,8 @@
-from dataclasses import dataclass
 from typing import Optional
+from pydantic import BaseModel
 
 
-@dataclass
-class GptResponse:
+class GptResponseSchema(BaseModel):
     content: str
     tokens_used: Optional[int] = None
     prompt_length: Optional[int] = None

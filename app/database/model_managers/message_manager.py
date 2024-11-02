@@ -1,8 +1,8 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.exc import SQLAlchemyError
-from app.model import Message, MessageVector
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from app.model import Message
+from app.model.models import HistoryVector
 
 
 class MessageManager:
@@ -16,6 +16,7 @@ class MessageManager:
         message_type: str,
         embedding_vector: List[float],
         role: str,
+        user_id: int,
     ) -> Optional[Message]:
         """Create a new message along with its embedding vector."""
         if (
@@ -30,12 +31,15 @@ class MessageManager:
             content=content,
             message_type=message_type,
             role=role,
+            user_id=user_id,  # Associate the message with the user
         )
         self.db.add(message)
         try:
             self.db.commit()
             self.db.refresh(message)
-            message_vector = MessageVector(
+
+            # Create the message vector
+            message_vector = HistoryVector(
                 message_id=message.id, embedding_vector=embedding_vector
             )
             self.db.add(message_vector)
@@ -49,12 +53,12 @@ class MessageManager:
             self.db.rollback()
             return None  # Handle other SQLAlchemy errors
 
-    async def get_messages_by_conversation(
+    def get_messages_by_conversation(
         self, conversation_id: int
     ) -> List[Message]:
         """Retrieve all messages for a given conversation."""
         return (
-            await self.db.query(Message)
+            self.db.query(Message)
             .filter(Message.conversation_id == conversation_id)
             .all()
         )

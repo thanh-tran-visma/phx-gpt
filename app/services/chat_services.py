@@ -1,9 +1,8 @@
-from sqlalchemy.orm import Session
-from fastapi import Request
-from app.database import DatabaseManager
-from app.types import GptResponse, UserPrompt
-from app.types.enum import Role, MessageType, HTTPStatus
 import logging
+from sqlalchemy.orm import Session
+from app.database import DatabaseManager
+from app.schemas import GptResponseSchema, UserPromptSchema
+from app.types.enum import Role, MessageType, HTTPStatus
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -11,51 +10,19 @@ logger = logging.getLogger(__name__)
 
 
 class ChatService:
-    def __init__(self, db: Session, model):
+    def __init__(self, db: Session, model, user_prompt: UserPromptSchema):
         self.db_manager = DatabaseManager(db)
         self.model = model
-        self.userPrompt = UserPrompt(prompt='', user_id=-1, conversation_id=-1)
+        self.userPrompt = user_prompt
 
-    async def handle_chat(self, request: Request) -> dict:
+    async def handle_chat(self) -> dict:
         try:
-            body = await request.json()
-            self.userPrompt.prompt = body.get("prompt", "").strip()
-            self.userPrompt.user_id = body.get("user_id")
-            self.userPrompt.conversation_id = body.get("conversation_id")
-
-            # Type checks
-            if (
-                not isinstance(self.userPrompt.user_id, int)
-                or self.userPrompt.user_id <= 0
-            ):
-                return {
-                    "status": HTTPStatus.NOT_FOUND.value,
-                    "response": "Invalid User ID provided.",
-                }
-
-            if (
-                not isinstance(self.userPrompt.prompt, str)
-                or not self.userPrompt.prompt
-            ):
-                return {
-                    "status": HTTPStatus.NOT_FOUND.value,
-                    "response": "Prompt must be a non-empty string.",
-                }
-
-            if self.userPrompt.conversation_id is not None and not isinstance(
-                self.userPrompt.conversation_id, int
-            ):
-                return {
-                    "status": HTTPStatus.NOT_FOUND.value,
-                    "response": "Invalid Conversation ID provided.",
-                }
-
-            user = await self.db_manager.create_user_if_not_exists(
+            user = self.db_manager.create_user_if_not_exists(
                 self.userPrompt.user_id
             )
 
             if self.userPrompt.conversation_id is None:
-                conversation = await self.db_manager.create_conversation(
+                conversation = self.db_manager.create_conversation(
                     user_id=user.id
                 )
                 if conversation is None:
@@ -65,50 +32,67 @@ class ChatService:
                     }
                 self.userPrompt.conversation_id = conversation.id
 
-            embedding_vector = await self.model.embed(self.userPrompt.prompt)
-            print(f"Embedding vector: {embedding_vector}")
+            # Create an embedding vector for the user's prompt
+            user_embedding_vector = self.model.embed(self.userPrompt.prompt)
+            logger.info(
+                f"Embedding vector generated for prompt: {self.userPrompt.prompt}"
+            )
 
-            await self.db_manager.create_message_with_vector(
+            # Create and store the user's message
+            self.db_manager.create_message_with_vector(
                 conversation_id=self.userPrompt.conversation_id,
                 content=self.userPrompt.prompt,
                 message_type=MessageType.PROMPT,
                 role=Role.USER,
-                embedding_vector=embedding_vector,
+                embedding_vector=user_embedding_vector,
+                user_id=self.userPrompt.user_id,
             )
 
-            history = await self.db_manager.get_conversation_vector_history(
+            # Get the conversation history
+            history = self.db_manager.get_conversation_vector_history(
                 self.userPrompt.conversation_id
             )
+
+            # Prepare the bot's response based on history
             total_tokens = sum(
                 len(msg.content.split()) for msg in history
             ) + len(self.userPrompt.prompt.split())
             while total_tokens > 2048 and history:
-                history.pop(0)
+                history.pop(0)  # Maintain a maximum length for the history
                 total_tokens = sum(
                     len(msg.content.split()) for msg in history
                 ) + len(self.userPrompt.prompt.split())
 
-            bot_response: GptResponse = await self.model.get_chat_response(
+            bot_response: GptResponseSchema = self.model.get_chat_response(
                 history
             )
-            response_embedding_vector = await self.model.embed(
-                bot_response.content
-            )
 
-            await self.db_manager.create_message_with_vector(
+            # Create an embedding vector for the bot's response
+            response_embedding_vector = self.model.embed(bot_response.content)
+
+            # Create and store the assistant's message
+            assistant_message = self.db_manager.create_message_with_vector(
                 conversation_id=self.userPrompt.conversation_id,
                 content=bot_response.content,
                 message_type=MessageType.RESPONSE,
                 role=Role.ASSISTANT,
                 embedding_vector=response_embedding_vector,
+                user_id=self.userPrompt.user_id,
             )
+
+            # Add the assistant's response to history for embedding
+            if (
+                assistant_message
+            ):  # Ensure the message was created successfully
+                history.append(assistant_message)
+
             return {
                 "status": HTTPStatus.OK.value,
                 "response": bot_response.content,
             }
 
         except Exception as e:
-            print(f"An error occurred: {str(e)}")  # Debugging line
+            logger.error(f"Error in handling chat: {str(e)}")
             return {
                 "status": HTTPStatus.INTERNAL_SERVER_ERROR.value,
                 "response": f"An error occurred: {str(e)}",

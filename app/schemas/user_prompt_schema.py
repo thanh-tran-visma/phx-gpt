@@ -1,9 +1,8 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 from typing import Optional
 
 
-@dataclass
-class UserPrompt:
+class UserPromptSchema(BaseModel):
     prompt: str
     user_id: int
     conversation_id: Optional[int] = None

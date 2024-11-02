@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Request, Depends
-from sqlalchemy.orm import Session
-from app.database import get_db
+from fastapi import APIRouter, Request, HTTPException
+from app.database.database import Database
 from app.services import ChatService
-from app.types import ChatResponse
+from app.schemas import UserPromptSchema, ChatResponseSchema
 from app.types.enum import HTTPStatus
 
 router = APIRouter()
@@ -10,33 +9,36 @@ router = APIRouter()
 
 @router.post(
     "/chat",
-    response_model=ChatResponse,
+    response_model=ChatResponseSchema,
     responses={
-        HTTPStatus.INTERNAL_SERVER_ERROR.value: {"model": ChatResponse}
+        HTTPStatus.INTERNAL_SERVER_ERROR.value: {"model": ChatResponseSchema}
     },
 )
 async def chat_endpoint(
-    request: Request, db: Session = Depends(get_db)
-) -> ChatResponse:
-    blue_vi_gpt_model = request.app.state.model
-    chat_service = ChatService(db, blue_vi_gpt_model)
+    request: Request, user_prompt: UserPromptSchema
+) -> ChatResponseSchema:
+    db = Database().get_session()
 
     try:
-        # Ensure chat_result is a string
-        chat_result = await chat_service.handle_chat(request)
-        if isinstance(chat_result, dict):
-            # Extract response if dict was returned
-            chat_result = chat_result.get(
-                "response", "Error: No response found."
+        blue_vi_gpt_model = request.app.state.model
+        chat_service = ChatService(db, blue_vi_gpt_model, user_prompt)
+        chat_result = await chat_service.handle_chat()
+
+        if chat_result["status"] != HTTPStatus.OK.value:
+            raise HTTPException(
+                status_code=chat_result["status"],
+                detail=chat_result["response"],
             )
 
-        # Ensure we return a ChatResponse object with consistent types
-        return ChatResponse(
-            status=HTTPStatus.OK.value, response=str(chat_result)
+        return ChatResponseSchema(
+            status=HTTPStatus.OK.value, response=str(chat_result["response"])
         )
 
     except Exception as e:
-        return ChatResponse(
-            status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-            response=f"An error occurred: {str(e)}",
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
+            detail="An internal error occurred.",
         )
+
+    finally:
+        db.close()

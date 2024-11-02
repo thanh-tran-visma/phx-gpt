@@ -1,35 +1,59 @@
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from unittest.mock import patch
-from app.main import app
+
+from app.api import router
+from app.middleware import CustomMiddleware
 from app.types.enum.http_status import HTTPStatus
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def client():
-    with TestClient(app) as client:
-        yield client
-
-
-# Test without a token should return a 401 Unauthorized and 'detail' in the response
-def test_auth_without_token(client):
-    response = client.get("/docs")
-    # Assert the response status code is 401 since the token is missing
-    assert response.status_code == HTTPStatus.UNAUTHORIZED.value
-    json_response = response.json()
-    assert "detail" in json_response
-    assert (
-        json_response["detail"]
-        == "Unauthenticated: Missing Authorization header"
-    )
+    app = FastAPI()
+    # noinspection PyTypeChecker
+    app.add_middleware(CustomMiddleware)
+    app.include_router(router)
+    with TestClient(app) as c:
+        yield c
 
 
 @patch("app.auth.Auth.validate_token")
-def test_auth_with_mocked_token(mock_validate_token, client):
-    # Simulate valid token
+def test_auth_valid_token(mock_validate_token, client):
     mock_validate_token.return_value = True
-    # Prepare the headers with a mocked token
     headers = {"Authorization": "Bearer mocked_token"}
-    response = client.get("/docs", headers=headers)
-    # Assert the response status code is 200 since the token is valid
+    response = client.get("/auth", headers=headers)
     assert response.status_code == HTTPStatus.OK.value
+
+
+@patch("app.auth.Auth.validate_token")
+def test_auth_invalid_token(mock_validate_token, client):
+    mock_validate_token.return_value = False
+    headers = {"Authorization": "Bearer mocked_token"}
+    response = client.get("/auth", headers=headers)
+    assert response.status_code == HTTPStatus.UNAUTHORIZED.value
+    assert response.json() == {"detail": "Not authenticated: Invalid token"}
+
+
+def test_auth_missing_token(client):
+    response = client.get("/auth")
+    assert response.status_code == HTTPStatus.UNAUTHORIZED.value
+    assert response.json() == {
+        "detail": "Unauthenticated: Missing Authorization header"
+    }
+
+
+def test_auth_invalid_format(client):
+    headers = {"Authorization": "Basic mocked_token"}
+    response = client.get("/auth", headers=headers)
+    assert response.status_code == HTTPStatus.UNAUTHORIZED.value
+    assert response.json() == {
+        "detail": "Not authenticated: Invalid Authorization format"
+    }
+
+
+def test_auth_token_missing_in_format(client):
+    headers = {"Authorization": "Bearer "}
+    response = client.get("/auth", headers=headers)
+    assert response.status_code == HTTPStatus.UNAUTHORIZED.value
+    assert response.json() == {"detail": "Not authenticated: Token is missing"}

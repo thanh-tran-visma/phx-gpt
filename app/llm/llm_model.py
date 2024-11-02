@@ -9,7 +9,7 @@ from huggingface_hub import login
 from app.config.config_env import MODEL_NAME, HF_TOKEN, GGUF_MODEL
 from app.llm.llm_embedding import LLMEmbedding
 from app.model import Message
-from app.types.gpt_response import GptResponse
+from app.schemas import GptResponseSchema
 
 
 class BlueViGptModel:
@@ -44,7 +44,7 @@ class BlueViGptModel:
 
     def get_chat_response(
         self, conversation_history: List[Message]
-    ) -> GptResponse:
+    ) -> GptResponseSchema:
         """Generate a response from the model based on conversation history."""
         try:
             # Prepare messages for the model
@@ -63,34 +63,36 @@ class BlueViGptModel:
 
             if isinstance(choices, list) and len(choices) > 0:
                 message_content = choices[0]["message"]["content"]
-                return GptResponse(content=message_content)
+                return GptResponseSchema(content=message_content)
 
-            return GptResponse("Sorry, I couldn't generate a response.")
+            return GptResponseSchema(
+                content="Sorry, I couldn't generate a response."
+            )
 
         except ValueError as ve:
             logging.error(f"Value error in chat response generation: {ve}")
-            return GptResponse(
-                "Sorry, there was a value error while generating a response."
+            return GptResponseSchema(
+                content="Sorry, there was a value error while generating a response."
             )
         except TypeError as te:
             logging.error(f"Type error in chat response generation: {te}")
-            return GptResponse(
-                "Sorry, there was a type error while generating a response."
+            return GptResponseSchema(
+                content="Sorry, there was a type error while generating a response."
             )
         except KeyError as ke:
             logging.error(f"Key error in chat response generation: {ke}")
-            return GptResponse(
-                "Sorry, there was a key error while generating a response."
+            return GptResponseSchema(
+                content="Sorry, there was a key error while generating a response."
             )
         except Exception as e:
             logging.error(
                 f"Unexpected error while generating chat response: {e}"
             )
-            return GptResponse(
-                "Sorry, something went wrong while generating a response."
+            return GptResponseSchema(
+                content="Sorry, something went wrong while generating a response."
             )
 
-    def get_anonymized_message(self, user_message: str) -> GptResponse:
+    def get_anonymized_message(self, user_message: str) -> GptResponseSchema:
         """Anonymize the user message."""
         instruction = f"Anonymize the data:\n{user_message}\n"
 
@@ -105,14 +107,14 @@ class BlueViGptModel:
             choices = response.get("choices")
             if isinstance(choices, list) and len(choices) > 0:
                 message_content = choices[0]["message"]["content"]
-                return GptResponse(content=message_content)
+                return GptResponseSchema(content=message_content)
             else:
-                return GptResponse(
-                    "Sorry, I couldn't generate an anonymized response."
+                return GptResponseSchema(
+                    content="Sorry, I couldn't generate an anonymized response."
                 )
 
         except Exception as e:
             logging.error(f"Error generating anonymized message: {e}")
-            return GptResponse(
-                "Sorry, an error occurred while generating an anonymized response."
+            return GptResponseSchema(
+                content="Sorry, an error occurred while generating an anonymized response."
             )
