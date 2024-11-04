@@ -1,11 +1,9 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-
 from app.database.model_managers import (
     UserManager,
     MessageManager,
     ConversationManager,
-    HistoryVectorManager,
 )
 from app.model import Message, User, Conversation
 
@@ -16,58 +14,53 @@ class DatabaseManager:
         self.user_manager = UserManager(db)
         self.message_manager = MessageManager(db)
         self.conversation_manager = ConversationManager(db)
-        self.history_vector_manager = HistoryVectorManager(db)
 
-    def user_exists(self: Session, user_id: int) -> bool:
-        return self.query(User).filter(User.id == user_id).count() > 0
+    # Users
+    def user_exists(self, user_id: int) -> bool:
+        return self.user_manager.get_user(user_id) is not None
 
     def create_user_if_not_exists(self, user_id: int) -> User:
-        """Create a user if they do not already exist."""
         return self.user_manager.create_user_if_not_exists(user_id)
 
+    # Conversations
     def create_conversation(self, user_id: int) -> Optional[Conversation]:
-        """Create a new conversation for the given user."""
         return self.conversation_manager.create_conversation(user_id)
 
     def delete_conversation(self, conversation_id: int) -> None:
-        """Delete a conversation by ID."""
         self.conversation_manager.delete_conversation(conversation_id)
 
-    def create_message_with_vector(
+    def update_embedding_vector_by_conversation_id(
+        self, conversation_id: int, new_embedding_vector: List[float]
+    ) -> Optional[Conversation]:
+        return self.conversation_manager.update_embedding_vector(
+            conversation_id, new_embedding_vector
+        )
+
+    def get_embedding_vector_by_conversation_id(
+        self, conversation_id: int
+    ) -> Optional[List[float]]:
+        return (
+            self.conversation_manager.get_embedding_vector_by_conversation_id(
+                conversation_id
+            )
+        )
+
+    # Messages
+    def create_message(
         self,
         conversation_id: int,
         content: str,
         message_type: str,
-        embedding_vector: List[float],
         role: str,
         user_id: int,
     ) -> Optional[Message]:
-        """Create a new message along with its embedding vector and store user_id."""
-        return self.message_manager.create_message_with_vector(
-            conversation_id,
-            content,
-            message_type,
-            embedding_vector,
-            role,
-            user_id,
+        return self.message_manager.create_message(
+            conversation_id, content, message_type, role, user_id
         )
 
-    def get_conversation_vector_history(
-        self, conversation_id: int
+    def get_messages_by_conversation_id(
+        self, conversation_id: int, user_id: int
     ) -> List[Message]:
-        """Retrieve message history for the given conversation."""
-        return self.message_manager.get_messages_by_conversation(
-            conversation_id
-        )
-
-    def create_history_vector(
-        self,
-        user_id: int,
-        conversation_id: int,
-        message_id: int,
-        embedding_vector: List[float],
-    ) -> None:
-        """Create a history vector for a given message."""
-        self.history_vector_manager.create_history_vector(
-            user_id, conversation_id, message_id, embedding_vector
+        return self.message_manager.get_messages_by_conversation_id(
+            conversation_id, user_id
         )

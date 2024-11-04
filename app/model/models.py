@@ -1,15 +1,7 @@
-from sqlalchemy import (
-    Column,
-    Integer,
-    Enum,
-    TIMESTAMP,
-    ForeignKey,
-    Text,
-    JSON,
-)
+from sqlalchemy import Column, Integer, Enum, TIMESTAMP, ForeignKey, Text
 from sqlalchemy.sql import func
-from app.database.base import Base
 from sqlalchemy.orm import relationship
+from app.database.base import Base
 
 
 class User(Base):
@@ -20,7 +12,6 @@ class User(Base):
 
     conversations = relationship("Conversation", back_populates="user")
     messages = relationship("Message", back_populates="user")
-    history_vectors = relationship("HistoryVector", back_populates="user")
 
 
 class Conversation(Base):
@@ -39,9 +30,7 @@ class Message(Base):
     __tablename__ = "messages"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(
-        Integer, ForeignKey("users.id"), nullable=True
-    )  # Link to user
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     conversation_id = Column(
         Integer, ForeignKey("conversations.id"), nullable=False
     )
@@ -50,29 +39,5 @@ class Message(Base):
     role = Column(Enum("user", "assistant"), nullable=False)
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
 
-    user = relationship(
-        "User", back_populates="messages"
-    )  # Establish relationship with User
+    user = relationship("User", back_populates="messages")
     conversation = relationship("Conversation", back_populates="messages")
-    history_vectors = relationship("HistoryVector", back_populates="message")
-
-
-class HistoryVector(Base):
-    __tablename__ = 'history_vectors'
-
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(
-        Integer, ForeignKey('users.id'), nullable=False
-    )  # Ensure this points to the correct foreign key
-    conversation_id = Column(
-        Integer, ForeignKey('conversations.id'), nullable=False
-    )  # Link to conversation
-    message_id = Column(
-        Integer, ForeignKey('messages.id'), nullable=False
-    )  # Link to message
-    embedding_vector = Column(
-        JSON, nullable=False
-    )  # Using JSON type for embedding vector
-
-    user = relationship("User", back_populates="history_vectors")
-    message = relationship("Message", back_populates="history_vectors")

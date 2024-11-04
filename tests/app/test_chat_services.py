@@ -3,8 +3,8 @@ from unittest.mock import MagicMock, AsyncMock, patch
 from starlette.requests import Request
 from http import HTTPStatus
 from app.database import DatabaseManager
+from app.schemas import GptResponseSchema
 from app.services import ChatService
-from app.types import GptResponse
 
 
 @pytest.fixture
@@ -132,7 +132,7 @@ async def test_handle_chat_valid_request(
 
     # Mock the model methods
     mock_model.embed.return_value = [0.1, 0.2, 0.3]
-    mock_model.get_chat_response.return_value = GptResponse(
+    mock_model.get_chat_response.return_value = GptResponseSchema(
         content="Hi there!"
     )
 

@@ -10,21 +10,23 @@ logger = logging.getLogger(__name__)
 
 
 class ChatService:
-    def __init__(self, db: Session, model, user_prompt: UserPromptSchema):
+    def __init__(self, db: Session, model, user_prompt: UserPromptSchema, max_tokens: int = 2048,
+                 history_window_size: int = 128):
         self.db_manager = DatabaseManager(db)
         self.model = model
         self.userPrompt = user_prompt
+        self.max_tokens = max_tokens
+        self.history_window_size = history_window_size
 
     async def handle_chat(self) -> dict:
+        logger.info("Starting chat handling process.")
         try:
-            user = self.db_manager.create_user_if_not_exists(
-                self.userPrompt.user_id
-            )
+            # Ensure user exists or create a new user
+            user = self.db_manager.create_user_if_not_exists(self.userPrompt.user_id)
 
+            # Check and create conversation
             if self.userPrompt.conversation_id is None:
-                conversation = self.db_manager.create_conversation(
-                    user_id=user.id
-                )
+                conversation = self.db_manager.create_conversation(user.id)
                 if conversation is None:
                     return {
                         "status": HTTPStatus.NOT_FOUND.value,
@@ -32,59 +34,40 @@ class ChatService:
                     }
                 self.userPrompt.conversation_id = conversation.id
 
-            # Create an embedding vector for the user's prompt
-            user_embedding_vector = self.model.embed(self.userPrompt.prompt)
-            logger.info(
-                f"Embedding vector generated for prompt: {self.userPrompt.prompt}"
-            )
-
-            # Create and store the user's message
-            self.db_manager.create_message_with_vector(
+            # Store the user message
+            self.db_manager.create_message(
                 conversation_id=self.userPrompt.conversation_id,
                 content=self.userPrompt.prompt,
                 message_type=MessageType.PROMPT,
                 role=Role.USER,
-                embedding_vector=user_embedding_vector,
                 user_id=self.userPrompt.user_id,
             )
 
-            # Get the conversation history
-            history = self.db_manager.get_conversation_vector_history(
-                self.userPrompt.conversation_id
+            # Retrieve conversation history
+            conversation_history = self.db_manager.get_messages_by_conversation_id(
+                self.userPrompt.conversation_id, self.userPrompt.user_id
             )
 
-            # Prepare the bot's response based on history
-            total_tokens = sum(
-                len(msg.content.split()) for msg in history
-            ) + len(self.userPrompt.prompt.split())
-            while total_tokens > 2048 and history:
-                history.pop(0)  # Maintain a maximum length for the history
-                total_tokens = sum(
-                    len(msg.content.split()) for msg in history
-                ) + len(self.userPrompt.prompt.split())
+            # Limit conversation history to the last 'history_window_size' messages
+            conversation_history = conversation_history[-self.history_window_size:]
 
-            bot_response: GptResponseSchema = self.model.get_chat_response(
-                history
-            )
+            # Check total token count and trim if necessary
+            total_tokens = sum(self._count_tokens(message.content) for message in conversation_history)
+            while total_tokens > self.max_tokens:
+                conversation_history.pop(0)  # Remove the oldest message
+                total_tokens = sum(self._count_tokens(message.content) for message in conversation_history)
 
-            # Create an embedding vector for the bot's response
-            response_embedding_vector = self.model.embed(bot_response.content)
+            # Get GPT response based on the conversation history
+            bot_response: GptResponseSchema = self.model.get_chat_response(conversation_history)
 
-            # Create and store the assistant's message
-            assistant_message = self.db_manager.create_message_with_vector(
+            # Store the bot response message
+            self.db_manager.create_message(
                 conversation_id=self.userPrompt.conversation_id,
                 content=bot_response.content,
                 message_type=MessageType.RESPONSE,
                 role=Role.ASSISTANT,
-                embedding_vector=response_embedding_vector,
                 user_id=self.userPrompt.user_id,
             )
-
-            # Add the assistant's response to history for embedding
-            if (
-                assistant_message
-            ):  # Ensure the message was created successfully
-                history.append(assistant_message)
 
             return {
                 "status": HTTPStatus.OK.value,
@@ -92,8 +75,14 @@ class ChatService:
             }
 
         except Exception as e:
-            logger.error(f"Error in handling chat: {str(e)}")
+            logger.error(f"An error occurred during chat handling: {str(e)}", exc_info=True)
             return {
                 "status": HTTPStatus.INTERNAL_SERVER_ERROR.value,
-                "response": f"An error occurred: {str(e)}",
+                "response": "An error occurred while processing your request.",
             }
+
+    @staticmethod
+    def _count_tokens(text: str) -> int:
+        """Estimate the number of tokens in a given text."""
+        # This is a simple way to count tokens; you may want to use a more sophisticated method based on your tokenizer.
+        return len(text.split())

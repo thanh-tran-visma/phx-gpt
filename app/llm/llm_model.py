@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import List
 
 from llama_cpp import (
     Llama,
@@ -7,7 +7,6 @@ from llama_cpp import (
 )
 from huggingface_hub import login
 from app.config.config_env import MODEL_NAME, HF_TOKEN, GGUF_MODEL
-from app.llm.llm_embedding import LLMEmbedding
 from app.model import Message
 from app.schemas import GptResponseSchema
 
@@ -16,7 +15,6 @@ class BlueViGptModel:
     def __init__(self):
         """Initialize BlueViGptModel with main model and embedding model."""
         self.llm = self.load_model()
-        self.embedding_model = LLMEmbedding()
 
     @staticmethod
     def load_model() -> Llama:
@@ -37,10 +35,6 @@ class BlueViGptModel:
         except Exception as e:
             logging.error(f"Error loading the model: {e}")
             raise
-
-    def embed(self, text: str) -> Optional[List[float]]:
-        """Generate embeddings for the provided text."""
-        return self.embedding_model.embed(text)
 
     def get_chat_response(
         self, conversation_history: List[Message]

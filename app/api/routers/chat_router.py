@@ -34,7 +34,7 @@ async def chat_endpoint(
             status=HTTPStatus.OK.value, response=str(chat_result["response"])
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
             detail="An internal error occurred.",

@@ -1,43 +1,36 @@
 from typing import Optional
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from app.model import User
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class UserManager:
     def __init__(self, db: Session) -> None:
         self.db: Session = db
 
+    def get_user(self, user_id: int) -> Optional[User]:
+        return self.db.query(User).filter(User.id == user_id).first()
+
     def create_user_if_not_exists(self, user_id: int) -> User:
-        """Check if the user exists; if not, create and return the user."""
-        user = self.db.query(User).filter(User.id == user_id).first()
+        user = self.get_user(user_id)
         if user is None:
             user = User(id=user_id)
             self.db.add(user)
-            try:
-                self.db.commit()
-                self.db.refresh(user)
-            except IntegrityError:
-                self.db.rollback()
-                user = self.db.query(User).filter(User.id == user_id).first()
+            self._commit_changes(user)
         return user
 
-    def delete_user(self, user_id: int) -> bool:
-        """Delete a user by their ID."""
+    def _commit_changes(
+        self, instance: Optional[User] = None
+    ) -> Optional[User]:
         try:
-            user = self.db.query(User).filter(User.id == user_id).first()
-            if user is None:
-                return False
-
-            self.db.delete(user)
             self.db.commit()
-            return True
-        except IntegrityError:
+            if instance:
+                self.db.refresh(instance)
+            return instance
+        except (IntegrityError, SQLAlchemyError):
             self.db.rollback()
-            return False
-        except SQLAlchemyError:
-            self.db.rollback()
-            return False
-
-    def get_user(self, user_id: int) -> Optional[User]:
-        return self.db.query(User).filter(User.id == user_id).first()
+            return None
