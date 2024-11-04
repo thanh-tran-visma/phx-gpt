@@ -17,5 +17,6 @@ pydantic ~= 2.9.2
 starlette ~= 0.40.0
 flake8
 black
+black[jupyter]
 sqlalchemy-stubs
 pytest-asyncio

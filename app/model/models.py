@@ -1,49 +1,60 @@
-from sqlalchemy import Column, Integer, Enum, TIMESTAMP, ForeignKey, Text
-from sqlalchemy.sql import func
+from sqlalchemy import (
+    Column,
+    Integer,
+    Enum as SQLAEnum,
+    TIMESTAMP,
+    ForeignKey,
+    Text,
+    func,
+)
 from sqlalchemy.orm import relationship
-from app.database.base import Base
+from app.database import Base
+from app.types.enum import MessageType, Role
 
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
 
-    conversations = relationship("Conversation", back_populates="user")
-    messages = relationship("Message", back_populates="user")
+    # Relationships
+    conversations = relationship(
+        'Conversation', back_populates='user', uselist=False
+    )  # One-to-one relationship
+    messages = relationship('Message', back_populates='user')
 
 
 class Conversation(Base):
-    __tablename__ = "conversations"
+    __tablename__ = 'conversations'
 
-    user_conversation_id = Column(
-        Integer, primary_key=True, autoincrement=True
-    )  # Make this the primary key
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(
-        Integer, ForeignKey("users.id"), nullable=False
-    )  # Foreign key only
+        Integer, ForeignKey('users.id'), unique=True, nullable=False
+    )  # Unique user_id
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
-    end_at = Column(TIMESTAMP, nullable=True)
+    end_at = Column(TIMESTAMP)
 
-    user = relationship("User", back_populates="conversations")
-    messages = relationship("Message", back_populates="conversation")
+    # Relationships
+    user = relationship(
+        'User', back_populates='conversations'
+    )  # One-to-one relationship
+    messages = relationship('Message', back_populates='conversation')
 
 
 class Message(Base):
-    __tablename__ = "messages"
+    __tablename__ = 'messages'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    user_conversation_id = Column(
-        Integer,
-        ForeignKey("conversations.user_conversation_id"),
-        nullable=False,
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    conversation_id = Column(
+        Integer, ForeignKey('conversations.id'), nullable=False
     )
     content = Column(Text, nullable=False)
-    message_type = Column(Enum("prompt", "response"), nullable=False)
-    role = Column(Enum("user", "assistant"), nullable=False)
+    message_type = Column(SQLAEnum(MessageType), nullable=False)
+    role = Column(SQLAEnum(Role), nullable=False)
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
 
-    user = relationship("User", back_populates="messages")
-    conversation = relationship("Conversation", back_populates="messages")
+    # Relationships
+    user = relationship('User', back_populates='messages')
+    conversation = relationship('Conversation', back_populates='messages')
