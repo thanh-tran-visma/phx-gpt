@@ -17,8 +17,12 @@ class User(Base):
 class Conversation(Base):
     __tablename__ = "conversations"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_conversation_id = Column(
+        Integer, primary_key=True, autoincrement=True
+    )  # Make this the primary key
+    user_id = Column(
+        Integer, ForeignKey("users.id"), nullable=False
+    )  # Foreign key only
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
     end_at = Column(TIMESTAMP, nullable=True)
 
@@ -31,8 +35,10 @@ class Message(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    conversation_id = Column(
-        Integer, ForeignKey("conversations.id"), nullable=False
+    user_conversation_id = Column(
+        Integer,
+        ForeignKey("conversations.user_conversation_id"),
+        nullable=False,
     )
     content = Column(Text, nullable=False)
     message_type = Column(Enum("prompt", "response"), nullable=False)

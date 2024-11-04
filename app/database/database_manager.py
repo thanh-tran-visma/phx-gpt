@@ -17,33 +17,21 @@ class DatabaseManager:
 
     # Users
     def user_exists(self, user_id: int) -> bool:
+        """Check if a user exists by their ID."""
         return self.user_manager.get_user(user_id) is not None
 
-    def create_user_if_not_exists(self, user_id: int) -> User:
+    def create_user_if_not_exists(self, user_id: int) -> None:
+        """Create a user if they do not already exist."""
         return self.user_manager.create_user_if_not_exists(user_id)
 
     # Conversations
     def create_conversation(self, user_id: int) -> Optional[Conversation]:
+        """Create a new conversation for the given user ID."""
         return self.conversation_manager.create_conversation(user_id)
 
-    def delete_conversation(self, conversation_id: int) -> None:
-        self.conversation_manager.delete_conversation(conversation_id)
-
-    def update_embedding_vector_by_conversation_id(
-        self, conversation_id: int, new_embedding_vector: List[float]
-    ) -> Optional[Conversation]:
-        return self.conversation_manager.update_embedding_vector(
-            conversation_id, new_embedding_vector
-        )
-
-    def get_embedding_vector_by_conversation_id(
-        self, conversation_id: int
-    ) -> Optional[List[float]]:
-        return (
-            self.conversation_manager.get_embedding_vector_by_conversation_id(
-                conversation_id
-            )
-        )
+    def delete_conversation(self, conversation_id: int) -> bool:
+        """Delete a conversation by its ID."""
+        return self.conversation_manager.delete_conversation(conversation_id)
 
     # Messages
     def create_message(
@@ -54,6 +42,7 @@ class DatabaseManager:
         role: str,
         user_id: int,
     ) -> Optional[Message]:
+        """Create a message for a specific conversation."""
         return self.message_manager.create_message(
             conversation_id, content, message_type, role, user_id
         )
@@ -61,6 +50,7 @@ class DatabaseManager:
     def get_messages_by_conversation_id(
         self, conversation_id: int, user_id: int
     ) -> List[Message]:
+        """Retrieve messages associated with a specific conversation and user."""
         return self.message_manager.get_messages_by_conversation_id(
             conversation_id, user_id
         )

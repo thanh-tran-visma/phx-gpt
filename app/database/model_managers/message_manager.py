@@ -10,14 +10,15 @@ class MessageManager:
 
     def create_message(
         self,
-        conversation_id: int,
+        user_conversation_id: int,
         content: str,
         message_type: str,
         role: str,
         user_id: int,
     ) -> Optional[Message]:
+        """Create a new message associated with a conversation."""
         message = Message(
-            conversation_id=conversation_id,
+            user_conversation_id=user_conversation_id,
             content=content,
             message_type=message_type,
             role=role,
@@ -27,15 +28,15 @@ class MessageManager:
         return self._commit_changes(message)
 
     def get_messages_by_conversation_id(
-            self, conversation_id: int, user_id: int
+        self, user_conversation_id: int, user_id: int
     ) -> List[Message]:
         """Retrieve all messages associated with a given conversation ID and user ID."""
         try:
             messages = (
                 self.db.query(Message)
                 .filter(
-                    Message.conversation_id == conversation_id,
-                    Message.user_id == user_id
+                    Message.user_conversation_id == user_conversation_id,
+                    Message.user_id == user_id,
                 )
                 .order_by(Message.created_at)
                 .all()
@@ -47,6 +48,7 @@ class MessageManager:
     def _commit_changes(
         self, instance: Optional[Message] = None
     ) -> Optional[Message]:
+        """Commit changes to the database and refresh the instance if provided."""
         try:
             self.db.commit()
             if instance:

@@ -36,6 +36,11 @@ class BlueViGptModel:
             logging.error(f"Error loading the model: {e}")
             raise
 
+    def tokenizer(
+        self, text: bytes, add_bos: bool, special: bool
+    ) -> List[int]:
+        return self.llm.tokenize(text, add_bos, special)
+
     def get_chat_response(
         self, conversation_history: List[Message]
     ) -> GptResponseSchema:
