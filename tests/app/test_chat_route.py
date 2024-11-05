@@ -1,6 +1,5 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
 from app.types.enum import HTTPStatus
 
 
@@ -24,7 +23,7 @@ def mock_db_session():
 
 # Mock client fixture
 @pytest.fixture(scope="module")
-def mock_client(mock_auth, mock_db_session):
+def mock_client():
     """Mock the FastAPI TestClient."""
     with patch("fastapi.testclient.TestClient") as MockClient:
         mock_test_client = (

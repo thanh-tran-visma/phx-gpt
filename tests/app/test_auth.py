@@ -21,19 +21,9 @@ def mock_auth():
         yield mock_validate
 
 
-@pytest.fixture(scope="module")
-def mock_db_session():
-    with patch(
-        "app.database.database.Database.get_session"
-    ) as mock_get_session:
-        mock_session = MagicMock()
-        mock_get_session.return_value = mock_session
-        yield mock_session
-
-
 def test_auth_valid_token(mock_auth, mock_client):
     headers = {"Authorization": "Bearer mocked_token"}
-
+    mock_auth.return_value = True
     # Set up the mock client response
     mock_client.return_value.get.return_value.status_code = HTTPStatus.OK.value
     mock_client.return_value.get.return_value.json.return_value = {}
@@ -117,9 +107,7 @@ def mock_chat_service():
     return mock_service
 
 
-def test_chat_endpoint_valid_token(
-    mock_auth, mock_db_session, mock_chat_service, mock_client
-):
+def test_chat_endpoint_valid_token(mock_auth, mock_chat_service, mock_client):
     mock_auth.return_value = True
     mock_chat_service.handle_chat.return_value = "mocked response"
 
@@ -145,9 +133,7 @@ def test_chat_endpoint_valid_token(
     }
 
 
-def test_chat_endpoint_invalid_token(
-    mock_auth, mock_chat_service, mock_client
-):
+def test_chat_endpoint_invalid_token(mock_auth, mock_client):
     mock_auth.return_value = False
 
     headers = {"Authorization": "Bearer mocked_token"}
