@@ -1,41 +1,43 @@
-from typing import List, Optional
+from typing import Optional, List
+
 from sqlalchemy.orm import Session
-from app.database.helper_functions import HelperFunctions
-from app.model import Message
+from app.model import Message, UserConversation
 
 
 class MessageManager:
-    def __init__(self, db: Session) -> None:
-        self.db: Session = db
-        self.helper_functions = HelperFunctions(db)
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_messages_for_conversation(
+        self, user_conversation_id: int
+    ) -> List[Message]:
+        return (
+            self.db.query(Message)
+            .filter(Message.user_conversation_id == user_conversation_id)
+            .all()
+        )
 
     def create_message(
         self,
-        user_id: int,
-        conversation_id: int,
+        user_conversation_id: int,
         content: str,
         message_type: str,
         role: str,
     ) -> Optional[Message]:
-        """Create a new message."""
         new_message = Message(
-            user_id=user_id,
-            conversation_id=conversation_id,
+            user_conversation_id=user_conversation_id,
             content=content,
             message_type=message_type,
             role=role,
         )
         self.db.add(new_message)
-        if self.helper_functions.commit_and_log(
-            f"Created message for user id {user_id} at conversation id {conversation_id}"
-        ):
-            return new_message
-        return None
+        self.db.commit()
+        self.db.refresh(new_message)
+        return new_message
 
     def get_messages_by_conversation_id(
         self, conversation_id: int
     ) -> List[Message]:
-        """Retrieve messages associated with a specific conversation."""
         return (
             self.db.query(Message)
             .filter(Message.conversation_id == conversation_id)
@@ -45,12 +47,12 @@ class MessageManager:
     def get_messages_by_user_conversation_id(
         self, user_id: int, conversation_id: int
     ) -> List[Message]:
-        """Retrieve messages for a specific user within a specific conversation."""
         return (
             self.db.query(Message)
+            .join(UserConversation)
             .filter(
-                Message.conversation_id == conversation_id,
-                Message.user_id == user_id,
+                UserConversation.user_id == user_id,
+                UserConversation.conversation_id == conversation_id,
             )
             .all()
         )

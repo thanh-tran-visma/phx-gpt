@@ -1,1 +1,1 @@
-from .models import Conversation, Message, User
+from .models import Conversation, Message, User, UserConversation

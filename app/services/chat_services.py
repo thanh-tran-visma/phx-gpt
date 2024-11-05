@@ -15,8 +15,8 @@ class ChatService:
         db: Session,
         model,
         user_prompt: UserPromptSchema,
-        max_tokens: int = 2048,
-        history_window_size: int = 128,
+        max_tokens: int = 8192,
+        history_window_size: int = 2048,
     ):
         self.db_manager = DatabaseManager(db)
         self.model = model
@@ -36,20 +36,37 @@ class ChatService:
                     "response": "Failed to create or retrieve the user.",
                 }
 
-            # Check if conversation ID is provided; if not, create a new conversation
-            if self.user_prompt.conversation_id is None:
-                conversation = self.db_manager.create_conversation(user.id)
-                if conversation is None:
+            # Ensure the conversation exists or create it
+            conversation = self.db_manager.get_or_create_conversation(
+                user.id, self.user_prompt.conversation_order
+            )
+            if conversation is None:
+                return {
+                    "status": HTTPStatus.NOT_FOUND.value,
+                    "response": "Failed to create or retrieve the conversation.",
+                }
+
+            # Ensure the UserConversation exists for the user and conversation
+            user_conversation_exists = (
+                self.db_manager.check_user_conversation_exists(
+                    user.id, conversation.id
+                )
+            )
+            if not user_conversation_exists:
+                user_conversation = self.db_manager.create_user_conversation(
+                    user.id,
+                    conversation.id,
+                    self.user_prompt.conversation_order,
+                )
+                if user_conversation is None:
                     return {
-                        "status": HTTPStatus.NOT_FOUND.value,
-                        "response": "Failed to create a conversation.",
+                        "status": HTTPStatus.INTERNAL_SERVER_ERROR.value,
+                        "response": "Failed to create user conversation.",
                     }
-                self.user_prompt.conversation_id = conversation.id
 
             # Create the user's message
             message = self.db_manager.create_message(
-                user.id,
-                self.user_prompt.conversation_id,
+                conversation.id,
                 self.user_prompt.prompt,
                 MessageType.PROMPT,
                 Role.USER,
@@ -63,7 +80,7 @@ class ChatService:
             # Retrieve conversation history
             conversation_history = (
                 self.db_manager.get_messages_by_user_conversation_id(
-                    user.id, self.user_prompt.conversation_id
+                    user.id, conversation.id
                 )[-self.history_window_size :]
             )
 
@@ -75,8 +92,7 @@ class ChatService:
 
             # Store the bot's response
             self.db_manager.create_message(
-                user.id,
-                self.user_prompt.conversation_id,
+                conversation.id,
                 bot_response.content,
                 MessageType.RESPONSE,
                 Role.ASSISTANT,
