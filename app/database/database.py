@@ -39,13 +39,14 @@ class Database:
             raise Exception("Database is not connected.")
         return self.Session()
 
-
-# Create an instance of the Database class
-database = Database()
+    def disconnect(self):
+        if self.engine:
+            self.engine.dispose()
 
 
 # Dependency to get a database session
 def get_db() -> Generator[Session, None, None]:
+    database = Database()
     db: Session = database.get_session()
     try:
         yield db
