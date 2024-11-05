@@ -23,7 +23,9 @@ def mock_auth():
 
 @pytest.fixture(scope="module")
 def mock_db_session():
-    with patch("app.database.database.Database.get_session") as mock_get_session:
+    with patch(
+        "app.database.database.Database.get_session"
+    ) as mock_get_session:
         mock_session = MagicMock()
         mock_get_session.return_value = mock_session
         yield mock_session
