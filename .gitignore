@@ -8,3 +8,4 @@ env
 model_cache/
 *.json
 datasets/
+migrations/versions

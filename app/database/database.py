@@ -6,16 +6,18 @@ from app.config.config_env import (
     DB_DATABASE,
 )
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from .base import Base
+from typing import Optional
 
 
 class Database:
-    def __init__(self):
+    def __init__(self) -> None:
         self.engine = None
-        self.Session = None
+        self.Session: Optional[sessionmaker] = None
+        self.connect()
 
-    def connect(self):
+    def connect(self) -> None:
         """Establish a connection to the database."""
         if self.engine is None:
             # Create connection string for SQLAlchemy
@@ -31,40 +33,12 @@ class Database:
 
             print("Connected to MySQL database using SQLAlchemy")
 
-    @staticmethod
-    def close():
-        """Close the database connection."""
-        # No need to manage connection explicitly, as sessions are created and closed in execute_query
-        print(
-            "No direct connection to close. Session management is handled by execute_query."
-        )
+    def get_session(self) -> Session:
+        """Get a new database session."""
+        if self.Session is None:
+            raise Exception("Database is not connected.")
+        return self.Session()
 
-    def execute_query(self, query, params=None):
-        """Execute a SQL query and return the result."""
-        self.connect()
-        session = self.Session()
-        try:
-            result = session.execute(query, params)
-            session.commit()
-            print("Query executed successfully")
-            return result.fetchall()  # Return all results
-        except Exception as e:
-            print(f"Error: {e}")
-            session.rollback()
-            return None  # Return None on error
-        finally:
-            session.close()
-
-
-# Create an instance of the Database class
-database = Database()
-
-
-# Dependency to get a database session
-def get_db():
-    database.connect()
-    db = database.Session()
-    try:
-        yield db
-    finally:
-        db.close()
+    def disconnect(self):
+        if self.engine:
+            self.engine.dispose()

@@ -1,2 +1,3 @@
-from .message_schemas import MessageBase
-from .conversation_schemas import ConversationBase
+from .gpt_response_schema import GptResponseSchema
+from .user_prompt_schema import UserPromptSchema
+from .chat_response_schema import ChatResponseSchema

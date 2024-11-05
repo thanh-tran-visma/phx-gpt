@@ -1,2 +1,3 @@
-from .database import Database, get_db
+from .database import Database
 from .base import Base
+from .database_manager import DatabaseManager

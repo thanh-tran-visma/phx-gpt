@@ -11,10 +11,6 @@ class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Response]
     ) -> Response:
-
-        if request.url.path.startswith(("/docs", "/redoc", "/openapi.json")):
-            return await call_next(request)
-
         try:
             Auth.is_token_valid(request)
         except HTTPException as e:

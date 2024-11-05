@@ -1,7 +1,7 @@
-from dotenv import load_dotenv
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
+from app.database import Base
 from app.model.models import *
 from app.config.config_env import DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
 

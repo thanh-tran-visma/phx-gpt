@@ -1,44 +1,44 @@
-from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Request, HTTPException
+from app.database.database import Database
+from app.services import ChatService
+from app.schemas import UserPromptSchema, ChatResponseSchema
 from app.types.enum import HTTPStatus
-import gc
-from app.types.llm_types import Message
 
 router = APIRouter()
 
 
-# Chat endpoint
-@router.post("/")
-async def chat_endpoint(request: Request):
-    blue_vi_gpt_model = request.app.state.model
-    prompt = None
+@router.post(
+    "/chat",
+    response_model=ChatResponseSchema,
+    responses={
+        HTTPStatus.INTERNAL_SERVER_ERROR.value: {"model": ChatResponseSchema}
+    },
+)
+async def chat_endpoint(
+    request: Request, user_prompt: UserPromptSchema
+) -> ChatResponseSchema:
+    db = Database().get_session()
 
     try:
-        body = await request.json()
-        prompt = body.get("prompt", "").strip()
+        blue_vi_gpt_model = request.app.state.model
+        chat_service = ChatService(db, blue_vi_gpt_model, user_prompt)
+        chat_result = await chat_service.handle_chat()
 
-        if not prompt:
-            return JSONResponse(
-                status_code=HTTPStatus.BAD_REQUEST.value,
-                content={"response": "No input provided."},
+        if chat_result["status"] != HTTPStatus.OK.value:
+            raise HTTPException(
+                status_code=chat_result["status"],
+                detail=chat_result["response"],
             )
 
-        # Create conversation history using Message instances
-        conversation_history = [Message(role="user", content=prompt)]
-        bot_response = blue_vi_gpt_model.get_response(conversation_history)
-
-        return JSONResponse(
-            status_code=HTTPStatus.OK.value,
-            content={"response": bot_response.content},
+        return ChatResponseSchema(
+            status=HTTPStatus.OK.value, response=str(chat_result["response"])
         )
 
-    except Exception as e:
-        return JSONResponse(
+    except Exception:
+        raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-            content={"response": f"An error occurred: {str(e)}"},
+            detail="An internal error occurred.",
         )
 
     finally:
-        if prompt is not None:
-            del prompt
-        gc.collect()
+        db.close()

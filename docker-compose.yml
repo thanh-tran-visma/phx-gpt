@@ -55,12 +55,6 @@ services:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=gpt_user
       - MYSQL_PASSWORD=${DB_PASSWORD}
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "gpt_user", "-p${DB_PASSWORD}"]
-      interval: 30s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
 
 networks:
   internal:
