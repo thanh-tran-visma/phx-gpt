@@ -33,7 +33,6 @@ def mock_client():
         yield mock_test_client
 
 
-@pytest.mark.asyncio
 def test_chat_endpoint_creates_user_and_conversation(mock_client):
     """Test chat endpoint for creating user and conversation."""
 
@@ -62,7 +61,6 @@ def test_chat_endpoint_creates_user_and_conversation(mock_client):
     }
 
 
-@pytest.mark.asyncio
 def test_chat_endpoint_internal_server_error(mock_client):
     """Test chat endpoint for handling internal server errors."""
 
@@ -84,7 +82,6 @@ def test_chat_endpoint_internal_server_error(mock_client):
     assert response.json() == {"detail": "Failed to process chat."}
 
 
-@pytest.mark.asyncio
 def test_chat_endpoint_invalid_user(mock_client):
     """Test chat endpoint for invalid user input."""
 
@@ -106,7 +103,6 @@ def test_chat_endpoint_invalid_user(mock_client):
     assert response.json() == {"detail": "Invalid user ID"}
 
 
-@pytest.mark.asyncio
 def test_chat_endpoint_missing_prompt(mock_client):
     """Test chat endpoint for missing prompt in request."""
 
@@ -124,7 +120,6 @@ def test_chat_endpoint_missing_prompt(mock_client):
     assert response.json() == {"detail": "Prompt is required"}
 
 
-@pytest.mark.asyncio
 def test_chat_endpoint_successful_user_creation(mock_client):
     """Test chat endpoint for successfully creating a user."""
 
