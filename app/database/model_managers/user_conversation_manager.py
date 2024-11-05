@@ -8,10 +8,15 @@ class UserConversationManager:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_user_conversation(self, user_id: int) -> UserConversation:
+    def get_user_conversation(
+        self, user_id: int, conversation_id: int
+    ) -> UserConversation:
         return (
             self.db.query(UserConversation)
-            .filter(UserConversation.user_id == user_id)
+            .filter(
+                UserConversation.user_id == user_id,
+                UserConversation.conversation_id == conversation_id,
+            )
             .first()
         )
 

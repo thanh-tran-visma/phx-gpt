@@ -46,12 +46,14 @@ class ChatService:
                     "response": "Failed to create or retrieve the conversation.",
                 }
 
-            # Ensure the UserConversation exists for the user and conversation
+            # Check if the UserConversation already exists
             user_conversation_exists = (
                 self.db_manager.check_user_conversation_exists(
                     user.id, conversation.id
                 )
             )
+
+            # Create UserConversation only if it does not exist
             if not user_conversation_exists:
                 user_conversation = self.db_manager.create_user_conversation(
                     user.id,
@@ -63,10 +65,15 @@ class ChatService:
                         "status": HTTPStatus.INTERNAL_SERVER_ERROR.value,
                         "response": "Failed to create user conversation.",
                     }
+            else:
+                # If it already exists, retrieve the existing user conversation
+                user_conversation = self.db_manager.get_user_conversation(
+                    user.id, conversation.id
+                )
 
             # Create the user's message
             message = self.db_manager.create_message(
-                conversation.id,
+                user_conversation.id,  # Use user_conversation.id here
                 self.user_prompt.prompt,
                 MessageType.PROMPT,
                 Role.USER,
@@ -77,10 +84,10 @@ class ChatService:
                     "response": "Failed to store the user message.",
                 }
 
-            # Retrieve conversation history
+            # Retrieve conversation history for the current user conversation
             conversation_history = (
                 self.db_manager.get_messages_by_user_conversation_id(
-                    user.id, conversation.id
+                    user_conversation.id
                 )[-self.history_window_size :]
             )
 
@@ -92,7 +99,7 @@ class ChatService:
 
             # Store the bot's response
             self.db_manager.create_message(
-                conversation.id,
+                user_conversation.id,  # Use user_conversation.id here as well
                 bot_response.content,
                 MessageType.RESPONSE,
                 Role.ASSISTANT,

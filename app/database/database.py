@@ -8,7 +8,7 @@ from app.config.config_env import (
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from .base import Base
-from typing import Generator, Optional
+from typing import Optional
 
 
 class Database:
@@ -42,13 +42,3 @@ class Database:
     def disconnect(self):
         if self.engine:
             self.engine.dispose()
-
-
-# Dependency to get a database session
-def get_db() -> Generator[Session, None, None]:
-    database = Database()
-    db: Session = database.get_session()
-    try:
-        yield db
-    finally:
-        db.close()

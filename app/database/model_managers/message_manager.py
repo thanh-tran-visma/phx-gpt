@@ -35,24 +35,21 @@ class MessageManager:
         self.db.refresh(new_message)
         return new_message
 
+    def get_messages_by_user_conversation_id(
+        self, user_conversation_id: int
+    ) -> List[Message]:
+        return (
+            self.db.query(Message)
+            .filter(Message.user_conversation_id == user_conversation_id)
+            .all()
+        )
+
     def get_messages_by_conversation_id(
         self, conversation_id: int
     ) -> List[Message]:
         return (
             self.db.query(Message)
-            .filter(Message.conversation_id == conversation_id)
-            .all()
-        )
-
-    def get_messages_by_user_conversation_id(
-        self, user_id: int, conversation_id: int
-    ) -> List[Message]:
-        return (
-            self.db.query(Message)
             .join(UserConversation)
-            .filter(
-                UserConversation.user_id == user_id,
-                UserConversation.conversation_id == conversation_id,
-            )
+            .filter(UserConversation.conversation_id == conversation_id)
             .all()
         )

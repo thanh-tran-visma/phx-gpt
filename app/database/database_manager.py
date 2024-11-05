@@ -54,21 +54,21 @@ class DatabaseManager:
             user_conversation_id, content, message_type, role
         )
 
-    def get_messages_by_conversation_id(
-        self, conversation_id: int
-    ) -> List[Message]:
-        return self.message_manager.get_messages_by_conversation_id(
-            conversation_id
-        )
-
     def get_messages_by_user_conversation_id(
-        self, user_id: int, conversation_id: int
+        self, user_conversation_id: int
     ) -> List[Message]:
         return self.message_manager.get_messages_by_user_conversation_id(
-            user_id, conversation_id
+            user_conversation_id
         )
 
     # User Conversations
+    def get_user_conversation(
+        self, user_id: int, conversation_id: int
+    ) -> Optional[UserConversation]:
+        return self.user_conversations_manager.get_user_conversation(
+            user_id, conversation_id
+        )
+
     def get_conversations_for_user(
         self, user_id: int
     ) -> List[UserConversation]:

@@ -1,6 +1,5 @@
 import pytest
 from unittest.mock import MagicMock, patch
-
 from app.main import app
 from app.types.enum.http_status import HTTPStatus
 from app.auth.auth import Auth
@@ -22,12 +21,11 @@ def mock_auth():
         yield mock_validate
 
 
-# Mock the database session
-@pytest.fixture
+@pytest.fixture(scope="module")
 def mock_db_session():
-    with patch("app.database.get_db") as mock_get_db:
+    with patch("app.database.database.Database.get_session") as mock_get_session:
         mock_session = MagicMock()
-        mock_get_db.return_value = mock_session
+        mock_get_session.return_value = mock_session
         yield mock_session
 
 
