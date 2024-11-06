@@ -50,8 +50,10 @@ def test_get_conversation_by_order(db_manager, mock_db_session):
         mock_conversation
     )
 
-    conversation = db_manager.get_conversation_by_order(
-        user_id, conversation_order
+    conversation = (
+        db_manager.get_conversation_by_user_id_and_conversation_order(
+            user_id, conversation_order
+        )
     )
 
     assert conversation == mock_conversation

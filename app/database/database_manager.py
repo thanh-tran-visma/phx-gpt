@@ -25,15 +25,18 @@ class DatabaseManager:
         return self.user_manager.create_user_if_not_exists(user_id)
 
     # Conversations
-    def get_conversation_by_order(
+    def get_conversation_by_user_id_and_conversation_order(
         self, user_id: int, conversation_order: int
     ) -> Optional[Conversation]:
-        return self.conversation_manager.get_conversation_by_order(
+        return self.conversation_manager.get_conversation_by_user_id_and_conversation_order(
             user_id, conversation_order
         )
 
     def create_conversation(self, user_id: int) -> Optional[Conversation]:
         return self.conversation_manager.create_conversation(user_id)
+
+    def end_conversation(self, conversation_id: int) -> bool:
+        return self.conversation_manager.end_conversation(conversation_id)
 
     def get_or_create_conversation(
         self, user_id: int, conversation_order: Optional[int] = None

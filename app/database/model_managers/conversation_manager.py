@@ -1,14 +1,14 @@
 from typing import Optional
-
 from sqlalchemy.orm import Session
-from app.model import Conversation
+from sqlalchemy.sql import func
+from app.model import Conversation, UserConversation
 
 
 class ConversationManager:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_conversation_by_order(
+    def get_conversation_by_user_id_and_conversation_order(
         self, user_id: int, conversation_order: int
     ) -> Optional[Conversation]:
         return (
@@ -35,8 +35,6 @@ class ConversationManager:
             conversation = self.create_conversation(user_id)
 
         # Create UserConversation if it doesn't exist
-        from app.model import UserConversation
-
         user_conversation = (
             self.db.query(UserConversation)
             .filter(
@@ -71,3 +69,15 @@ class ConversationManager:
         self.db.commit()
 
         return new_conversation
+
+    def end_conversation(self, conversation_id: int) -> bool:
+        conversation = (
+            self.db.query(Conversation)
+            .filter(Conversation.id == conversation_id)
+            .first()
+        )
+        if not conversation:
+            return False
+        conversation.end_at = func.current_timestamp()
+        self.db.commit()
+        return True
