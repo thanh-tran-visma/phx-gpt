@@ -71,7 +71,7 @@ class BlueViGptModel:
         except ValueError as ve:
             logging.error(f"Value error in chat response generation: {ve}")
             return GptResponseSchema(
-                content="Sorry, there was a value error while generating a response."
+                content="Sorry, something went wrong while generating a response. Please retry with shorter prompt"
             )
         except TypeError as te:
             logging.error(f"Type error in chat response generation: {te}")
@@ -88,14 +88,13 @@ class BlueViGptModel:
                 f"Unexpected error while generating chat response: {e}"
             )
             return GptResponseSchema(
-                content="Sorry, something went wrong while generating a response."
+                content="Sorry, something went wrong while generating a response. Please retry with shorter prompt"
             )
 
     def check_for_personal_data(self, prompt: str) -> bool:
         """Detect personal data in the prompt."""
         instruction = (
-            f"Detect personal data:\n{prompt}\n"
-            f"return True or False"
+            f"Detect personal data:\n{prompt}\n" f"return True or False"
         )
         try:
             response = self.llm.create_chat_completion(
@@ -111,7 +110,7 @@ class BlueViGptModel:
                 # Extract the content from the model's response
                 model_response = choices[0]["message"]["content"]
 
-                # Assuming the model will return a direct True/False response
+                # The model will return a direct True/False response
                 if "True" in model_response:
                     return True
                 elif "False" in model_response:
