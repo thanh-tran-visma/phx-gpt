@@ -94,7 +94,7 @@ class BlueViGptModel:
     def check_for_personal_data(self, prompt: str) -> bool:
         """Detect personal data in the prompt."""
         instruction = (
-            f"Detect personal data in this prompt:\n{prompt}\n"
+            f"Detect personal data:\n{prompt}\n"
             f"return True or False"
         )
         try:

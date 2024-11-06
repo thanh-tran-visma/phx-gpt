@@ -9,7 +9,6 @@ router = APIRouter()
 
 @router.post(
     "/chat",
-    response_model=ChatResponseSchema,
     responses={
         HTTPStatus.INTERNAL_SERVER_ERROR.value: {"model": ChatResponseSchema}
     },

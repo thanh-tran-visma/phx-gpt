@@ -73,21 +73,6 @@ class ChatService:
                     user.id, conversation.id
                 )
 
-            # Flag user prompt for personal data
-            is_personal_data = self.model.check_for_personal_data(
-                self.user_prompt.prompt
-            )
-
-            # Ensure is_personal_data is a boolean and log the result
-            if is_personal_data:
-                logger.warning(
-                    f"Personal data detected in user prompt: {self.user_prompt.prompt}"
-                )
-            else:
-                logger.info(
-                    f"No personal data detected in user prompt: {self.user_prompt.prompt}"
-                )
-
             # Create the user's message
             message = self.db_manager.create_message(
                 user_conversation.id,
@@ -100,6 +85,22 @@ class ChatService:
                     "status": HTTPStatus.INTERNAL_SERVER_ERROR.value,
                     "response": "Failed to store the user message.",
                 }
+
+            # Flag user prompt for personal data
+            is_personal_data = self.model.check_for_personal_data(
+                message.content
+            )
+
+            # Ensure is_personal_data is a boolean and log the result
+            if is_personal_data:
+                logger.warning(
+                    f"Personal data detected in user prompt: {self.user_prompt.prompt}"
+                )
+                self.db_manager.flag_message(message.id)
+            else:
+                logger.info(
+                    f"No personal data detected in user prompt: {self.user_prompt.prompt}"
+                )
 
             # Retrieve and trim conversation history
             conversation_history = (

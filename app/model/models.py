@@ -1,4 +1,12 @@
-from sqlalchemy import Column, Integer, ForeignKey, TIMESTAMP, Enum, Text
+from sqlalchemy import (
+    Column,
+    Integer,
+    ForeignKey,
+    TIMESTAMP,
+    Enum,
+    Text,
+    Boolean,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database.database import Base
@@ -63,3 +71,6 @@ class Message(Base):
     user_conversation = relationship(
         'UserConversation', back_populates='messages'
     )
+
+    # Fixed the boolean type here
+    sensitive_data_flag = Column(Boolean, nullable=False, default=False)

@@ -64,6 +64,19 @@ class DatabaseManager:
             user_conversation_id
         )
 
+    def get_sensitive_messages(
+        self, user_conversation_id: int
+    ) -> List[Message]:
+        return self.message_manager.get_sensitive_messages(
+            user_conversation_id
+        )
+
+    def update_message_content(self, message_id: int, content: str):
+        return self.message_manager.update_message_content(message_id, content)
+
+    def flag_message(self, message_id: int):
+        return self.message_manager.flag_message(message_id)
+
     # User Conversations
     def get_user_conversation(
         self, user_id: int, conversation_id: int

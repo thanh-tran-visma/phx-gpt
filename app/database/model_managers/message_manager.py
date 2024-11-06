@@ -53,3 +53,36 @@ class MessageManager:
             .filter(UserConversation.conversation_id == conversation_id)
             .all()
         )
+
+    def get_sensitive_messages(
+        self, user_conversation_id: int
+    ) -> List[Message]:
+        return (
+            self.db.query(Message)
+            .filter(Message.user_conversation_id == user_conversation_id)
+            .filter(Message.sensitive_data_flag == True)
+            .all()
+        )
+
+    def update_message_content(self, message_id: int, content: str):
+        message = (
+            self.db.query(Message).filter(Message.id == message_id).first()
+        )
+        if message:
+            message.content = content
+            message.sensitive_data_flag = False
+            self.db.commit()
+            self.db.refresh(message)
+            return None
+
+    def flag_message(self, message_id: int) -> Optional[Message]:
+        message = (
+            self.db.query(Message).filter(Message.id == message_id).first()
+        )
+        if message:
+            message.sensitive_data_flag = True
+            self.db.commit()
+            self.db.refresh(message)
+            return message
+        else:
+            return None
