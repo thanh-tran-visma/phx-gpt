@@ -49,7 +49,6 @@ class ConversationManager:
             user_conversation = UserConversation(
                 user_id=user_id,
                 conversation_id=conversation.id,
-                conversation_order=conversation_order,
             )
             self.db.add(user_conversation)
             self.db.commit()

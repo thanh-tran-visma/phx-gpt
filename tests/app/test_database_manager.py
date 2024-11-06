@@ -119,10 +119,9 @@ def test_get_conversations_for_user(db_manager, mock_db_session):
 def test_create_user_conversation(db_manager, mock_db_session):
     user_id = 1
     conversation_id = 1
-    conversation_order = 1
 
     user_conversation = db_manager.create_user_conversation(
-        user_id, conversation_id, conversation_order
+        user_id, conversation_id
     )
 
     assert user_conversation is not None

@@ -77,10 +77,10 @@ class DatabaseManager:
         )
 
     def create_user_conversation(
-        self, user_id: int, conversation_id: int, conversation_order: int
+        self, user_id: int, conversation_id: int
     ) -> Optional[UserConversation]:
         return self.user_conversations_manager.create_user_conversation(
-            user_id, conversation_id, conversation_order
+            user_id, conversation_id
         )
 
     def check_user_conversation_exists(

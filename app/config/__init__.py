@@ -3,6 +3,8 @@ from .config_env import (
     HF_TOKEN,
     MODEL_NAME,
     GGUF_MODEL,
+    LLM_MAX_TOKEN,
+    MAX_HISTORY_WINDOW_SIZE,
     BLUEVI_GPT,
     BEARER_TOKEN,
     DB_HOST,

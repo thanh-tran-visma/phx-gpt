@@ -91,6 +91,42 @@ class BlueViGptModel:
                 content="Sorry, something went wrong while generating a response."
             )
 
+    def check_for_personal_data(self, prompt: str) -> bool:
+        """Detect personal data in the prompt."""
+        instruction = (
+            f"Detect personal data in this prompt:\n{prompt}\n"
+            f"return True or False"
+        )
+        try:
+            response = self.llm.create_chat_completion(
+                messages=[
+                    ChatCompletionRequestUserMessage(
+                        role="user", content=instruction
+                    )
+                ]
+            )
+            choices = response.get("choices")
+
+            if isinstance(choices, list) and len(choices) > 0:
+                # Extract the content from the model's response
+                model_response = choices[0]["message"]["content"]
+
+                # Assuming the model will return a direct True/False response
+                if "True" in model_response:
+                    return True
+                elif "False" in model_response:
+                    return False
+                else:
+                    logging.warning("Model response is unclear.")
+                    return False
+            else:
+                logging.warning("Model did not return a valid response.")
+                return False
+
+        except Exception as e:
+            logging.error(f"Error checking for personal data: {e}")
+            return False
+
     def get_anonymized_message(self, user_message: str) -> GptResponseSchema:
         """Anonymize the user message."""
         instruction = f"Anonymize the data:\n{user_message}\n"

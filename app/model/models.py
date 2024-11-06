@@ -1,11 +1,4 @@
-from sqlalchemy import (
-    Column,
-    Integer,
-    ForeignKey,
-    TIMESTAMP,
-    Enum,
-    Text,
-)
+from sqlalchemy import Column, Integer, ForeignKey, TIMESTAMP, Enum, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database.database import Base
@@ -33,7 +26,6 @@ class UserConversation(Base):
     conversation_id = Column(
         Integer, ForeignKey('conversations.id'), nullable=False
     )  # ForeignKey to Conversation
-    conversation_order = Column(Integer)
 
     user = relationship("User", back_populates="user_conversations")
     conversation = relationship(

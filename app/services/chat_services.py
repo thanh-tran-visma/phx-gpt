@@ -1,8 +1,10 @@
-import logging
 from sqlalchemy.orm import Session
 from app.database import DatabaseManager
 from app.schemas import UserPromptSchema
 from app.types.enum import Role, MessageType, HTTPStatus
+from app.utils import TokenUtils
+from app.config.config_env import LLM_MAX_TOKEN, MAX_HISTORY_WINDOW_SIZE
+import logging
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -15,18 +17,18 @@ class ChatService:
         db: Session,
         model,
         user_prompt: UserPromptSchema,
-        max_tokens: int = 8192,
-        history_window_size: int = 2048,
+        max_tokens=LLM_MAX_TOKEN,
+        history_window_size=MAX_HISTORY_WINDOW_SIZE,
     ):
         self.db_manager = DatabaseManager(db)
         self.model = model
         self.user_prompt = user_prompt
-        self.max_tokens = max_tokens
         self.history_window_size = history_window_size
+        self.token_utils = TokenUtils(model, max_tokens)
 
     async def handle_chat(self) -> dict:
         try:
-            # Create or retrieve the user
+            # Create and/or retrieve the user
             user = self.db_manager.create_user_if_not_exists(
                 self.user_prompt.user_id
             )
@@ -49,7 +51,8 @@ class ChatService:
             # Check if the UserConversation already exists
             user_conversation_exists = (
                 self.db_manager.check_user_conversation_exists(
-                    user.id, conversation.id
+                    user.id,
+                    conversation.id,
                 )
             )
 
@@ -58,7 +61,6 @@ class ChatService:
                 user_conversation = self.db_manager.create_user_conversation(
                     user.id,
                     conversation.id,
-                    self.user_prompt.conversation_order,
                 )
                 if user_conversation is None:
                     return {
@@ -71,9 +73,24 @@ class ChatService:
                     user.id, conversation.id
                 )
 
+            # Flag user prompt for personal data
+            is_personal_data = self.model.check_for_personal_data(
+                self.user_prompt.prompt
+            )
+
+            # Ensure is_personal_data is a boolean and log the result
+            if is_personal_data:
+                logger.warning(
+                    f"Personal data detected in user prompt: {self.user_prompt.prompt}"
+                )
+            else:
+                logger.info(
+                    f"No personal data detected in user prompt: {self.user_prompt.prompt}"
+                )
+
             # Create the user's message
             message = self.db_manager.create_message(
-                user_conversation.id,  # Use user_conversation.id here
+                user_conversation.id,
                 self.user_prompt.prompt,
                 MessageType.PROMPT,
                 Role.USER,
@@ -84,22 +101,22 @@ class ChatService:
                     "response": "Failed to store the user message.",
                 }
 
-            # Retrieve conversation history for the current user conversation
+            # Retrieve and trim conversation history
             conversation_history = (
                 self.db_manager.get_messages_by_user_conversation_id(
                     user_conversation.id
                 )[-self.history_window_size :]
             )
-
-            if conversation_history:  # Ensure history is not empty
-                self._trim_history_to_fit_tokens(conversation_history)
+            trimmed_history = self.token_utils.trim_history_to_fit_tokens(
+                conversation_history
+            )
 
             # Get bot response
-            bot_response = self.model.get_chat_response(conversation_history)
+            bot_response = self.model.get_chat_response(trimmed_history)
 
             # Store the bot's response
             self.db_manager.create_message(
-                user_conversation.id,  # Use user_conversation.id here as well
+                user_conversation.id,
                 bot_response.content,
                 MessageType.RESPONSE,
                 Role.ASSISTANT,
@@ -119,27 +136,3 @@ class ChatService:
                 "status": HTTPStatus.INTERNAL_SERVER_ERROR.value,
                 "response": "An error occurred while processing your request.",
             }
-
-    def _trim_history_to_fit_tokens(self, conversation_history: list) -> None:
-        """Trim the conversation history to ensure the total token count fits within max_tokens."""
-        total_tokens = sum(
-            self._count_tokens(message.content)
-            for message in conversation_history
-        )
-
-        while total_tokens > self.max_tokens:
-            conversation_history.pop(0)  # Remove the oldest message
-            total_tokens = sum(
-                self._count_tokens(message.content)
-                for message in conversation_history
-            )
-
-    def _count_tokens(
-        self, text: str, add_bos: bool = True, special: bool = False
-    ) -> int:
-        """Estimate the number of tokens in a given text using the model's tokenizer."""
-        if isinstance(text, str):
-            text = text.encode('utf-8')
-
-        tokens = self.model.tokenizer(text, add_bos=add_bos, special=special)
-        return len(tokens)

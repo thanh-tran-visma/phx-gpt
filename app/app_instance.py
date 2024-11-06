@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.api.router import router
-from app.llm.llm_model import BlueViGptModel
+from app.llm.blue_vi_gpt_model import BlueViGptModel
 from app.middleware.middleware import CustomMiddleware
 from contextlib import asynccontextmanager
 
