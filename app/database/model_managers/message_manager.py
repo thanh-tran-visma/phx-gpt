@@ -60,7 +60,7 @@ class MessageManager:
         return (
             self.db.query(Message)
             .filter(Message.user_conversation_id == user_conversation_id)
-            .filter(Message.sensitive_data_flag == True)
+            .filter(Message.sensitive_data_flag)
             .all()
         )
 
