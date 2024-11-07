@@ -1,4 +1,5 @@
 import logging
+from lib2to3.btm_utils import tokens
 from typing import List
 
 from llama_cpp import (
@@ -20,16 +21,12 @@ class BlueViGptModel:
     def load_model() -> Llama:
         """Load the main Llama model from Hugging Face."""
         model_cache_dir = "./model_cache"
-        if HF_TOKEN:
-            login(HF_TOKEN)
-        else:
-            raise ValueError("HF_TOKEN environment variable is not set.")
-
         try:
             llm = Llama.from_pretrained(
                 repo_id=MODEL_NAME,
                 filename=GGUF_MODEL,
                 cache_dir=model_cache_dir,
+                token=HF_TOKEN,
             )
             return llm
         except Exception as e:
