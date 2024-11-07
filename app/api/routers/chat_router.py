@@ -13,14 +13,11 @@ router = APIRouter()
         HTTPStatus.INTERNAL_SERVER_ERROR.value: {"model": ChatResponseSchema}
     },
 )
-async def chat_endpoint(
-    request: Request, user_prompt: UserPromptSchema
-) -> ChatResponseSchema:
+async def chat_endpoint(user_prompt: UserPromptSchema) -> ChatResponseSchema:
     db = Database().get_session()
 
     try:
-        blue_vi_gpt_model = request.app.state.model
-        chat_service = ChatService(db, blue_vi_gpt_model, user_prompt)
+        chat_service = ChatService(db, user_prompt)
         chat_result = await chat_service.handle_chat()
 
         if chat_result["status"] != HTTPStatus.OK.value:

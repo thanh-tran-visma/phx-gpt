@@ -14,7 +14,7 @@ class TokenUtils:
         )
 
         while total_tokens > self.max_tokens:
-            conversation_history.pop(0)  # Remove the oldest message
+            conversation_history.pop(0)
             total_tokens = sum(
                 self.count_tokens(message.content)
                 for message in conversation_history

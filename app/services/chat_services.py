@@ -1,10 +1,11 @@
+import logging
 from sqlalchemy.orm import Session
 from app.database import DatabaseManager
+from app.llm import Agent, BlueViGptModel
 from app.schemas import UserPromptSchema
 from app.types.enum import Role, MessageType, HTTPStatus
 from app.utils import TokenUtils
 from app.config.config_env import LLM_MAX_TOKEN, MAX_HISTORY_WINDOW_SIZE
-import logging
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -15,16 +16,21 @@ class ChatService:
     def __init__(
         self,
         db: Session,
-        model,
         user_prompt: UserPromptSchema,
         max_tokens=LLM_MAX_TOKEN,
         history_window_size=MAX_HISTORY_WINDOW_SIZE,
     ):
         self.db_manager = DatabaseManager(db)
-        self.model = model
+        self.blue_vi_gpt_model = BlueViGptModel()
         self.user_prompt = user_prompt
         self.history_window_size = history_window_size
-        self.token_utils = TokenUtils(model, max_tokens)
+        self.token_utils = TokenUtils(self.blue_vi_gpt_model, max_tokens)
+        self.agent = Agent(
+            model=self.blue_vi_gpt_model,
+            db_manager=self.db_manager,
+            token_utils=self.token_utils,
+            history_window_size=self.history_window_size,
+        )
 
     async def handle_chat(self) -> dict:
         try:
@@ -86,34 +92,8 @@ class ChatService:
                     "response": "Failed to store the user message.",
                 }
 
-            # Flag user prompt for personal data
-            is_personal_data = self.model.check_for_personal_data(
-                message.content
-            )
-
-            # Ensure is_personal_data is a boolean and log the result
-            if is_personal_data:
-                logger.warning(
-                    f"Personal data detected in user prompt: {self.user_prompt.prompt}"
-                )
-                self.db_manager.flag_message(message.id)
-            else:
-                logger.info(
-                    f"No personal data detected in user prompt: {self.user_prompt.prompt}"
-                )
-
-            # Retrieve and trim conversation history
-            conversation_history = (
-                self.db_manager.get_messages_by_user_conversation_id(
-                    user_conversation.id
-                )[-self.history_window_size :]
-            )
-            trimmed_history = self.token_utils.trim_history_to_fit_tokens(
-                conversation_history
-            )
-
-            # Get bot response
-            bot_response = self.model.get_chat_response(trimmed_history)
+            # Let the agent handle the conversation
+            bot_response = self.agent.handle_conversation(message)
 
             # Store the bot's response
             self.db_manager.create_message(
