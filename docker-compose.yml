@@ -24,9 +24,9 @@ services:
       - BEARER_TOKEN=${BEARER_TOKEN}
       - DB_HOST=gpt_mysql  
       - DB_DATABASE=${DB_DATABASE}
-      - DB_USERNAME=${DB_USERNAME}
+      - DB_USERNAME=gpt_user
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_PORT=${DB_PORT}
+      - DB_PORT=3306
 
   nginx:
     container_name: gpt_web
