@@ -14,13 +14,13 @@ router = APIRouter()
     },
 )
 async def chat_endpoint(user_prompt: UserPromptSchema) -> ChatResponseSchema:
-    db = Database().get_session()
+    database = Database()
+    db = database.get_session()
 
     try:
         chat_service = ChatService(db, user_prompt)
         chat_result = await chat_service.handle_chat()
 
-        # Check if the status is not OK and raise an exception accordingly
         if chat_result["status"] != HTTPStatus.OK.value:
             raise HTTPException(
                 status_code=chat_result["status"],

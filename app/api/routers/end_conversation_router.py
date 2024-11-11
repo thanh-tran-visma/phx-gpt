@@ -9,7 +9,8 @@ router = APIRouter()
 
 @router.post("/end")
 async def end_conversation_endpoint(end_conversation_data: UserPromptSchema):
-    db = Database().get_session()
+    database = Database()
+    db = database.get_session()
     db_manager = DatabaseManager(db)
     try:
         end_conversation_service = EndConversationService(db)

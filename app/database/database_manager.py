@@ -18,8 +18,8 @@ class DatabaseManager:
         self.user_conversations_manager = UserConversationManager(db)
 
     # Users
-    def user_exists(self, user_id: int) -> bool:
-        return self.user_manager.get_user(user_id) is not None
+    def get_user(self, user_id: int) -> Optional[User]:
+        return self.user_manager.get_user(user_id)
 
     def create_user_if_not_exists(self, user_id: int) -> Optional[User]:
         return self.user_manager.create_user_if_not_exists(user_id)

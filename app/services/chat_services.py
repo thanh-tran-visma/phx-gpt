@@ -34,14 +34,12 @@ class ChatService:
 
     async def handle_chat(self) -> dict:
         try:
-            # Create and/or retrieve the user
-            user = self.db_manager.create_user_if_not_exists(
-                self.user_prompt.user_id
-            )
+            # get user
+            user = self.db_manager.get_user(self.user_prompt.user_id)
             if user is None:
                 return {
                     "status": HTTPStatus.NOT_FOUND.value,
-                    "response": "Failed to create or retrieve the user.",
+                    "response": "Invalid user id.",
                 }
 
             # Ensure the conversation exists or create it
@@ -53,11 +51,6 @@ class ChatService:
                     "status": HTTPStatus.NOT_FOUND.value,
                     "response": "Failed to create or retrieve the conversation.",
                 }
-
-            # Log conversation order for debugging purposes
-            logger.info(
-                f"Conversation order: {conversation.conversation_order}"
-            )
 
             # Check if the UserConversation already exists
             user_conversation_exists = (

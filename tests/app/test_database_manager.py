@@ -16,13 +16,13 @@ def db_manager(mock_db_session):
     return DatabaseManager(mock_db_session)
 
 
-def test_user_exists(db_manager, mock_db_session):
+def test_get_user(db_manager, mock_db_session):
     user_id = 1
     mock_db_session.query.return_value.filter.return_value.first.return_value = User(
         id=user_id
     )
-
-    assert db_manager.user_exists(user_id) is True
+    test_user = db_manager.get_user(user_id)
+    assert test_user.id == user_id
     mock_db_session.query.assert_called_once_with(User)
 
 

@@ -21,7 +21,7 @@ class ConversationManager:
         )
 
     def get_or_create_conversation(
-        self, user_id: int, conversation_order: int
+        self, user_id: int, conversation_order: Optional[int]
     ) -> Optional[Conversation]:
         conversation = (
             self.db.query(Conversation)
