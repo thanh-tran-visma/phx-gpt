@@ -31,6 +31,10 @@ class Agent:
         """Generate a response from the model."""
         return self.model.get_chat_response(conversation_history)
 
+    def handle_operation_instructions(self, conversation_history):
+        """Generate a response from the model for operating."""
+        return self.model.handle_operation_instructions(conversation_history)
+
     def handle_conversation(self, message: Message):
         """Evaluate the prompt, flag data, retrieve history, and generate a response."""
         # Flag personal data if detected
@@ -42,5 +46,9 @@ class Agent:
             message.user_conversation_id
         )
 
-        # Generate and return the model response
+        instruction = self.model.identify_instruction_type(
+            conversation_history
+        )
+        if instruction == 'Operating Instructions':
+            return self.generate_response(conversation_history)
         return self.generate_response(conversation_history)

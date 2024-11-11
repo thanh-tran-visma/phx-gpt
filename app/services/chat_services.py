@@ -54,6 +54,11 @@ class ChatService:
                     "response": "Failed to create or retrieve the conversation.",
                 }
 
+            # Log conversation order for debugging purposes
+            logger.info(
+                f"Conversation order: {conversation.conversation_order}"
+            )
+
             # Check if the UserConversation already exists
             user_conversation_exists = (
                 self.db_manager.check_user_conversation_exists(
@@ -72,6 +77,7 @@ class ChatService:
                     return {
                         "status": HTTPStatus.INTERNAL_SERVER_ERROR.value,
                         "response": "Failed to create user conversation.",
+                        "conversation_order": -1,
                     }
             else:
                 # If it already exists, retrieve the existing user conversation
@@ -106,6 +112,7 @@ class ChatService:
             return {
                 "status": HTTPStatus.OK.value,
                 "response": bot_response.content,
+                "conversation_order": conversation.conversation_order,
             }
 
         except Exception as e:

@@ -81,3 +81,10 @@ class ConversationManager:
         conversation.end_at = func.current_timestamp()
         self.db.commit()
         return True
+
+    def get_conversation_by_user_id(self, user_id):
+        return (
+            self.db.query(Conversation)
+            .filter(Conversation.user_id == user_id)
+            .all()
+        )

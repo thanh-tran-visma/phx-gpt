@@ -795,7 +795,7 @@ def main():
     personal_data = [
         # English Cases
         {
-            "prompt": "Allice Smith's email is allice.smith@example..com. Her BSN is 12345678. Her address is 15 Elm Street, and her zip code is 12345.",
+            "prompt": "Alice Smith's email is allice.smith@example..com. Her BSN is 12345678. Her address is 15 Elm Street, and her zip code is 12345.",
             "response": "True",
         },
         {
@@ -1034,6 +1034,60 @@ def main():
         },
         {
             "prompt": "Smantha was born on 15/13/2024, she's 34 year.",
+            "response": "True",
+        },
+        {
+            "prompt": "Jke's date of brith is 2024-31-11 and he is 28 yo.",
+            "response": "True",
+        },
+        {"prompt": "Mia's dob is 01//12/2024. She is 24.", "response": "True"},
+        {
+            "prompt": "His birthdate is 1/13/2024, he is now 35 year.",
+            "response": "True",
+        },
+        {
+            "prompt": "Born on Febuary 29, 2024, Jake is 33 years old.",
+            "response": "True",
+        },
+        {
+            "prompt": "Ben's birtdate: 2024/12/01. He is twenty five.",
+            "response": "True",
+        },
+        {"prompt": "Anna, dob 12th Oct, 2024, age 32.", "response": "True"},
+        {
+            "prompt": "Her DOB is 01-33-2024, and she's 22 yr.",
+            "response": "True",
+        },
+        {
+            "prompt": "His date of brth is 12/01/2024. Now he's 45 yo.",
+            "response": "True",
+        },
+        {
+            "prompt": "asdicjsdocnsdjk Allice Smith's email is allice.smith@example..com. Her BSN is 12345678. Her home adress is 45 Elm St, and her postal code is 9021. Her MasterCard number is 5412-3456-7890-12345 and her IBAN number is GB29NWBK60161331926819.",
+            "response": "True",
+        },
+        {
+            "prompt": "sdkjcnskjdcnkjsdcnsdncljkncpda Ma rk Jon son h as a n em ail m ar k.j @e xa m pl .c om.  H i s   B     SN i s 9 876 543 2. H is  ad re s s  i s 72 O ak Ave. His zip code is 5 4321.",
+            "response": "True",
+        },
+        {
+            "prompt": " asdcasdca ad sasdcdsdacc email: test.email@invalid..com. BSN: 321-45-6789. IP address: 172.16.254.01. sdcasdcafwqefsad2324567",
+            "response": "True",
+        },
+        {
+            "prompt": "adscsdf234wedqwsda C on  ta          c t m e  at m y ema il add res s: not.a.v. alid .email@domain..com.   My BS N is 1. 234. 567 89, and my IP is 192.168.0.256. asr123rdascsadc",
+            "response": "True",
+        },
+        {
+            "prompt": "savcasf 23r fsda12 werfThere is a problem with my email, which is john.doe@exampl.com, and my BSN is 234-56-7890.",
+            "response": "True",
+        },
+        {
+            "prompt": "Johhn's bisadcasdr123t hdate is Dec 32, 2024. He is now 26 yrs old.",
+            "response": "True",
+        },
+        {
+            "prompt": "sdfsad2 34 asc ac scSmantha was born on 15/13/2024, she's 34 year.",
             "response": "True",
         },
         {
@@ -1387,20 +1441,530 @@ def main():
             "response": "False",
         },
     ]
+    phx_operation_data = [
+        {
+            "prompt": "I want to create a new operation.",
+            "response": "In order to create a new operation, please provide the following details:\n1. Operation Name\n2. Invoice Description (Optional)\n3. Duration (in minutes)\n4. Whether invoicing will be applied (yes or no)\n5. Hourly Rate (if invoicing is applied)\n6. Unit Price (if invoicing is not applied)\n7. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Please provide the details to create a new operation.",
+            "response": "To create a new operation, kindly provide the following details:\n1. Operation Name\n2. Invoice Description (Optional)\n3. Duration (in minutes)\n4. Whether invoicing will be applied (yes or no)\n5. Hourly Rate (if invoicing is applied)\n6. Unit Price (if invoicing is not applied)\n7. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "I want to create a new operation. But I don't have the invoice description yet.",
+            "response": "No problem! The invoice description is optional. Please provide the other required details:\n1. Operation Name\n2. Duration (in minutes)\n3. Whether invoicing will be applied (yes or no)\n4. Hourly Rate (if invoicing is applied)\n5. Unit Price (if invoicing is not applied)\n6. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "I have the operation name, duration, and invoicing details, but no methods of consultation.",
+            "response": "Please provide the method of consultation. You can choose from TEL, WEB, or LOC.",
+        },
+        {
+            "prompt": "I want to create a new operation with the operation name, invoicing applied, and hourly rate.",
+            "response": "Please also provide the following:\n1. Duration (in minutes)\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "I want to create a new operation but I don’t have the hourly rate.",
+            "response": "No problem! If invoicing is applied, the hourly rate is required. Please provide the hourly rate to proceed.",
+        },
+        {
+            "prompt": "I want to create a new operation but I'm unsure about the invoicing.",
+            "response": "Please let us know whether invoicing will be applied. If yes, we’ll need the hourly rate. If not, we’ll need the unit price.",
+        },
+        {
+            "prompt": "I want to create a new operation. The name is 'Customer Support Call'.",
+            "response": "In order to create the 'Customer Support Call' operation, please provide the following details:\n1. Invoice Description (Optional)\n2. Duration (in minutes)\n3. Whether invoicing will be applied (yes or no)\n4. Hourly Rate (if invoicing is applied)\n5. Unit Price (if invoicing is not applied)\n6. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Create a new operation named 'Marketing Consultation' with invoicing applied and unit price 100.",
+            "response": "Please provide the following missing details:\n1. Duration (in minutes)\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "I want to create a new operation called 'Product Demo' with invoicing not applied and unit price 200.",
+            "response": "In order to create the 'Product Demo' operation, please provide the following details:\n1. Duration (in minutes)\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Create operation 'Financial Review' with invoicing yes, hourly rate 150.",
+            "response": "Please also provide the following details:\n1. Duration (in minutes)\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "I want to create a new operation 'Sales Meeting' but I don't know the duration yet.",
+            "response": "No problem! Please provide the other details:\n1. Invoice Description (Optional)\n2. Whether invoicing will be applied (yes or no)\n3. Hourly Rate (if invoicing is applied)\n4. Unit Price (if invoicing is not applied)\n5. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Please create a new operation 'Team Workshop' with invoicing applied, hourly rate 120, and method of consultation WEB.",
+            "response": "Please provide the missing details:\n1. Duration (in minutes)",
+        },
+        {
+            "prompt": "Create a new operation called 'Webinar' with no invoicing applied, unit price 50.",
+            "response": "In order to create the 'Webinar' operation, please provide the following details:\n1. Duration (in minutes)\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "I want to create an operation called 'Team Training'.",
+            "response": "To create the 'Team Training' operation, please provide the following details:\n1. Invoice Description (Optional)\n2. Duration (in minutes)\n3. Whether invoicing will be applied (yes or no)\n4. Hourly Rate (if invoicing is applied)\n5. Unit Price (if invoicing is not applied)\n6. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "I have the operation name, description, and hourly rate. But I don’t have the duration yet.",
+            "response": "No worries! Please provide the missing details:\n1. Duration (in minutes)\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Please create an operation called 'Product Training'. I have the hourly rate and duration.",
+            "response": "Please provide the following missing details:\n1. Invoice Description (Optional)\n2. Whether invoicing will be applied (yes or no)\n3. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "I want to create a new operation, but I’m not sure about the method of consultation.",
+            "response": "Please select a method of consultation: TEL, WEB, or LOC.",
+        },
+        {
+            "prompt": "Can you create a new operation for a webinar? I know the operation name and invoicing details.",
+            "response": "Please also provide the following details:\n1. Duration (in minutes)\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Create an operation 'Consulting Session' with invoicing applied. The hourly rate is 100.",
+            "response": "Please provide the following missing details:\n1. Duration (in minutes)\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "I want to create a new operation called 'Client Call' with no invoicing. I know the unit price.",
+            "response": "In order to create the 'Client Call' operation, please provide the following details:\n1. Duration (in minutes)\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "I need a new operation called 'Strategy Meeting' with hourly rate 120. I don’t have the unit price.",
+            "response": "Please specify whether invoicing will be applied. If invoicing is applied, the hourly rate is required. Otherwise, provide the unit price.",
+        },
+        {
+            "prompt": "Create an operation 'Team Review' where invoicing is not applied. The unit price is 200.",
+            "response": "In order to create the 'Team Review' operation, please provide the following details:\n1. Duration (in minutes)\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Create an operation for 'Client Onboarding'. I have the invoice description and method of consultation.",
+            "response": "Please provide the following missing details:\n1. Duration (in minutes)\n2. Whether invoicing will be applied (yes or no)\n3. Hourly Rate (if invoicing is applied)\n4. Unit Price (if invoicing is not applied)",
+        },
+        {
+            "prompt": "I want to create a new operation for 'Product Consultation'. I know the duration and invoicing details.",
+            "response": "Please also provide the following:\n1. Operation Name\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Create a new operation called 'Branding Workshop' with invoicing applied.",
+            "response": "Please provide the following missing details:\n1. Duration (in minutes)\n2. Hourly Rate (if invoicing is applied)\n3. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "I want to create an operation called 'Market Research' with unit price 300.",
+            "response": "Please provide the following missing details:\n1. Duration (in minutes)\n2. Methods of Consultation (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken.",
+            "response": "Om een nieuwe operatie te maken, geef alstublieft de volgende gegevens op:\n1. Operatienaam\n2. Factuuromschrijving (Optioneel)\n3. Duur (in minuten)\n4. Of er gefactureerd zal worden (ja of nee)\n5. Uurtarief (indien facturering van toepassing is)\n6. Stukprijs (indien geen facturering van toepassing is)\n7. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Geef de gegevens voor het maken van een nieuwe operatie.",
+            "response": "Om een nieuwe operatie te maken, geef alstublieft de volgende gegevens op:\n1. Operatienaam\n2. Factuuromschrijving (Optioneel)\n3. Duur (in minuten)\n4. Of er gefactureerd zal worden (ja of nee)\n5. Uurtarief (indien facturering van toepassing is)\n6. Stukprijs (indien geen facturering van toepassing is)\n7. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken, maar ik heb de factuuromschrijving nog niet.",
+            "response": "Geen probleem! De factuuromschrijving is optioneel. Geef de andere vereiste gegevens op:\n1. Operatienaam\n2. Duur (in minuten)\n3. Of er gefactureerd zal worden (ja of nee)\n4. Uurtarief (indien facturering van toepassing is)\n5. Stukprijs (indien geen facturering van toepassing is)\n6. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Ik heb de operatienaam, duur en factureringsgegevens, maar geen methode van consultatie.",
+            "response": "Geef de methode van consultatie op. Je kunt kiezen uit TEL, WEB of LOC.",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken met de operatienaam, facturering toegepast, en uurtarief.",
+            "response": "Geef ook de volgende gegevens op:\n1. Duur (in minuten)\n2. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken, maar ik heb het uurtarief niet.",
+            "response": "Geen probleem! Als facturering van toepassing is, is het uurtarief vereist. Geef het uurtarief op om verder te gaan.",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken, maar ik weet niet zeker of er gefactureerd zal worden.",
+            "response": "Laat ons weten of er gefactureerd zal worden. Als dat het geval is, hebben we het uurtarief nodig. Zo niet, hebben we de stukprijs nodig.",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken. De naam is 'Klantenondersteuning Oproep'.",
+            "response": "Om de operatie 'Klantenondersteuning Oproep' te maken, geef alstublieft de volgende gegevens op:\n1. Factuuromschrijving (Optioneel)\n2. Duur (in minuten)\n3. Of er gefactureerd zal worden (ja of nee)\n4. Uurtarief (indien facturering van toepassing is)\n5. Stukprijs (indien geen facturering van toepassing is)\n6. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Maak een nieuwe operatie genaamd 'Marketing Consultatie' met facturering toegepast en een stukprijs van 100.",
+            "response": "Geef de volgende ontbrekende gegevens op:\n1. Duur (in minuten)\n2. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken genaamd 'Product Demo' met geen facturering toegepast en een stukprijs van 200.",
+            "response": "Om de operatie 'Product Demo' te maken, geef alstublieft de volgende gegevens op:\n1. Duur (in minuten)\n2. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Maak de operatie 'Financiële Beoordeling' met facturering ja, uurtarief 150.",
+            "response": "Geef ook de volgende gegevens op:\n1. Duur (in minuten)\n2. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie 'Sales Meeting' maken, maar ik weet de duur nog niet.",
+            "response": "Geen probleem! Geef de andere gegevens op:\n1. Factuuromschrijving (Optioneel)\n2. Of er gefactureerd zal worden (ja of nee)\n3. Uurtarief (indien facturering van toepassing is)\n4. Stukprijs (indien geen facturering van toepassing is)\n5. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Maak een nieuwe operatie 'Team Workshop' met facturering toegepast, uurtarief 120 en methode van consultatie WEB.",
+            "response": "Geef de ontbrekende gegevens op:\n1. Duur (in minuten)",
+        },
+        {
+            "prompt": "Maak een nieuwe operatie genaamd 'Webinar' zonder facturering toegepast, stukprijs 50.",
+            "response": "Om de operatie 'Webinar' te maken, geef alstublieft de volgende gegevens op:\n1. Duur (in minuten)\n2. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Ik wil de operatie 'Team Training' maken.",
+            "response": "Om de operatie 'Team Training' te maken, geef alstublieft de volgende gegevens op:\n1. Factuuromschrijving (Optioneel)\n2. Duur (in minuten)\n3. Of er gefactureerd zal worden (ja of nee)\n4. Uurtarief (indien facturering van toepassing is)\n5. Stukprijs (indien geen facturering van toepassing is)\n6. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Ik heb de operatienaam, omschrijving en uurtarief. Maar ik heb de duur nog niet.",
+            "response": "Geen zorgen! Geef de ontbrekende gegevens op:\n1. Duur (in minuten)\n2. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Maak een operatie genaamd 'Product Training'. Ik heb het uurtarief en de duur.",
+            "response": "Geef de volgende ontbrekende gegevens op:\n1. Factuuromschrijving (Optioneel)\n2. Of er gefactureerd zal worden (ja of nee)\n3. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken, maar ik weet niet zeker over de methode van consultatie.",
+            "response": "Kies een methode van consultatie: TEL, WEB of LOC.",
+        },
+        {
+            "prompt": "Kun je een nieuwe operatie maken voor een webinar? Ik weet de operatienaam en factureringdetails.",
+            "response": "Geef ook de volgende gegevens op:\n1. Duur (in minuten)\n2. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Maak een operatie 'Consultatiesessie' met facturering toegepast. Het uurtarief is 100.",
+            "response": "Geef de volgende ontbrekende gegevens op:\n1. Duur (in minuten)\n2. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken genaamd 'Klantenoproep' zonder facturering. Ik weet de stukprijs.",
+            "response": "Om de operatie 'Klantenoproep' te maken, geef alstublieft de volgende gegevens op:\n1. Duur (in minuten)\n2. Methode van consultatie (TEL, WEB, LOC)",
+        },
+        {
+            "prompt": "Ik heb een nieuwe operatie nodig genaamd 'Strategiebespreking' met uurtarief 120. Ik heb de stukprijs niet.",
+            "response": "Geef aan of facturering toegepast wordt. Als facturering wordt toegepast, is het uurtarief vereist. Anders, geef de stukprijs op.",
+        },
+        {
+            "prompt": "Maak een operatie 'Teambeoordeling' waarbij geen facturering wordt toegepast. De stukprijs is 200.",
+            "response": "Om de operatie 'Teambeoordeling' te maken, geef alstublieft de volgende gegevens op:\n1. Duur (in minuten)\n2. Methode van consultatie (TEL, WEB, LOC)",
+        },
+    ]
+    phx_instructions_data = [
+        {
+            "prompt": "I want to create a new operation.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Please provide the details to create a new operation.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create a new operation. But I don't have the invoice description yet.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I have the operation name, duration, and invoicing details, but no methods of consultation.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create a new operation with the operation name, invoicing applied, and hourly rate.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create a new operation but I don’t have the hourly rate.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create a new operation but I'm unsure about the invoicing.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create a new operation. The name is 'Customer Support Call'.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Create a new operation named 'Marketing Consultation' with invoicing applied and unit price 100.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create a new operation called 'Product Demo' with invoicing not applied and unit price 200.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Create operation 'Financial Review' with invoicing yes, hourly rate 150.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create a new operation 'Sales Meeting' but I don't know the duration yet.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Please create a new operation 'Team Workshop' with invoicing applied, hourly rate 120, and method of consultation WEB.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Create a new operation called 'Webinar' with no invoicing applied, unit price 50.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create an operation called 'Team Training'.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I have the operation name, description, and hourly rate. But I don’t have the duration yet.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Please create an operation called 'Product Training'. I have the hourly rate and duration.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create a new operation, but I’m not sure about the method of consultation.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Can you create a new operation for a webinar? I know the operation name and invoicing details.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Create an operation 'Consulting Session' with invoicing applied. The hourly rate is 100.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create a new operation called 'Client Call' with no invoicing. I know the unit price.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I need a new operation called 'Strategy Meeting' with hourly rate 120. I don’t have the unit price.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Create an operation 'Team Review' where invoicing is not applied. The unit price is 200.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Create an operation for 'Client Onboarding'. I have the invoice description and method of consultation.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create a new operation for 'Product Consultation'. I know the duration and invoicing details.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Create a new operation called 'Branding Workshop' with invoicing applied.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "I want to create an operation called 'Market Research' with unit price 300.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Geef de gegevens voor het maken van een nieuwe operatie.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken, maar ik heb de factuuromschrijving nog niet.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik heb de operatienaam, duur en factureringsgegevens, maar geen methode van consultatie.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken met de operatienaam, facturering toegepast, en uurtarief.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken, maar ik heb het uurtarief niet.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken, maar ik weet niet zeker of er gefactureerd zal worden.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken. De naam is 'Klantenondersteuning Oproep'.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Maak een nieuwe operatie genaamd 'Marketing Consultatie' met facturering toegepast en een stukprijs van 100.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken genaamd 'Product Demo' met geen facturering toegepast en een stukprijs van 200.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Maak de operatie 'Financiële Beoordeling' met facturering ja, uurtarief 150.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie 'Sales Meeting' maken, maar ik weet de duur nog niet.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Maak een nieuwe operatie 'Team Workshop' met facturering toegepast, uurtarief 120 en methode van consultatie WEB.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Maak een nieuwe operatie genaamd 'Webinar' zonder facturering toegepast, stukprijs 50.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik wil de operatie 'Team Training' maken.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik heb de operatienaam, omschrijving en uurtarief. Maar ik heb de duur nog niet.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Maak een operatie genaamd 'Product Training'. Ik heb het uurtarief en de duur.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken, maar ik weet niet zeker over de methode van consultatie.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Kun je een nieuwe operatie maken voor een webinar? Ik weet de operatienaam en factureringdetails.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Maak een operatie 'Consultatiesessie' met facturering toegepast. Het uurtarief is 100.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik wil een nieuwe operatie maken genaamd 'Klantenoproep' zonder facturering. Ik weet de stukprijs.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Ik heb een nieuwe operatie nodig genaamd 'Strategiebespreking' met uurtarief 120. Ik heb de stukprijs niet.",
+            "response": "Operating Instructions",
+        },
+        {
+            "prompt": "Maak een operatie 'Teambeoordeling' waarbij geen facturering wordt toegepast. De stukprijs is 200.",
+            "response": "Operating Instructions",
+        },
+        # default
+        {
+            "prompt": "Hi what is your name?",
+            "response": "Default",
+        },
+        {
+            "prompt": "1+2+3+4+5+6",
+            "response": "Default",
+        },
+        {
+            "prompt": "Hello, how can you help me?",
+            "response": "Default",
+        },
+        {
+            "prompt": "Tell me a joke.",
+            "response": "Default",
+        },
+        {
+            "prompt": "What is the weather today?",
+            "response": "Default",
+        },
+        {
+            "prompt": "Who was the first president of the United States?",
+            "response": "Default",
+        },
+        {
+            "prompt": "Translate 'Hello' to French.",
+            "response": "Default",
+        },
+        {
+            "prompt": "List the planets in the solar system.",
+            "response": "Default",
+        },
+        {
+            "prompt": "What is the square root of 64?",
+            "response": "Default",
+        },
+        {
+            "prompt": "How many countries are in Europe?",
+            "response": "Default",
+        },
+        {
+            "prompt": "What’s the capital of Japan?",
+            "response": "Default",
+        },
+        {
+            "prompt": "2+2",
+            "response": "Default",
+        },
+        {
+            "prompt": "Define artificial intelligence.",
+            "response": "Default",
+        },
+        {
+            "prompt": "What is your favorite color?",
+            "response": "Default",
+        },
+        {
+            "prompt": "Hallo, hoe kun je me helpen?",
+            "response": "Default",
+        },
+        {
+            "prompt": "Vertel me een grap.",
+            "response": "Default",
+        },
+        {
+            "prompt": "Wat is het weer vandaag?",
+            "response": "Default",
+        },
+        {
+            "prompt": "Wie was de eerste president van de Verenigde Staten?",
+            "response": "Default",
+        },
+        {
+            "prompt": "Vertaal 'Hallo' naar het Frans.",
+            "response": "Default",
+        },
+        {
+            "prompt": "Noem de planeten in het zonnestelsel.",
+            "response": "Default",
+        },
+        {
+            "prompt": "Wat is de vierkantswortel van 64?",
+            "response": "Default",
+        },
+        {
+            "prompt": "Hoeveel landen zijn er in Europa?",
+            "response": "Default",
+        },
+        {
+            "prompt": "Wat is de hoofdstad van Japan?",
+            "response": "Default",
+        },
+        {
+            "prompt": "2+2",
+            "response": "Default",
+        },
+        {
+            "prompt": "Definieer kunstmatige intelligentie.",
+            "response": "Default",
+        },
+        {
+            "prompt": "Wat is je favoriete kleur?",
+            "response": "Default",
+        },
+    ]
     # Instructions
     anonymize_instruction = "Anonymize the data"
     qa_instruction = "Answer the question"
-    personal_data_instruction = (
-        "Detect personal data then return True or False"
-    )
+    personal_data_instruction = "Return True or False. Note that the data may contain inaccuracies in the response"
+    phx_operation_instruction = "Handle Operating"
+    phx_instructions_instruction = "Return the most suitable instruction"
     # Initialize preparer and add data entries
     preparer = DatasetPreparer()
     preparer.add_data(anonymize_instruction, anonymize_data)
     preparer.add_data(qa_instruction, qa_data)
     preparer.add_data(personal_data_instruction, personal_data)
-
+    preparer.add_data(phx_operation_instruction, phx_operation_data)
+    preparer.add_data(phx_instructions_instruction, phx_instructions_data)
     # Save the dataset to a JSONL file
-    json_file_path = "blueVi-GPT-dataset-answer-question.json"
+    json_file_path = "blueVi-GPT-dataset.json"
     preparer.save_to_jsonl(json_file_path)
 
     repo_name = "ThanhTranVisma/blueVi-GPT-dataset"
@@ -1409,7 +1973,7 @@ def main():
     api = HfApi()
     api.upload_file(
         path_or_fileobj=json_file_path,
-        path_in_repo="blueVi-GPT-dataset-answer-question.json",
+        path_in_repo="blueVi-GPT-dataset.json",
         repo_id=repo_name,
         repo_type="dataset",
         token=HF_TOKEN,
