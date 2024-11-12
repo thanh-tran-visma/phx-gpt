@@ -20,3 +20,4 @@ black
 black[jupyter]
 sqlalchemy-stubs
 pytest-asyncio
+redis[asyncio]

@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import List
 
@@ -8,7 +9,8 @@ from llama_cpp import (
 )
 
 from app.model import Message
-from app.schemas import GptResponseSchema
+from app.schemas import GptResponseSchema, PhxAppOperation
+from app.types.enum import InstructionTypes
 
 
 class BlueViGptAssistantRole:
@@ -69,7 +71,7 @@ class BlueViGptAssistantRole:
 
     def identify_instruction_type(self, prompt: str) -> str:
         """Identify the type of instruction based on the prompt content."""
-        instruction_prompt = f"Choose the most appropriate instruction between 'Handle Operating' and 'Default' based on the context provided in: {prompt}"
+        instruction_prompt = f"Choose the most appropriate instruction between {InstructionTypes.OPERATION.value} and {InstructionTypes.DEFAULT.value} based on the context provided in: {prompt}"
         try:
             response = self.llm.create_chat_completion(
                 messages=[
@@ -80,18 +82,16 @@ class BlueViGptAssistantRole:
             )
             choices = response.get("choices")
             if isinstance(choices, list) and len(choices) > 0:
-                category = choices[0]["message"]["content"].strip()
-                logging.info(f"Instruction type identified: {category}")
-                return category
-            return "Default"
+                return choices[0]["message"]["content"].strip()
+            return InstructionTypes.DEFAULT.value
         except Exception as e:
             logging.error(f"Error identifying instruction type: {e}")
-            return "Default"
+            return InstructionTypes.DEFAULT.value
 
     def handle_operation_instructions(
         self, conversation_history: List[Message]
-    ) -> GptResponseSchema:
-        """Generate a response from the model for operation instructions."""
+    ) -> PhxAppOperation:  # Return type is PhxAppOperation
+        """Generate a response from the model for operation instructions, filling in empty values."""
         try:
             # Prepare the messages for the model, ensuring the conversation history is properly mapped
             mapped_messages: List[ChatCompletionRequestUserMessage] = [
@@ -100,31 +100,80 @@ class BlueViGptAssistantRole:
                 )
                 for msg in conversation_history
             ]
+
+            # Define the operation schema with empty values for the model to fill
+            operation_schema = PhxAppOperation(
+                name="",
+                invoice_description=None,
+                duration=None,
+                wizard=None,
+                invoicing=False,
+                hourlyRate=None,
+                unitPrice=None,
+                operationRateType=None,
+                methodsOfConsult=None,
+            )
+
+            # Use model_dump instead of dict to serialize the schema
+            operation_schema_dict = operation_schema.model_dump(
+                exclude_unset=True
+            )
             operating_instructions = {
-                "role": "user",
-                "content": "Operating Instructions: Please follow the provided steps carefully to create a new operation.",
+                "role": "assistant",
+                "content": f"Instructions: Use the schema with empty values: {json.dumps(operation_schema_dict)}. Return the correct JSON format. Fields can be None if not in the prompt.",
             }
-
-            # Add the instruction to the beginning of the mapped messages
             mapped_messages.insert(0, operating_instructions)
-
-            # Get the response from the model
             response = self.llm.create_chat_completion(
                 messages=mapped_messages
             )
             choices = response.get("choices")
-
             if isinstance(choices, list) and len(choices) > 0:
                 message_content = choices[0]["message"]["content"]
-                return GptResponseSchema(content=message_content)
-
-            return GptResponseSchema(
-                content="Sorry, I couldn't generate a response."
-            )
+                try:
+                    parsed_response = json.loads(message_content)
+                    operation_schema.name = parsed_response.get("name", "")
+                    operation_schema.invoice_description = parsed_response.get(
+                        "invoice_description", None
+                    )
+                    operation_schema.duration = parsed_response.get(
+                        "duration", None
+                    )
+                    operation_schema.wizard = parsed_response.get(
+                        "wizard", None
+                    )
+                    operation_schema.invoicing = parsed_response.get(
+                        "invoicing", False
+                    )
+                    operation_schema.hourlyRate = parsed_response.get(
+                        "hourlyRate", None
+                    )
+                    operation_schema.unitPrice = parsed_response.get(
+                        "unitPrice", None
+                    )
+                    operation_schema.operationRateType = parsed_response.get(
+                        "operationRateType", None
+                    )
+                    operation_schema.methodsOfConsult = parsed_response.get(
+                        "methodsOfConsult", None
+                    )
+                except json.JSONDecodeError:
+                    logging.error(
+                        "Failed to parse the response content as JSON"
+                    )
+                return operation_schema
+            return operation_schema
         except Exception as e:
             logging.error(
                 f"Unexpected error while generating chat response: {e}"
             )
-            return GptResponseSchema(
-                content="Sorry, something went wrong while generating a response. Please retry with a shorter prompt."
+            return PhxAppOperation(
+                name="Error",
+                invoice_description=None,
+                duration=None,
+                wizard=None,
+                invoicing=False,
+                hourlyRate=None,
+                unitPrice=None,
+                operationRateType=None,
+                methodsOfConsult=None,
             )

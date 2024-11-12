@@ -13,6 +13,7 @@ services:
     restart: on-failure
     depends_on:
       - gpt_mysql
+      - redis
     networks:
       - internal
       - dotweb.test
@@ -22,11 +23,14 @@ services:
       - BLUEVI_GPT=${BLUEVI_GPT}
       - GGUF_MODEL=${GGUF_MODEL}
       - BEARER_TOKEN=${BEARER_TOKEN}
-      - DB_HOST=gpt_mysql  
+      - DB_HOST=gpt_mysql
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=gpt_user
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_PORT=3306
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
 
   nginx:
     container_name: gpt_web
@@ -55,6 +59,17 @@ services:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=gpt_user
       - MYSQL_PASSWORD=${DB_PASSWORD}
+
+  redis:
+    container_name: gpt_redis
+    image: redis:7
+    restart: on-failure
+    networks:
+      - internal
+    ports:
+      - "6376:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
 
 networks:
   internal:

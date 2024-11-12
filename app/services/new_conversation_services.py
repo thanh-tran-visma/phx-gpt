@@ -21,12 +21,7 @@ class NewConversationService:
 
         # Get the newest conversation
         conversation = self.db_manager.get_newest_conversation(user.id)
-        if conversation is None:
-            return {
-                "status": HTTPStatus.OK.value,
-                "conversation_order": 1,
-            }
         return {
             "status": HTTPStatus.OK.value,
-            "conversation_order": conversation.conversation_order,
+            "conversation_order": conversation.conversation_order + 1,
         }
