@@ -41,7 +41,6 @@ BEARER_TOKEN = EnvConfig.get("BEARER_TOKEN")
 API_URL = EnvConfig.get("API_URL")
 
 REDIS_HOST = EnvConfig.get("API_URL")
-REDIS_PASSWORD = EnvConfig.get("REDIS_PASSWORD")
 REDIS_PORT = EnvConfig.get_int("REDIS_PORT")
 
 LLM_MAX_TOKEN = EnvConfig.get_int("LLM_MAX_TOKEN", 2048)

@@ -15,5 +15,4 @@ from .config_env import (
     API_URL,
     REDIS_PORT,
     REDIS_HOST,
-    REDIS_PASSWORD,
 )
