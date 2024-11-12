@@ -19,12 +19,12 @@ class NewConversationService:
                 "response": "User not found or could not be created.",
             }
 
-        # Create a new conversation
-        conversation = self.db_manager.get_or_create_conversation(user.id)
+        # Get the newest conversation
+        conversation = self.db_manager.get_newest_conversation(user.id)
         if conversation is None:
             return {
-                "status": HTTPStatus.NOT_FOUND.value,
-                "response": "Failed to create conversation.",
+                "status": HTTPStatus.OK.value,
+                "conversation_order": 1,
             }
         return {
             "status": HTTPStatus.OK.value,

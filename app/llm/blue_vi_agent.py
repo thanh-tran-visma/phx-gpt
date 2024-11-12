@@ -1,5 +1,6 @@
 import logging
 from app.model import Message
+from app.schemas import GptResponseSchema
 
 
 class Agent:
@@ -10,8 +11,10 @@ class Agent:
         self.history_window_size = history_window_size
 
     def flag_personal_data(self, prompt: str) -> bool:
-        """Flag personal data in the user prompt using the model."""
-        is_personal_data = self.model.check_for_personal_data(prompt)
+        """Flag personal data in the user prompt using the assistant role."""
+        is_personal_data = self.model.assistant_role.check_for_personal_data(
+            prompt
+        )
         if is_personal_data:
             logging.warning(f"Personal data detected: {prompt}")
         return is_personal_data
@@ -27,15 +30,19 @@ class Agent:
             conversation_history
         )
 
-    def generate_response(self, conversation_history):
-        """Generate a response from the model."""
-        return self.model.get_chat_response(conversation_history)
+    def generate_response(self, conversation_history) -> GptResponseSchema:
+        """Generate a response using the user role."""
+        return self.model.user_role.get_chat_response(conversation_history)
 
-    def handle_operation_instructions(self, conversation_history):
-        """Generate a response from the model for operating."""
-        return self.model.handle_operation_instructions(conversation_history)
+    def handle_operation_instructions(
+        self, conversation_history
+    ) -> GptResponseSchema:
+        """Generate a response for operation instructions using the assistant role."""
+        return self.model.assistant_role.handle_operation_instructions(
+            conversation_history
+        )
 
-    def handle_conversation(self, message: Message):
+    def handle_conversation(self, message: Message) -> GptResponseSchema:
         """Evaluate the prompt, flag data, retrieve history, and generate a response."""
         # Flag personal data if detected
         if self.flag_personal_data(message.content):
@@ -46,9 +53,12 @@ class Agent:
             message.user_conversation_id
         )
 
-        instruction = self.model.identify_instruction_type(
-            conversation_history
+        # Identify if this prompt needs special handling
+        instruction_type = self.model.assistant_role.identify_instruction_type(
+            message.content
         )
-        if instruction == 'Operating Instructions':
-            return self.generate_response(conversation_history)
+
+        if instruction_type == 'Handle Operating':
+            return self.handle_operation_instructions(conversation_history)
+
         return self.generate_response(conversation_history)

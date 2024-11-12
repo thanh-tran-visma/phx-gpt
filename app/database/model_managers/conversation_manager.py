@@ -88,3 +88,19 @@ class ConversationManager:
             .filter(Conversation.user_id == user_id)
             .all()
         )
+
+    def get_newest_conversation(
+        self, user_id: int, conversation_order: Optional[int] = None
+    ) -> Optional[Conversation]:
+        query = self.db.query(Conversation).filter(
+            Conversation.user_id == user_id
+        )
+
+        if conversation_order is not None:
+            query = query.filter(
+                Conversation.conversation_order == conversation_order
+            )
+        else:
+            query = query.order_by(Conversation.conversation_order.desc())
+
+        return query.first()

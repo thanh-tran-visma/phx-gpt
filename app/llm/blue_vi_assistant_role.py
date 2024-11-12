@@ -3,72 +3,17 @@ from typing import List
 
 from llama_cpp import (
     Llama,
+    ChatCompletionRequestAssistantMessage,
     ChatCompletionRequestUserMessage,
 )
-from app.config.config_env import MODEL_NAME, HF_TOKEN, GGUF_MODEL
+
 from app.model import Message
 from app.schemas import GptResponseSchema
 
 
-class BlueViGptModel:
-    def __init__(self):
-        """Initialize BlueViGptModel with main model and embedding model."""
-        self.llm = self.load_model()
-
-    @staticmethod
-    def load_model() -> Llama:
-        """Load the main Llama model from Hugging Face."""
-        model_cache_dir = "./model_cache"
-        try:
-            llm = Llama.from_pretrained(
-                repo_id=MODEL_NAME,
-                filename=GGUF_MODEL,
-                cache_dir=model_cache_dir,
-                token=HF_TOKEN,
-            )
-            return llm
-        except Exception as e:
-            logging.error(f"Error loading the model: {e}")
-            raise
-
-    def tokenizer(
-        self, text: bytes, add_bos: bool, special: bool
-    ) -> List[int]:
-        return self.llm.tokenize(text, add_bos, special)
-
-    def get_chat_response(
-        self, conversation_history: List[Message]
-    ) -> GptResponseSchema:
-        """Generate a response from the model based on conversation history."""
-        try:
-            # Prepare messages for the model
-            mapped_messages: List[ChatCompletionRequestUserMessage] = [
-                ChatCompletionRequestUserMessage(
-                    role=msg.role, content=msg.content
-                )
-                for msg in conversation_history
-            ]
-
-            # Get response from LLM
-            response = self.llm.create_chat_completion(
-                messages=mapped_messages
-            )
-            choices = response.get("choices")
-
-            if isinstance(choices, list) and len(choices) > 0:
-                message_content = choices[0]["message"]["content"]
-                return GptResponseSchema(content=message_content)
-
-            return GptResponseSchema(
-                content="Sorry, I couldn't generate a response."
-            )
-        except Exception as e:
-            logging.error(
-                f"Unexpected error while generating chat response: {e}"
-            )
-            return GptResponseSchema(
-                content="Sorry, something went wrong while generating a response. Please retry with shorter prompt"
-            )
+class BlueViGptAssistantRole:
+    def __init__(self, llm: Llama):
+        self.llm = llm
 
     def check_for_personal_data(self, prompt: str) -> bool:
         """Detect personal data in the prompt."""
@@ -79,8 +24,8 @@ class BlueViGptModel:
         try:
             response = self.llm.create_chat_completion(
                 messages=[
-                    ChatCompletionRequestUserMessage(
-                        role="user", content=instruction
+                    ChatCompletionRequestAssistantMessage(
+                        role="assistant", content=instruction
                     )
                 ]
             )
@@ -88,18 +33,10 @@ class BlueViGptModel:
 
             if isinstance(choices, list) and len(choices) > 0:
                 model_response = choices[0]["message"]["content"]
-
-                # The model will return a direct True/False response
-                if "True" in model_response:
-                    return True
-                elif "False" in model_response:
-                    return False
-                else:
-                    return False
+                return "True" in model_response
             else:
                 logging.warning("Model did not return a valid response.")
                 return False
-
         except Exception as e:
             logging.error(f"Error checking for personal data: {e}")
             return False
@@ -111,8 +48,8 @@ class BlueViGptModel:
         try:
             response = self.llm.create_chat_completion(
                 messages=[
-                    ChatCompletionRequestUserMessage(
-                        role="user", content=instruction
+                    ChatCompletionRequestAssistantMessage(
+                        role="assistant", content=instruction
                     )
                 ]
             )
@@ -124,7 +61,6 @@ class BlueViGptModel:
                 return GptResponseSchema(
                     content="Sorry, I couldn't generate an anonymized response."
                 )
-
         except Exception as e:
             logging.error(f"Error generating anonymized message: {e}")
             return GptResponseSchema(
@@ -133,12 +69,12 @@ class BlueViGptModel:
 
     def identify_instruction_type(self, prompt: str) -> str:
         """Identify the type of instruction based on the prompt content."""
-        instruction_prompt = f"Return the most suitable instruction. Or respond with 'Default' if no specific category applies:\n\nPrompt: {prompt}"
+        instruction_prompt = f"Choose the most appropriate instruction between 'Handle Operating' and 'Default' based on the context provided in: {prompt}"
         try:
             response = self.llm.create_chat_completion(
                 messages=[
-                    ChatCompletionRequestUserMessage(
-                        role="user", content=instruction_prompt
+                    ChatCompletionRequestAssistantMessage(
+                        role="assistant", content=instruction_prompt
                     )
                 ]
             )
@@ -155,7 +91,7 @@ class BlueViGptModel:
     def handle_operation_instructions(
         self, conversation_history: List[Message]
     ) -> GptResponseSchema:
-        """Generate a response from the model for operation instructions"""
+        """Generate a response from the model for operation instructions."""
         try:
             # Prepare the messages for the model, ensuring the conversation history is properly mapped
             mapped_messages: List[ChatCompletionRequestUserMessage] = [

@@ -45,6 +45,13 @@ class DatabaseManager:
             user_id, conversation_order
         )
 
+    def get_newest_conversation(
+        self, user_id: int, conversation_order: Optional[int] = None
+    ) -> Optional[Conversation]:
+        return self.conversation_manager.get_newest_conversation(
+            user_id, conversation_order
+        )
+
     def get_conversations_by_user_id(self, user_id: int):
         return self.conversation_manager.get_conversation_by_user_id(user_id)
 
