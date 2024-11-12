@@ -15,10 +15,13 @@ class UserManager:
         self.db.commit()
         return new_user
 
-    def create_user_if_not_exists(self, user_id: int) -> Optional[User]:
+    def create_user_if_not_exists(
+        self, user_id: int, uuid: str
+    ) -> Optional[User]:
         user = self.get_user(user_id)
         if user is None:
             user = User(id=user_id)
+            user = User(uuid=uuid)
             self.db.add(user)
             self.db.commit()
             self.db.refresh(user)

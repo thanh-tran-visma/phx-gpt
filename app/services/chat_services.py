@@ -92,7 +92,7 @@ class ChatService:
                 }
 
             # Let the agent handle the conversation
-            bot_response = self.agent.handle_conversation(message)
+            bot_response = self.agent.handle_conversation(user, message)
 
             # Store the bot's response
             self.db_manager.create_message(

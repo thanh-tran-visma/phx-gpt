@@ -9,6 +9,7 @@ router = APIRouter()
 
 class UserIdRequest(BaseModel):
     user_id: int
+    uuid: str
 
 
 @router.get("/new-conversation")
@@ -18,7 +19,7 @@ async def new_conversation_endpoint(request: UserIdRequest):
     try:
         new_conversation_service = NewConversationService(db)
         response = new_conversation_service.handle_new_conversation(
-            request.user_id
+            request.user_id, request.uuid
         )
 
         if response["status"] != HTTPStatus.OK.value:

@@ -86,7 +86,7 @@ class BlueViGptAssistantRole:
             return InstructionTypes.DEFAULT.value
 
     async def handle_operation_instructions(
-        self, user_input: str
+        self, uuid: str, user_input: str
     ) -> PhxAppOperation:
         """Generate a response from the model for operation instructions and store the result in Redis."""
         try:
@@ -103,13 +103,14 @@ class BlueViGptAssistantRole:
                 methodsOfConsult=None,
                 forAppointment=True,
                 vatRate=0,
-                uuid="",
+                uuid=uuid,
             )
 
             # Serialize schema with default values, excluding unset fields
             operation_schema_dict = operation_schema.model_dump(
                 exclude_unset=True
             )
+
             operating_instructions = {
                 "role": "assistant",
                 "content": f"Instructions: Use the schema with empty values: {json.dumps(operation_schema_dict)}. Return the correct JSON format. Fields can be None if not in the prompt.",
@@ -164,11 +165,13 @@ class BlueViGptAssistantRole:
                     operation_schema.vatRate = parsed_response.get(
                         "vatRate", 0
                     )
-                    # Store the result in Redis as a JSON string
-                    redis_key = f"operation:{operation_schema.name}"  # Use operation name as key
+
+                    # Use UUID directly as Redis key
+                    redis_key = f"operation:{uuid}"
                     await self.redis_client.set(
-                        redis_key, json.dumps(operation_schema_dict)
+                        redis_key, operation_schema_dict
                     )
+
                 except json.JSONDecodeError:
                     logging.error(
                         "Failed to parse the response content as JSON"
@@ -190,7 +193,7 @@ class BlueViGptAssistantRole:
                 methodsOfConsult=None,
                 forAppointment=True,
                 vatRate=0,
-                uuid="",
+                uuid=uuid,
             )
 
     def operation_processing(self, operation: dict) -> GptResponseSchema:
@@ -198,7 +201,6 @@ class BlueViGptAssistantRole:
         instruction = f"Check for missing fields in the operation:\n{json.dumps(operation, indent=2)}\n"
 
         try:
-            # Sending the instruction to the LLM to check for missing fields
             response = self.llm.create_chat_completion(
                 messages=[
                     ChatCompletionRequestAssistantMessage(
@@ -208,14 +210,22 @@ class BlueViGptAssistantRole:
             )
             choices = response.get("choices")
             if isinstance(choices, list) and len(choices) > 0:
-                message_content = choices[0]["message"]["content"]
-                return GptResponseSchema(content=message_content)
+                model_response = choices[0]["message"]["content"]
+                if "True" in model_response:
+                    return GptResponseSchema(content=model_response)
+                elif "False" in model_response:
+                    error_message = model_response.split("False")[-1].strip()
+                    return GptResponseSchema(
+                        content=f"Response is False. Error: {error_message}"
+                    )
+                else:
+                    return GptResponseSchema(content=model_response)
             else:
                 return GptResponseSchema(
-                    content="Sorry, I couldn't generate an anonymized response."
+                    content="Sorry, an error occurred while processing operation."
                 )
         except Exception as e:
-            logging.error(f"Error generating anonymized message: {e}")
+            logging.error(f"Error generating response: {e}")
             return GptResponseSchema(
-                content="Sorry, an error occurred while generating an anonymized response."
+                content="Sorry, an error occurred while processing operation."
             )

@@ -1,5 +1,5 @@
 import logging
-from app.model import Message
+from app.model import Message, User
 from app.schemas import GptResponseSchema
 from app.types.enum import InstructionTypes
 
@@ -40,12 +40,14 @@ class Agent:
         return self.model.user_role.get_chat_response(conversation_history)
 
     def handle_operation_instructions(
-        self, user_input: str
+        self, uuid: str, user_input: str
     ) -> GptResponseSchema:
         """Generate a response for operation instructions using the assistant role."""
         # Generate the initial operation schema from assistant role
         operation_schema = (
-            self.model.assistant_role.handle_operation_instructions(user_input)
+            self.model.assistant_role.handle_operation_instructions(
+                uuid, user_input
+            )
         )
 
         logging.info(
@@ -67,7 +69,9 @@ class Agent:
         # Return the operation schema or GptResponseSchema
         return GptResponseSchema(content=operation_schema.name)
 
-    def handle_conversation(self, message: Message) -> GptResponseSchema:
+    def handle_conversation(
+        self, user: User, message: Message
+    ) -> GptResponseSchema:
         """Evaluate the prompt, flag data, retrieve history, and generate a response."""
         try:
             # Flag personal data if detected
@@ -93,7 +97,9 @@ class Agent:
                     if conversation_history
                     else message.content
                 )
-                return self.handle_operation_instructions(user_input)
+                return self.handle_operation_instructions(
+                    user.uuid, user_input
+                )
 
             return self.generate_response(conversation_history)
 

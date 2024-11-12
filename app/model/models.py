@@ -1,3 +1,5 @@
+from tokenize import String
+
 from sqlalchemy import (
     Column,
     Integer,
@@ -16,6 +18,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    uuid = Column(String, unique=True, nullable=False)
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
 
     # Relationship to UserConversation
@@ -28,6 +31,7 @@ class UserConversation(Base):
     __tablename__ = 'user_conversations'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+
     user_id = Column(
         Integer, ForeignKey('users.id'), nullable=False
     )  # ForeignKey to User
