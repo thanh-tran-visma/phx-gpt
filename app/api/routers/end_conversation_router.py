@@ -14,8 +14,8 @@ async def end_conversation_endpoint(end_conversation_data: UserPromptSchema):
     db_manager = DatabaseManager(db)
     try:
         end_conversation_service = EndConversationService(db)
-        end_conversation_service.handle_end_conversation(
-            end_conversation_data.user_id,
+        await end_conversation_service.handle_end_conversation(
+            end_conversation_data.uuid,
             end_conversation_data.conversation_order,
         )
         return {"message": "Conversation ended successfully"}

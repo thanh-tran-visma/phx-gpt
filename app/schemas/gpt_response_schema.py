@@ -1,8 +1,6 @@
-from typing import Optional
 from pydantic import BaseModel
 
 
 class GptResponseSchema(BaseModel):
+    status: int
     content: str
-    tokens_used: Optional[int] = None
-    prompt_length: Optional[int] = None

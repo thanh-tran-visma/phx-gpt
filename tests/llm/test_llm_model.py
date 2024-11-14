@@ -3,7 +3,7 @@ import pytest
 from app.llm import BlueViGptModel
 from app.config.config_env import GGUF_MODEL, MODEL_NAME
 from app.model.models import Message
-from app.types.enum import Role
+from app.types.enum.gpt import Role
 
 
 @pytest.fixture(scope="class")
@@ -32,7 +32,7 @@ class TestGetResponse:
         messages = [
             Message(role=Role.USER, content=user_message)
         ]  # Using Message directly
-        response = blue_vi_gpt_model.get_chat_response(messages)
+        response = blue_vi_gpt_model.user_role.get_chat_response(messages)
 
         assert (
             response is not None
@@ -43,7 +43,7 @@ class TestGetResponse:
     def test_get_response_with_blue_vi_answer(self, blue_vi_gpt_model):
         user_message = "what is your name?"
         messages = [Message(role=Role.USER, content=user_message)]
-        response = blue_vi_gpt_model.get_chat_response(messages)
+        response = blue_vi_gpt_model.user_role.get_chat_response(messages)
 
         # Assert that the response content contains references to "blueVi", "blueVi-GPT", or "Visma Verzuim"
         assert (
@@ -56,7 +56,9 @@ class TestGetResponse:
 class TestAnonymization:
     def test_get_anonymized_name(self, blue_vi_gpt_model):
         user_message = "John Doe's email is J.Simpson@netwrix.com."
-        response = blue_vi_gpt_model.get_anonymized_message(user_message)
+        response = blue_vi_gpt_model.assistant_role.get_anonymized_message(
+            user_message
+        )
 
         assert (
             "[NAME_1]" in response.content
@@ -65,7 +67,9 @@ class TestAnonymization:
 
     def test_get_anonymized_email(self, blue_vi_gpt_model):
         user_message = "John Doe's email is J.Simpson@netwrix.com."
-        response = blue_vi_gpt_model.get_anonymized_message(user_message)
+        response = blue_vi_gpt_model.assistant_role.get_anonymized_message(
+            user_message
+        )
 
         assert (
             "[EMAIL_1]" in response.content
@@ -74,7 +78,9 @@ class TestAnonymization:
 
     def test_get_anonymized_bsn(self, blue_vi_gpt_model):
         user_message = "His BSN is 123456789."
-        response = blue_vi_gpt_model.get_anonymized_message(user_message)
+        response = blue_vi_gpt_model.user_role.get_anonymized_message(
+            user_message
+        )
 
         assert (
             "[BSN_1]" in response.content
@@ -83,7 +89,9 @@ class TestAnonymization:
 
     def test_get_anonymized_address(self, blue_vi_gpt_model):
         user_message = "His home address is 10 Langelo."
-        response = blue_vi_gpt_model.get_anonymized_message(user_message)
+        response = blue_vi_gpt_model.assistant_role.get_anonymized_message(
+            user_message
+        )
 
         assert (
             "[ADDRESS_1]" in response.content
@@ -92,7 +100,9 @@ class TestAnonymization:
 
     def test_get_anonymized_zip(self, blue_vi_gpt_model):
         user_message = "His ZIP code is 7666MC."
-        response = blue_vi_gpt_model.get_anonymized_message(user_message)
+        response = blue_vi_gpt_model.assistant_role.get_anonymized_message(
+            user_message
+        )
 
         assert (
             "[ZIP_1]" in response.content or "7666MC" not in response.content
@@ -100,7 +110,9 @@ class TestAnonymization:
 
     def test_get_anonymized_mastercard(self, blue_vi_gpt_model):
         user_message = "His MasterCard number is 5258704108753590."
-        response = blue_vi_gpt_model.get_anonymized_message(user_message)
+        response = blue_vi_gpt_model.assistant_role.get_anonymized_message(
+            user_message
+        )
 
         assert (
             "[MASTERCARD_1]" in response.content
@@ -109,7 +121,9 @@ class TestAnonymization:
 
     def test_get_anonymized_visa(self, blue_vi_gpt_model):
         user_message = "His Visa number is 4563-7568-5698-4587."
-        response = blue_vi_gpt_model.get_anonymized_message(user_message)
+        response = blue_vi_gpt_model.assistant_role.get_anonymized_message(
+            user_message
+        )
 
         assert (
             "[VISA_1]" in response.content
@@ -118,7 +132,9 @@ class TestAnonymization:
 
     def test_get_anonymized_iban(self, blue_vi_gpt_model):
         user_message = "His IBAN number is NL91ABNA0417164300."
-        response = blue_vi_gpt_model.get_anonymized_message(user_message)
+        response = blue_vi_gpt_model.assistant_role.get_anonymized_message(
+            user_message
+        )
 
         assert (
             "[IBAN_1]" in response.content
@@ -127,7 +143,9 @@ class TestAnonymization:
 
     def test_get_anonymized_dob(self, blue_vi_gpt_model):
         user_message = "His date of birth is 01/01/1990."
-        response = blue_vi_gpt_model.get_anonymized_message(user_message)
+        response = blue_vi_gpt_model.assistant_role.get_anonymized_message(
+            user_message
+        )
 
         assert (
             "[DOB_1]" in response.content
@@ -136,7 +154,9 @@ class TestAnonymization:
 
     def test_get_anonymized_ip_address(self, blue_vi_gpt_model):
         user_message = "His IP address is 192.168.1.1."
-        response = blue_vi_gpt_model.get_anonymized_message(user_message)
+        response = blue_vi_gpt_model.assistant_role.get_anonymized_message(
+            user_message
+        )
 
         assert (
             "[IP_ADDRESS_1]" in response.content
@@ -155,7 +175,9 @@ class TestAnonymization:
             "His date of birth is 01/01/1990. "
             "His IP address is 192.168.1.1."
         )
-        response = blue_vi_gpt_model.get_anonymized_message(user_message)
+        response = blue_vi_gpt_model.assistant_role.get_anonymized_message(
+            user_message
+        )
 
         assert (
             "[NAME_1]" in response.content

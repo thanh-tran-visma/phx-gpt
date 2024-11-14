@@ -1,5 +1,3 @@
-from tokenize import String
-
 from sqlalchemy import (
     Column,
     Integer,
@@ -8,6 +6,7 @@ from sqlalchemy import (
     Enum,
     Text,
     Boolean,
+    String,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -18,7 +17,12 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    uuid = Column(String, unique=True, nullable=False)
+    uuid = Column(
+        String(36),
+        unique=True,
+        nullable=False,
+        default=None,
+    )
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
 
     # Relationship to UserConversation
@@ -76,5 +80,4 @@ class Message(Base):
         'UserConversation', back_populates='messages'
     )
 
-    # Fixed the boolean type here
     sensitive_data_flag = Column(Boolean, nullable=False, default=False)

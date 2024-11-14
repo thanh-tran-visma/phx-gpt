@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from app.database import DatabaseManager
 from app.llm import Agent, BlueViGptModel
 from app.schemas import UserPromptSchema
-from app.types.enum import Role, MessageType, HTTPStatus
+from app.types.enum import HTTPStatus
+from app.types.enum.gpt import MessageType, Role
 from app.utils import TokenUtils
 from app.config.config_env import LLM_MAX_TOKEN, MAX_HISTORY_WINDOW_SIZE
 
@@ -22,7 +23,7 @@ class ChatService:
     ):
         self.db_manager = DatabaseManager(db)
         self.blue_vi_gpt_model = BlueViGptModel()
-        self.user_prompt = user_prompt
+        self.user = user_prompt
         self.history_window_size = history_window_size
         self.token_utils = TokenUtils(self.blue_vi_gpt_model, max_tokens)
         self.agent = Agent(
@@ -35,7 +36,7 @@ class ChatService:
     async def handle_chat(self) -> dict:
         try:
             # get user
-            user = self.db_manager.get_user(self.user_prompt.user_id)
+            user = self.db_manager.get_user(self.user.uuid)
             if user is None:
                 return {
                     "status": HTTPStatus.NOT_FOUND.value,
@@ -44,7 +45,7 @@ class ChatService:
 
             # Ensure the conversation exists or create it
             conversation = self.db_manager.get_or_create_conversation(
-                user.id, self.user_prompt.conversation_order
+                user.id, self.user.conversation_order
             )
             if conversation is None:
                 return {
@@ -81,7 +82,7 @@ class ChatService:
             # Create the user's message
             message = self.db_manager.create_message(
                 user_conversation.id,
-                self.user_prompt.prompt,
+                self.user.prompt,
                 MessageType.PROMPT,
                 Role.USER,
             )
@@ -92,7 +93,7 @@ class ChatService:
                 }
 
             # Let the agent handle the conversation
-            bot_response = self.agent.handle_conversation(user, message)
+            bot_response = await self.agent.handle_conversation(user, message)
 
             # Store the bot's response
             self.db_manager.create_message(
@@ -103,7 +104,7 @@ class ChatService:
             )
 
             return {
-                "status": HTTPStatus.OK.value,
+                "status": bot_response.status,
                 "response": bot_response.content,
                 "conversation_order": conversation.conversation_order,
             }
