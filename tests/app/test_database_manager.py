@@ -20,7 +20,7 @@ def test_get_user(db_manager, mock_db_session):
     user_id = 1
     uuid = 'cfb6e466-8366-4f88-bdf9-3ae6984c0716'
     mock_db_session.query.return_value.filter.return_value.first.return_value = User(
-        id=user_id,uuid=uuid
+        id=user_id, uuid=uuid
     )
     test_user = db_manager.get_user(uuid)
     assert test_user.id == user_id

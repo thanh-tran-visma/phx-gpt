@@ -52,7 +52,7 @@ class BlueViGptAssistantRole:
         self, user_message: str
     ) -> GptResponseSchema:
         """Anonymize the user message."""
-        instruction = f"Anonymize the data:\n{user_message}\n"
+        instruction = f"{InstructionEnum.Anonymize.value}:\n{user_message}\n"
 
         try:
             response = await run_in_threadpool(
@@ -64,6 +64,7 @@ class BlueViGptAssistantRole:
                     ]
                 )
             )
+
             choices = response.get("choices")
             if isinstance(choices, list) and len(choices) > 0:
                 message_content = choices[0]["message"]["content"]
