@@ -18,25 +18,25 @@ def db_manager(mock_db_session):
 
 def test_get_user(db_manager, mock_db_session):
     user_id = 1
+    uuid = 'cfb6e466-8366-4f88-bdf9-3ae6984c0716'
     mock_db_session.query.return_value.filter.return_value.first.return_value = User(
-        id=user_id
+        id=user_id,uuid=uuid
     )
-    test_user = db_manager.get_user(user_id)
+    test_user = db_manager.get_user(uuid)
     assert test_user.id == user_id
+    assert test_user.uuid == uuid
     mock_db_session.query.assert_called_once_with(User)
 
 
 def test_create_user_if_not_exists_creates_user(db_manager, mock_db_session):
-    user_id = 1
-    uuid = 'test-uuid'
+    uuid = 'cfb6e466-8366-4f88-bdf9-3ae6984c0716'
     mock_db_session.query.return_value.filter.return_value.first.return_value = (
         None
     )
 
-    new_user = db_manager.create_user_if_not_exists(user_id, uuid)
+    new_user = db_manager.create_user_if_not_exists(uuid)
 
     assert new_user is not None
-    assert new_user.id == user_id
     assert new_user.uuid == uuid
     mock_db_session.add.assert_called_once()
     mock_db_session.commit.assert_called_once()
@@ -138,7 +138,7 @@ def test_check_user_conversation_exists(db_manager, mock_db_session):
     user_id = 1
     conversation_id = 1
     mock_db_session.query.return_value.filter.return_value.count.return_value = (
-        1  # UserConversation exists
+        1
     )
 
     exists = db_manager.check_user_conversation_exists(
