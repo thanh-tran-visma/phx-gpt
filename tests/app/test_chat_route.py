@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 
 
 # Mock the authentication

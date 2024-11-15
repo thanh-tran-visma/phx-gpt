@@ -3,7 +3,7 @@ import pytest
 from app.llm import BlueViGptModel
 from app.config.config_env import GGUF_MODEL, MODEL_NAME
 from app.model.models import Message
-from app.types.enum import Role
+from app.types.enum.gpt import Role
 
 
 @pytest.fixture(scope="class")
