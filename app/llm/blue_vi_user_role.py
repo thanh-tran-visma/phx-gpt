@@ -1,11 +1,15 @@
 import logging
 from typing import List
-from starlette.concurrency import run_in_threadpool
-
-from llama_cpp import Llama, ChatCompletionRequestUserMessage
+from llama_cpp import Llama
 from app.model import Message
 from app.schemas import GptResponseSchema
 from app.types.enum import HTTPStatus
+from app.utils import (
+    map_conversation_to_messages,
+    get_blue_vi_response,
+    process_model_response,
+)
+from app.types.enum.gpt import Role
 
 
 class BlueViGptUserRole:
@@ -17,30 +21,16 @@ class BlueViGptUserRole:
     ) -> GptResponseSchema:
         """Generate a response from the model based on conversation history for the user role."""
         try:
-            # Prepare messages for the model
-            mapped_messages: List[ChatCompletionRequestUserMessage] = [
-                ChatCompletionRequestUserMessage(
-                    role=msg.role, content=msg.content
-                )
-                for msg in conversation_history
-            ]
-            response = await run_in_threadpool(
-                lambda: self.llm.create_chat_completion(
-                    messages=mapped_messages
-                )
+            mapped_messages = map_conversation_to_messages(
+                conversation_history, role_type=Role.USER.value
             )
-            choices = response.get("choices")
 
-            if isinstance(choices, list) and len(choices) > 0:
-                message_content = choices[0]["message"]["content"]
-                return GptResponseSchema(
-                    status=HTTPStatus.OK.value, content=message_content
-                )
+            # Request the model response using the utility function
+            response = await get_blue_vi_response(self.llm, mapped_messages)
 
-            return GptResponseSchema(
-                status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-                content="Sorry, I couldn't generate a response.",
-            )
+            # Process the response using the utility function
+            return process_model_response(response)
+
         except Exception as e:
             logging.error(
                 f"Unexpected error while generating chat response: {e}"

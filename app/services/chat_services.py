@@ -52,17 +52,13 @@ class ChatService:
                     "status": HTTPStatus.NOT_FOUND.value,
                     "response": "Failed to create or retrieve the conversation.",
                 }
-
-            # Check if the UserConversation already exists
-            user_conversation_exists = (
+            # Create UserConversation only if it does not exist
+            if not (
                 self.db_manager.check_user_conversation_exists(
                     user.id,
                     conversation.id,
                 )
-            )
-
-            # Create UserConversation only if it does not exist
-            if not user_conversation_exists:
+            ):
                 user_conversation = self.db_manager.create_user_conversation(
                     user.id,
                     conversation.id,

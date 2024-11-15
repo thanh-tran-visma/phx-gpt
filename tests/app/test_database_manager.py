@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.database import DatabaseManager
 from app.model import User, Message, Conversation, UserConversation
+from app.types.enum.gpt.role import Role
 
 
 @pytest.fixture
@@ -79,7 +80,7 @@ def test_create_message(db_manager, mock_db_session):
     user_conversation_id = 1
     content = "Hello"
     message_type = "text"
-    role = "user"
+    role = Role.USER.value
 
     Message(content=content, message_type=message_type, role=role)
     mock_db_session.add.return_value = None

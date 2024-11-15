@@ -48,13 +48,14 @@ class Agent:
         self, uuid: str, conversation_history: List[Message]
     ) -> GptResponseSchema:
         """Generate a response for operation instructions and check for missing fields."""
-        valid_operation = (
-            await self.model.assistant_role.handle_operation_instruction(
+        operation_schema = (
+            await self.model.assistant_role.get_operation_format(
                 uuid, conversation_history
             )
         )
-        if valid_operation:
+        if operation_schema:
             logging.info('valid_operation')
+            logging.info(operation_schema)
         return await self.model.user_role.get_chat_response(
             conversation_history
         )
@@ -79,7 +80,7 @@ class Agent:
                     message.content
                 )
             )
-            if instruction_type == InstructionEnum.OPERATION.value:
+            if instruction_type == InstructionEnum.OPERATION_Instruction.value:
                 # Extract the user input from the last message in the history
                 return await self.handle_operation_instructions(
                     user.uuid, conversation_history

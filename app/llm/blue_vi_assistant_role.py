@@ -1,19 +1,18 @@
 import json
 import logging
+from json import JSONDecodeError
 from typing import List
-
-from fastapi.encoders import jsonable_encoder
-from llama_cpp import (
-    Llama,
-    ChatCompletionRequestAssistantMessage,
-)
-from starlette.concurrency import run_in_threadpool
-
-from app.model import Message
+from llama_cpp import Llama, ChatCompletionRequestAssistantMessage
 from app.schemas import GptResponseSchema, PhxAppOperation
-from app.types.enum import HTTPStatus
+from app.types.enum.gpt import Role
+from app.utils import (
+    get_blue_vi_response,
+    map_conversation_to_messages,
+    process_model_response,
+)
 from app.types.enum.instruction import InstructionEnum
 from app.types.enum.operation import OperationRateType, VatRate
+from app.model import Message
 
 
 class BlueViGptAssistantRole:
@@ -22,208 +21,107 @@ class BlueViGptAssistantRole:
 
     async def check_for_personal_data(self, prompt: str) -> bool:
         """Detect personal data in the prompt."""
-        instruction = (
-            f"Detect personal data:\n{prompt}\n"
-            f"Return True or False. Note that the data may contain inaccuracies in the response"
-        )
-        try:
-            response = await run_in_threadpool(
-                lambda: self.llm.create_chat_completion(
-                    messages=[
-                        ChatCompletionRequestAssistantMessage(
-                            role="assistant", content=instruction
-                        )
-                    ]
-                )
-            )
-            choices = response.get("choices")
+        instruction = f"Detect personal data:\n{prompt}\nReturn True or False. Note that the data may contain inaccuracies in the response"
 
-            if isinstance(choices, list) and len(choices) > 0:
-                model_response = choices[0]["message"]["content"]
-                return "True" in model_response
-            else:
-                logging.warning("Model did not return a valid response.")
-                return False
-        except Exception as e:
-            logging.error(f"Error checking for personal data: {e}")
+        response = await get_blue_vi_response(
+            self.llm,
+            [
+                ChatCompletionRequestAssistantMessage(
+                    role=Role.ASSISTANT.value, content=instruction
+                )
+            ],
+        )
+
+        if not response:
+            logging.warning("Error detecting personal data.")
             return False
+
+        result = process_model_response(response)
+        return "True" in result.content
 
     async def get_anonymized_message(
         self, user_message: str
     ) -> GptResponseSchema:
         """Anonymize the user message."""
-        instruction = f"{InstructionEnum.Anonymize.value}:\n{user_message}\n"
+        instruction = f"{InstructionEnum.Assistant_Anonymize_Data.value}:\n{user_message}\n"
 
-        try:
-            response = await run_in_threadpool(
-                lambda: self.llm.create_chat_completion(
-                    messages=[
-                        ChatCompletionRequestAssistantMessage(
-                            role="assistant", content=instruction
-                        )
-                    ]
+        response = await get_blue_vi_response(
+            self.llm,
+            [
+                ChatCompletionRequestAssistantMessage(
+                    role=Role.ASSISTANT.value, content=instruction
                 )
-            )
+            ],
+        )
 
-            choices = response.get("choices")
-            if isinstance(choices, list) and len(choices) > 0:
-                message_content = choices[0]["message"]["content"]
-                return GptResponseSchema(
-                    status=HTTPStatus.OK.value, content=message_content
-                )
-            else:
-                return GptResponseSchema(
-                    status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-                    content="Sorry, I couldn't generate an anonymized response.",
-                )
-        except Exception as e:
-            logging.error(f"Error generating anonymized message: {e}")
-            return GptResponseSchema(
-                status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-                content="Sorry, an error occurred while generating an anonymized response.",
-            )
+        return process_model_response(response)
 
     async def identify_instruction_type(self, prompt: str) -> str:
         """Identify the type of instruction based on the prompt content."""
-        instruction = f"Choose the most appropriate instruction between {InstructionEnum.OPERATION.value} and {InstructionEnum.DEFAULT.value} based on the context provided in: {prompt}"
-        try:
-            response = await run_in_threadpool(
-                lambda: self.llm.create_chat_completion(
-                    messages=[
-                        ChatCompletionRequestAssistantMessage(
-                            role="assistant", content=instruction
-                        )
-                    ]
-                )
-            )
-            choices = response.get("choices")
-            if isinstance(choices, list) and len(choices) > 0:
-                return choices[0]["message"]["content"].strip()
-            return InstructionEnum.DEFAULT.value
-        except Exception as e:
-            logging.error(f"Error identifying instruction type: {e}")
-            return InstructionEnum.DEFAULT.value
+        instruction = f"Choose the most appropriate instruction between {InstructionEnum.OPERATION_Instruction.value} and {InstructionEnum.DEFAULT.value} based on the context provided in: {prompt}"
 
-    async def handle_operation_instruction(
-        self, uuid: str, conversation_history: List[Message]
-    ) -> bool:
-        """Handle operation instructions"""
-        try:
-            # Initialize operation schema with default values
-            operation_schema = PhxAppOperation(
-                name="",
-                description=None,
-                duration=None,
-                invoicing=False,
-                hourlyRate=None,
-                unitPrice=0,
-                operationRateType=OperationRateType.UNIT_PRICE,
-                methodsOfConsult=[],
-                forAppointment=True,
-                vatRate=VatRate.LOW,
-                uuid=uuid,
-            )
-
-            logging.info("Handling operation for UUID: %s", uuid)
-
-            # Serialize schema with default values using jsonable_encoder
-            operation_schema_dict = jsonable_encoder(
-                operation_schema, exclude_unset=True
-            )
-
-            logging.debug("Serialized schema: %s", operation_schema_dict)
-
-            # Prepare operating instructions for the LLM
-            operating_instructions = {
-                "role": "assistant",
-                "content": f"Instructions: Use the schema with empty values: {operation_schema_dict}. Return the correct JSON format. Fields can be None if not in the prompt.",
-            }
-
-            # Create mapped messages for the model
-            mapped_messages: List[ChatCompletionRequestAssistantMessage] = [
+        response = await get_blue_vi_response(
+            self.llm,
+            [
                 ChatCompletionRequestAssistantMessage(
-                    role=msg.role, content=msg.content
+                    role=Role.ASSISTANT.value, content=instruction
                 )
-                for msg in conversation_history
-            ]
-            # Include the instruction message as the last message
-            mapped_messages.append(operating_instructions)
+            ],
+        )
 
-            # Get response from the model
-            response = await run_in_threadpool(
-                lambda: self.llm.create_chat_completion(
-                    messages=mapped_messages
-                )
-            )
+        if not response:
+            return InstructionEnum.DEFAULT.value
 
-            logging.debug("Model response: %s", response)
+        result = process_model_response(response)
+        return result.content.strip()
 
-            choices = response.get("choices")
-            if isinstance(choices, list) and len(choices) > 0:
-                message_content = choices[0]["message"]["content"]
+    async def get_operation_format(
+        self, uuid: str, conversation_history: List[Message]
+    ) -> PhxAppOperation:
+        """Generates an operation schema based on the user's conversation history and model response."""
+        operation_schema = PhxAppOperation(
+            name="",
+            description=None,
+            duration=None,
+            invoicing=False,
+            hourlyRate=None,
+            unitPrice=0,
+            operationRateType=OperationRateType.UNIT_PRICE,
+            methodsOfConsult=[],
+            forAppointment=True,
+            vatRate=VatRate.LOW,
+            uuid=uuid,
+        )
 
-                # Check if message_content is a string before parsing
-                if isinstance(message_content, str):
-                    try:
-                        # Parse model's JSON response and update schema fields
-                        parsed_response = json.loads(message_content)
+        # Prepare conversation messages for the model
+        model_messages = map_conversation_to_messages(
+            conversation_history, role_type=Role.ASSISTANT.value
+        )
+        instruction_message = {
+            "role": Role.ASSISTANT.value,
+            "content": f"Instructions: Use the schema with empty values: {operation_schema}. {InstructionEnum.ASSISTANT_OPERATION_HANDLING.value} Fields can be None if not provided in the prompt.",
+        }
+        model_messages.append(instruction_message)
 
-                        # Map the parsed response back to operation schema
-                        operation_schema.name = parsed_response.get(
-                            "name", operation_schema.name
-                        )
-                        operation_schema.description = parsed_response.get(
-                            "description", operation_schema.description
-                        )
-                        operation_schema.duration = parsed_response.get(
-                            "duration", operation_schema.duration
-                        )
-                        operation_schema.invoicing = parsed_response.get(
-                            "invoicing", operation_schema.invoicing
-                        )
-                        operation_schema.hourlyRate = parsed_response.get(
-                            "hourlyRate", operation_schema.hourlyRate
-                        )
-                        operation_schema.unitPrice = parsed_response.get(
-                            "unitPrice", operation_schema.unitPrice
-                        )
-                        operation_schema.operationRateType = (
-                            parsed_response.get(
-                                "operationRateType",
-                                operation_schema.operationRateType,
-                            )
-                        )
-                        operation_schema.methodsOfConsult = (
-                            parsed_response.get(
-                                "methodsOfConsult",
-                                operation_schema.methodsOfConsult,
-                            )
-                        )
-                        operation_schema.forAppointment = parsed_response.get(
-                            "forAppointment", operation_schema.forAppointment
-                        )
-                        operation_schema.vatRate = parsed_response.get(
-                            "vatRate", operation_schema.vatRate
-                        )
-                    except json.JSONDecodeError as e:
-                        logging.error(
-                            "Failed to parse the response content as JSON: %s",
-                            e,
-                        )
-                else:
-                    logging.error(
-                        "The message content is not a valid JSON string: %s",
-                        message_content,
-                    )
+        # Request response from the model
+        response = await get_blue_vi_response(self.llm, model_messages)
 
-            logging.info(
-                "Operation schema after processing: %s", operation_schema
-            )
-            return True
-
-        except Exception as e:
+        if not response:
             logging.error(
-                "Unexpected error while handling operation instruction chat response: %s",
-                e,
+                "Failed to receive valid response for operation format."
             )
-            return False
+            return operation_schema
+
+        # Process the model response and update the schema
+        result = process_model_response(response)
+        try:
+            parsed_response = json.loads(result.content)
+            for field, value in parsed_response.items():
+                if hasattr(operation_schema, field):
+                    setattr(operation_schema, field, value)
+        except (JSONDecodeError, ValueError) as e:
+            logging.error(f"Error processing model response: {e}")
+        except Exception as e:
+            logging.error(f"Unexpected error during operation handling: {e}")
+
+        return operation_schema
