@@ -1,7 +1,9 @@
 import json
-from huggingface_hub import HfApi, create_repo
-from app.config.config_env import HF_TOKEN
 from typing import List
+
+from huggingface_hub import HfApi, create_repo
+
+from app.config.config_env import HF_TOKEN
 from app.types.dataset import DatasetEntry
 from app.types.enum.instruction import InstructionEnum
 
@@ -16,9 +18,9 @@ class DatasetPreparer:
         # Format each entry with the given instruction
         formatted_data = [
             DatasetEntry(
-                instruction=instruction,
                 input=entry["input"],
                 output=entry["response"],
+                instruction=instruction,
             )
             for entry in data
         ]
@@ -1562,339 +1564,339 @@ def main():
         {
             "input": "I want to create a new operation.",
             "response": "{\n  \"name\": \"\",\n  \"description\": \"\",\n  \"duration\": 0,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": None,\n  \"operationRateType\": None,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": None,\n  \"operationRateType\": None,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Operation name is 'Operation A'. The description is 'Consulting services'. The duration is 30 minutes. Invoicing will be applied with an hourly rate of 50. The method of consultation is TEL.",
             "response": "{\n  \"name\": \"Operation A\",\n  \"description\": \"Consulting services\",\n  \"duration\": 30,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 50,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 50,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation B', with no invoicing. It will have a unit price of 100 and last 60 minutes. The consultation method will be WEB.",
             "response": "{\n  \"name\": \"Operation B\",\n  \"description\": \"\",\n  \"duration\": 60,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 100,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 100,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I would like to create an operation named 'Operation C' with invoicing. It will be 45 minutes long with an hourly rate of 70. Methods of consultation will be TEL and LOC.",
             "response": "{\n  \"name\": \"Operation C\",\n  \"description\": \"\",\n  \"duration\": 45,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 70,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 70,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create a new operation.",
             "response": "{\n  \"name\": \"\",\n  \"description\": \"\",\n  \"duration\": 0,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": None,\n  \"operationRateType\": None,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": None,\n  \"operationRateType\": None,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation A', lasting 45 minutes, with an hourly rate of 50 and invoicing enabled. The consultation method will be TEL.",
             "response": "{\n  \"name\": \"Operation A\",\n  \"description\": \"\",\n  \"duration\": 45,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 50,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 50,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation B', with no invoicing, a unit price of 100, and lasting 60 minutes. The consultation method will be WEB.",
             "response": "{\n  \"name\": \"Operation B\",\n  \"description\": \"\",\n  \"duration\": 60,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 100,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 100,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation C' with invoicing enabled, an hourly rate of 70, and a duration of 45 minutes. The consultation methods will be TEL and LOC.",
             "response": "{\n  \"name\": \"Operation C\",\n  \"description\": \"\",\n  \"duration\": 45,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 70,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 70,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I would like to create an operation named 'Operation D' with a unit price of 200, lasting 30 minutes. The method of consultation will be WEB.",
             "response": "{\n  \"name\": \"Operation D\",\n  \"description\": \"\",\n  \"duration\": 30,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 200,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 200,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation E', with invoicing, an hourly rate of 120, and a duration of 90 minutes. The methods of consultation will be TEL, WEB, and LOC.",
             "response": "{\n  \"name\": \"Operation E\",\n  \"description\": \"\",\n  \"duration\": 90,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 120,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 120,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation F' without invoicing. The duration will be 120 minutes, and the method of consultation will be TEL.",
             "response": "{\n  \"name\": \"Operation F\",\n  \"description\": \"\",\n  \"duration\": 120,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": None,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": None,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation G', with invoicing enabled, an hourly rate of 150, and a duration of 75 minutes. The consultation methods will be TEL and LOC.",
             "response": "{\n  \"name\": \"Operation G\",\n  \"description\": \"\",\n  \"duration\": 75,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 150,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 150,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation H', with invoicing disabled, a unit price of 50, and a duration of 30 minutes. The method of consultation will be WEB.",
             "response": "{\n  \"name\": \"Operation H\",\n  \"description\": \"\",\n  \"duration\": 30,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 50,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 50,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation I', with invoicing enabled, an hourly rate of 200, and a duration of 90 minutes. The methods of consultation will be TEL, WEB, and LOC.",
             "response": "{\n  \"name\": \"Operation I\",\n  \"description\": \"\",\n  \"duration\": 90,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 200,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 200,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation J' with no invoicing, a unit price of 150, and a duration of 120 minutes. The consultation method will be TEL.",
             "response": "{\n  \"name\": \"Operation J\",\n  \"description\": \"\",\n  \"duration\": 120,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 150,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 150,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation K', with invoicing enabled, an hourly rate of 250, and a duration of 60 minutes. The consultation method will be WEB.",
             "response": "{\n  \"name\": \"Operation K\",\n  \"description\": \"\",\n  \"duration\": 60,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 250,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 250,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation L', with invoicing disabled, a unit price of 120, and a duration of 45 minutes. The method of consultation will be LOC.",
             "response": "{\n  \"name\": \"Operation L\",\n  \"description\": \"\",\n  \"duration\": 45,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 120,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 120,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "I want to create an operation named 'Operation M', with invoicing enabled, an hourly rate of 180, and a duration of 90 minutes. The consultation methods will be TEL and WEB.",
             "response": "{\n  \"name\": \"Operation M\",\n  \"description\": \"\",\n  \"duration\": 90,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 180,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 180,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie A', met facturering ingeschakeld, een uurtarief van 100 en een duur van 60 minuten. De methoden van consultatie zijn TEL en WEB.",
             "response": "{\n  \"name\": \"Operatie A\",\n  \"description\": \"\",\n  \"duration\": 60,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 100,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 100,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie B', met facturering uitgeschakeld, een eenheidsprijs van 50 en een duur van 30 minuten. De consultatiemethode is WEB.",
             "response": "{\n  \"name\": \"Operatie B\",\n  \"description\": \"\",\n  \"duration\": 30,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 50,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 50,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie C', met facturering ingeschakeld, een uurtarief van 150 en een duur van 90 minuten. De methoden van consultatie zijn TEL, WEB en LOC.",
             "response": "{\n  \"name\": \"Operatie C\",\n  \"description\": \"\",\n  \"duration\": 90,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 150,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 150,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie D', met facturering uitgeschakeld, een eenheidsprijs van 80 en een duur van 120 minuten. De consultatiemethode is TEL.",
             "response": "{\n  \"name\": \"Operatie D\",\n  \"description\": \"\",\n  \"duration\": 120,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 80,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 80,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie E', met facturering ingeschakeld, een uurtarief van 200 en een duur van 45 minuten. De methoden van consultatie zijn WEB.",
             "response": "{\n  \"name\": \"Operatie E\",\n  \"description\": \"\",\n  \"duration\": 45,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 200,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 200,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie F', met facturering uitgeschakeld, een eenheidsprijs van 100 en een duur van 60 minuten. De methoden van consultatie zijn TEL, WEB en LOC.",
             "response": "{\n  \"name\": \"Operatie F\",\n  \"description\": \"\",\n  \"duration\": 60,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 100,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 100,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie G', met facturering ingeschakeld, een uurtarief van 120 en een duur van 75 minuten. De methoden van consultatie zijn TEL en LOC.",
             "response": "{\n  \"name\": \"Operatie G\",\n  \"description\": \"\",\n  \"duration\": 75,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 120,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 120,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie H', met facturering uitgeschakeld, een eenheidsprijs van 200 en een duur van 45 minuten. De consultatiemethode is WEB.",
             "response": "{\n  \"name\": \"Operatie H\",\n  \"description\": \"\",\n  \"duration\": 45,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 200,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 200,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie I', met facturering ingeschakeld, een uurtarief van 110 en een duur van 50 minuten. De methoden van consultatie zijn TEL, WEB, en LOC.",
             "response": "{\n  \"name\": \"Operatie I\",\n  \"description\": \"\",\n  \"duration\": 50,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 110,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 110,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\",\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie J', met facturering uitgeschakeld, een eenheidsprijs van 75 en een duur van 100 minuten. De consultatiemethode is TEL en WEB.",
             "response": "{\n  \"name\": \"Operatie J\",\n  \"description\": \"\",\n  \"duration\": 100,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 75,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 75,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"TEL\",\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie K', met facturering ingeschakeld, een uurtarief van 90 en een duur van 80 minuten. De methoden van consultatie zijn LOC.",
             "response": "{\n  \"name\": \"Operatie K\",\n  \"description\": \"\",\n  \"duration\": 80,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 90,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 90,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"LOC\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie L', met facturering uitgeschakeld, een eenheidsprijs van 50 en een duur van 40 minuten. De consultatiemethode is WEB en TEL.",
             "response": "{\n  \"name\": \"Operatie L\",\n  \"description\": \"\",\n  \"duration\": 40,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 50,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\",\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 0,\n  \"invoicing\": False,\n  \"hourlyRate\": 0,\n  \"unitPrice\": 50,\n  \"operationRateType\": 2,\n  \"methodsOfConsult\": [\n    \"WEB\",\n    \"TEL\"\n  ],\n  \"wizard\": None\n}",
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie M', met facturering ingeschakeld, een uurtarief van 140 en een duur van 100 minuten. De methoden van consultatie zijn LOC, TEL, en WEB.",
             "response": "{\n  \"name\": \"Operatie M\",\n  \"description\": \"\",\n  \"duration\": 100,\n  \"forAppointment\": True"
-            ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
-            ",\n  \"hourlyRate\": 140,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"LOC\",\n    \"TEL\",\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
+                        ",\n  \"vatRate\": 6,\n  \"invoicing\": True"
+                        ",\n  \"hourlyRate\": 140,\n  \"unitPrice\": None,\n  \"operationRateType\": 1,\n  \"methodsOfConsult\": [\n    \"LOC\",\n    \"TEL\",\n    \"WEB\"\n  ],\n  \"wizard\": None\n}",
         },
     ]
     phx_instructions_data = [
         {
             "input": "Operation name is 'Operation A'. The description is 'Consulting services'. The duration is 30 minutes. Invoicing will be applied with an hourly rate of 50. The method of consultation is TEL.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Operation name is 'Operation A'. The description is 'Consulting services'. The duration is 30 minutes. Invoicing will be applied with an hourly rate of 50. The method of consultation is TEL.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation named 'Operation B', with no invoicing. It will have a unit price of 100 and last 60 minutes. The consultation method will be WEB.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I would like to create an operation named 'Operation C' with invoicing. It will be 45 minutes long with an hourly rate of 70. Methods of consultation will be TEL and LOC.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation named 'Operation A', lasting 45 minutes, with an hourly rate of 50 and invoicing enabled. The consultation method will be TEL.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation named 'Operation B', with no invoicing, a unit price of 100, and lasting 60 minutes. The consultation method will be WEB.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation named 'Operation C' with invoicing enabled, an hourly rate of 70, and a duration of 45 minutes. The consultation methods will be TEL and LOC.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I would like to create an operation named 'Operation D' with a unit price of 200, lasting 30 minutes. The method of consultation will be WEB.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Please provide the details to create a new operation.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation. But I don't have the invoice description yet.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I have the operation name, duration, and invoicing details, but no methods of consultation.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation with the operation name, invoicing applied, and hourly rate.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation but I don’t have the hourly rate.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation but I'm unsure about the invoicing.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation. The name is 'Customer Support Call'.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create a new operation named 'Marketing Consultation' with invoicing applied and unit price 100.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation called 'Product Demo' with invoicing not applied and unit price 200.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create operation 'Financial Review' with invoicing yes, hourly rate 150.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation 'Sales Meeting' but I don't know the duration yet.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Please create a new operation 'Team Workshop' with invoicing applied, hourly rate 120, and method of consultation WEB.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create a new operation called 'Webinar' with no invoicing applied, unit price 50.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation called 'Team Training'.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I have the operation name, description, and hourly rate. But I don’t have the duration yet.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Please create an operation called 'Product Training'. I have the hourly rate and duration.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation, but I’m not sure about the method of consultation.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Can you create a new operation for a webinar? I know the operation name and invoicing details.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create an operation 'Consulting Session' with invoicing applied. The hourly rate is 100.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation called 'Client Call' with no invoicing. I know the unit price.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I need a new operation called 'Strategy Meeting' with hourly rate 120. I don’t have the unit price.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create an operation 'Team Review' where invoicing is not applied. The unit price is 200.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create an operation for 'Client Onboarding'. I have the invoice description and method of consultation.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation for 'Product Consultation'. I know the duration and invoicing details.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create a new operation called 'Branding Workshop' with invoicing applied.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation called 'Market Research' with unit price 300.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Geef de gegevens voor het maken van een nieuwe operatie.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken, maar ik heb de factuuromschrijving nog niet.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik heb de operatienaam, duur en factureringsgegevens, maar geen methode van consultatie.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken met de operatienaam, facturering toegepast, en uurtarief.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken, maar ik heb het uurtarief niet.",
@@ -1902,75 +1904,75 @@ def main():
         },
         {
             "input": "Ik wil een nieuwe operatie maken, maar ik weet niet zeker of er gefactureerd zal worden.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken. De naam is 'Klantenondersteuning Oproep'.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een nieuwe operatie genaamd 'Marketing Consultatie' met facturering toegepast en een stukprijs van 100.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Product Demo' met geen facturering toegepast en een stukprijs van 200.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak de operatie 'Financiële Beoordeling' met facturering ja, uurtarief 150.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie 'Sales Meeting' maken, maar ik weet de duur nog niet.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een nieuwe operatie 'Team Workshop' met facturering toegepast, uurtarief 120 en methode van consultatie WEB.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een nieuwe operatie genaamd 'Webinar' zonder facturering toegepast, stukprijs 50.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil de operatie 'Team Training' maken.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik heb de operatienaam, omschrijving en uurtarief. Maar ik heb de duur nog niet.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een operatie genaamd 'Product Training'. Ik heb het uurtarief en de duur.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken, maar ik weet niet zeker over de methode van consultatie.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Kun je een nieuwe operatie maken voor een webinar? Ik weet de operatienaam en factureringdetails.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een operatie 'Consultatiesessie' met facturering toegepast. Het uurtarief is 100.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Klantenoproep' zonder facturering. Ik weet de stukprijs.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik heb een nieuwe operatie nodig genaamd 'Strategiebespreking' met uurtarief 120. Ik heb de stukprijs niet.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een operatie 'Teambeoordeling' waarbij geen facturering wordt toegepast. De stukprijs is 200.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie M', met facturering ingeschakeld, een uurtarief van 140 en een duur van 100 minuten. De methoden van consultatie zijn LOC, TEL, en WEB.",
-            "response": InstructionEnum.OPERATION_Instruction.value,
+            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
         },
         # default
         {

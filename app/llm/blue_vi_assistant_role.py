@@ -2,17 +2,19 @@ import json
 import logging
 from json import JSONDecodeError
 from typing import List
+
 from llama_cpp import Llama, ChatCompletionRequestAssistantMessage
+
+from app.model import Message
 from app.schemas import GptResponseSchema, PhxAppOperation
 from app.types.enum.gpt import Role
+from app.types.enum.instruction import InstructionEnum
+from app.types.enum.operation import OperationRateType, VatRate
 from app.utils import (
     get_blue_vi_response,
     map_conversation_to_messages,
     convert_blue_vi_response_to_schema,
 )
-from app.types.enum.instruction import InstructionEnum
-from app.types.enum.operation import OperationRateType, VatRate
-from app.model import Message
 
 
 class BlueViGptAssistantRole:
@@ -40,7 +42,7 @@ class BlueViGptAssistantRole:
         return "True" in result.content
 
     async def get_anonymized_message(
-        self, user_message: str
+            self, user_message: str
     ) -> GptResponseSchema:
         """Anonymize the user message."""
         instruction = f"{InstructionEnum.Assistant_Anonymize_Data.value}:\n{user_message}\n"
@@ -70,7 +72,7 @@ class BlueViGptAssistantRole:
         # Construct the instruction to be sent to the model
         instruction = (
             f"Choose the most appropriate instruction between "
-            f"{InstructionEnum.OPERATION_Instruction.value} and {InstructionEnum.DEFAULT.value} "
+            f"{InstructionEnum.OPERATION_INSTRUCTION.value} and {InstructionEnum.DEFAULT.value} "
             f"based on the context provided in: {prompt}"
         )
 
@@ -86,13 +88,13 @@ class BlueViGptAssistantRole:
         if not response:
             return InstructionEnum.DEFAULT.value
         result = convert_blue_vi_response_to_schema(response)
-        if InstructionEnum.OPERATION_Instruction.value in result.content:
-            return InstructionEnum.OPERATION_Instruction.value
+        if InstructionEnum.OPERATION_INSTRUCTION.value in result.content:
+            return InstructionEnum.OPERATION_INSTRUCTION.value
         else:
             return InstructionEnum.DEFAULT.value
 
     async def get_operation_format(
-        self, uuid: str, conversation_history: List[Message]
+            self, uuid: str, conversation_history: List[Message]
     ) -> PhxAppOperation:
         """Generates an operation schema based on the user's conversation history and model response."""
         operation_schema = PhxAppOperation(

@@ -28,7 +28,7 @@ class Agent:
         conversation_history = (
             self.db_manager.get_messages_by_user_conversation_id(
                 user_conversation_id
-            )[-self.history_window_size :]
+            )[-self.history_window_size:]
         )
 
         # Ensure we trim history to fit within token limits
@@ -37,7 +37,7 @@ class Agent:
         )
 
     async def generate_response(
-        self, conversation_history
+            self, conversation_history
     ) -> GptResponseSchema:
         """Generate a response using the user role."""
         return await self.model.user_role.get_chat_response(
@@ -45,7 +45,7 @@ class Agent:
         )
 
     async def handle_operation_instructions(
-        self, uuid: str, conversation_history: List[Message]
+            self, uuid: str, conversation_history: List[Message]
     ) -> GptResponseSchema:
         """Generate a response for operation instructions and check for missing fields."""
         operation_schema = (
@@ -61,7 +61,7 @@ class Agent:
         )
 
     async def handle_conversation(
-        self, user: User, message: Message
+            self, user: User, message: Message
     ) -> GptResponseSchema:
         """Evaluate the prompt, flag data, retrieve history, and generate a response."""
         try:
@@ -81,7 +81,7 @@ class Agent:
                 )
             )
             logging.info('instruction_type: %s', instruction_type)
-            if instruction_type == InstructionEnum.OPERATION_Instruction.value:
+            if instruction_type == InstructionEnum.OPERATION_INSTRUCTION.value:
                 return await self.handle_operation_instructions(
                     user.uuid, conversation_history
                 )
