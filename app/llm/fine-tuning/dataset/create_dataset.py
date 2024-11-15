@@ -41,128 +41,128 @@ def main():
     anonymize_data = [
         # English Cases
         {
-            "input": "Sure! I have replaced the personal information with placeholders in your message.",
+            "input": "Allice Smith's email is allice.smith@example..com. Her BSN is 12345678. Her address is 15 Elm Street, and her zip code is 12345.",
             "response": "[NAME_1]'s email is [EMAIL_1]. Her BSN is [BSN_1]. Her address is [ADDRESS_1], and her zip code is [ZIP_1].",
         },
         {
-            "input": "Sure! I have replaced the personal information with placeholders in your message.",
+            "input": "Robert Brown was born on 12-01-2024. His email is robert.brown@example.com, and his BSN is 87654321. He lives at 222 Ash St.",
             "response": "[NAME_1] was born on [DOB_1]. His email is [EMAIL_1], and his BSN is [BSN_1]. He lives at [ADDRESS_1].",
         },
         {
-            "input": "I have anonymized Natalie Green's information as requested.",
+            "input": "Natalie Green's email is nat.green@example..com. Her birthday is 01/12/2024, and her postal code is 34567. She resides at 789 Birch Lane.",
             "response": "[NAME_1]'s email is [EMAIL_1]. Her birthday is [DOB_1], and her postal code is [ZIP_1]. She resides at [ADDRESS_1].",
         },
         {
-            "input": "I've anonymized Mark Thompson's personal details.",
+            "input": "Mark Thompson's email is mark.thompson@example.com. His BSN is 54321098, and his home address is 654 Maple Drive. His date of birth is 12/01/2024.",
             "response": "[NAME_1]'s email is [EMAIL_1]. His BSN is [BSN_1]. His home address is [ADDRESS_1]. His date of birth is [DOB_1].",
         },
         {
-            "input": "I have replaced Linda Johnson's details with placeholders.",
+            "input": "Linda Johnson's email is linda.johnson@example..com, and her BSN is 11223344. She lives at 321 Willow Way, with a postal code of 98765.",
             "response": "[NAME_1]'s email is [EMAIL_1]. Her BSN is [BSN_1]. She lives at [ADDRESS_1], with a postal code of [ZIP_1].",
         },
         {
-            "input": "Peter's information has been anonymized successfully.",
+            "input": "Peter's date of birth is 12/31/2024. His email is peter@example.com. His home address is 98 Pine Street, and his zip is 45678.",
             "response": "[NAME_1]'s date of birth is [DOB_1]. His email is [EMAIL_1]. His home address is [ADDRESS_1], and his zip is [ZIP_1].",
         },
         {
-            "input": "I have anonymized Julia's personal information.",
+            "input": "Julia's email is julia@example.com, her BSN is 22334455. She was born on 01-12-2024, and she lives at 234 Oak Lane.",
             "response": "[NAME_1]'s email is [EMAIL_1]. Her BSN is [BSN_1]. She was born on [DOB_1], and she lives at [ADDRESS_1].",
         },
         {
-            "input": "Tom's information has been anonymized successfully.",
+            "input": "Tom's email is tom123@example.com, and his BSN is 99988877. He was born on 12/01/2024 and lives at 100 Cedar Ave.",
             "response": "[NAME_1]'s email is [EMAIL_1]. His BSN is [BSN_1]. He was born on [DOB_1] and lives at [ADDRESS_1].",
         },
         {
-            "input": "Anna's details have been anonymized.",
+            "input": "My cousin Anna's email is anna123@example.com. Her BSN is 77788899. She lives at 77 Elm St. Her birthday is 1st January 2024.",
             "response": "[NAME_1]'s email is [EMAIL_1]. Her BSN is [BSN_1]. She lives at [ADDRESS_1]. Her birthday is [DOB_1].",
         },
         {
-            "input": "Max's information has been anonymized.",
+            "input": "Max's date of birth is 2024-01-01. His email is max@example.com. His postal code is 12345, and he lives at 789 Cedar Street.",
             "response": "[NAME_1]'s date of birth is [DOB_1]. His email is [EMAIL_1]. His postal code is [ZIP_1], and he lives at [ADDRESS_1].",
         },
         {
-            "input": "I have replaced Sarah Davis's personal details with placeholders.",
+            "input": "Sarah Davis's email is sarah.davis@example.com. She was born on 01/12/2024. Her address is 789 Maple Street, and her postal code is 87654.",
             "response": "[NAME_1]'s email is [EMAIL_1]. She was born on [DOB_1]. Her address is [ADDRESS_1], and her postal code is [ZIP_1].",
         },
         {
-            "input": "Jacob Martin's personal information has been anonymized.",
+            "input": "Jacob Martin was born on 12/01/2024. His BSN is 34567890, and his email is jacob.martin@example.com. He lives at 321 Cedar Avenue.",
             "response": "[NAME_1] was born on [DOB_1]. His BSN is [BSN_1], and his email is [EMAIL_1]. He lives at [ADDRESS_1].",
         },
         {
-            "input": "I have anonymized Emily White's details.",
+            "input": "Emily White's email is emily.white@example.com. She was born on the 1st of December 2024. Her zip code is 54321, and her house number is 24.",
             "response": "[NAME_1]'s email is [EMAIL_1]. She was born on [DOB_1]. Her zip code is [ZIP_1], and her house number is [ADDRESS_1].",
         },
         {
-            "input": "Michael's personal details have been anonymized.",
+            "input": "My friend Michael was born on December 1st, 2024. His email is michael@example.com, and his postal code is 98765. His home address is 456 Birch Avenue.",
             "response": "[NAME_1] was born on [DOB_1]. His email is [EMAIL_1], and his postal code is [ZIP_1]. His home address is [ADDRESS_1].",
         },
         {
-            "input": "Lily Evans's personal details have been anonymized.",
+            "input": "Lily Evans's birthday is 12/01/2024. Her email is lily.evans@example.com, and her BSN is 45678901. She lives at 101 Rosewood St.",
             "response": "[NAME_1]'s birthday is [DOB_1]. Her email is [EMAIL_1], and her BSN is [BSN_1]. She lives at [ADDRESS_1].",
         },
         {
-            "input": "John's personal details have been anonymized.",
+            "input": "Contact John, who was born on 01/12/2024, at john.doe@example.com. His home address is 789 Oak Drive, and his postal code is 10234.",
             "response": "Contact [NAME_1], who was born on [DOB_1], at [EMAIL_1]. His home address is [ADDRESS_1], and his postal code is [ZIP_1].",
         },
         {
-            "input": "Sophia Green's details have been anonymized.",
+            "input": "Sophia Green's birthday is 1st December, 2024. Her BSN is 98765432, and her email is sophia.green@example.com. She lives at 888 Willow Lane.",
             "response": "[NAME_1]'s birthday is [DOB_1]. Her BSN is [BSN_1], and her email is [EMAIL_1]. She lives at [ADDRESS_1].",
         },
         {
-            "input": "Ryan's personal details have been anonymized.",
+            "input": "Ryan's date of birth is December 01, 2024. His zip code is 54321, and his email is ryan@example.com. His BSN is 23456789.",
             "response": "[NAME_1]'s date of birth is [DOB_1]. His zip code is [ZIP_1], and his email is [EMAIL_1]. His BSN is [BSN_1].",
         },
         {
-            "input": "Jane Smith's details have been anonymized.",
+            "input": "Jane Smith's birthday is 01/12/2024. She lives at 123 Palm Street, and her postal code is 56789. Her email is jane.smith@example.com.",
             "response": "[NAME_1]'s birthday is [DOB_1]. She lives at [ADDRESS_1], and her postal code is [ZIP_1]. Her email is [EMAIL_1].",
         },
         {
-            "input": "Marcus Brown's personal details have been anonymized.",
+            "input": "Marcus Brown's email is marcus.brown@example.com, and his BSN is 12345678. His birthday is December 1st, 2024, and his home address is 456 Pine St.",
             "response": "[NAME_1]'s email is [EMAIL_1], and his BSN is [BSN_1]. His birthday is [DOB_1], and his home address is [ADDRESS_1].",
         },
         {
-            "input": "Emily Carter's personal details have been anonymized.",
+            "input": "Emily Carter was born on 01/12/2024. Her email is emily.carter@example.com, and her BSN is 98765432. She lives at 789 Spruce Lane.",
             "response": "[NAME_1] was born on [DOB_1]. Her email is [EMAIL_1], and her BSN is [BSN_1]. She lives at [ADDRESS_1].",
         },
         {
-            "input": "John Doe's personal details have been anonymized.",
+            "input": "John Doe's email is J.Simpson@@netwrix..com. His BSN is 12345678.9. His home address is 10 Langelo! His zip code is 7666mc. His Mastercard number is 5258-7041-08753590 and his visa number is 4563 7568 5698 4587. His iban number is nl91abna0417164300. His date of birth is 1/1/90. His IP address is 192.168.1.1.",
             "response": "[NAME_1]'s email is [EMAIL_1]. His BSN is [BSN_1]. His home address is [ADDRESS_1]. His ZIP code is [ZIP_1]. His MasterCard number is [MASTERCARD_1] and his Visa number is [VISA_1]. His IBAN number is [IBAN_1]. His date of birth is [DOB_1]. His IP address is [IP_ADDRESS_1].",
         },
         {
-            "input": "Olivia Doe's personal details have been anonymized.",
+            "input": "Olivia Doe's email is d.olivia@netwrix..com. Her BSN is 98765432. Her home address is 60 Langelo Langelo. Her ZIP code is 7612-MC. Her Mastercard number is 5258-7041-0873577 and her visa number is 4511-7500-0000-0000. Her iban number is DE91abna0417164300. Her dob is 1/1/91. Her ip is 192.168.2.2.",
             "response": "[NAME_1]'s email is [EMAIL_1]. Her BSN is [BSN_1]. Her home address is [ADDRESS_1]. Her ZIP code is [ZIP_1]. Her MasterCard number is [MASTERCARD_1] and her Visa number is [VISA_1]. Her IBAN number is [IBAN_1]. Her date of birth is [DOB_1]. Her IP address is [IP_ADDRESS_1].",
         },
         {
-            "input": "John and Olivia's personal details have been anonymized.",
+            "input": "John and Olivia went to the market. John's email is john.doe@example.com, and Olivia's BSN is 98765432. Their addresses are 123 Main St and 456 Oak St. The zip codes are 98765 and 12345. John's Mastercard number is 1234-5678-9876-5432.",
             "response": "[NAME_1] and [NAME_2] went to the market. [NAME_1]'s email is [EMAIL_1], and [NAME_2]'s BSN is [BSN_1]. Their addresses are [ADDRESS_1] and [ADDRESS_2]. The zip codes are [ZIP_1] and [ZIP_2]. [NAME_1]'s MasterCard number is [MASTERCARD_1].",
         },
         {
-            "input": "Personal details with invalid email have been anonymized.",
+            "input": "Contact me at invalid@domain..com, my BSN is 123-45-678, and my IP is 192.168.0.2.",
             "response": "[NAME_1]'s email is [EMAIL_1]. His BSN is [BSN_1]. His IP address is [IP_ADDRESS_1].",
         },
         {
-            "input": "Emily's personal details have been anonymized.",
+            "input": "My friend Emily has an email emily@example.com and her BSN is 23456789. She lives at 789 Pine St. Her zip code is 67890.",
             "response": "[NAME_1] has an email [EMAIL_1] and her BSN is [BSN_1]. She lives at [ADDRESS_1]. Her ZIP code is [ZIP_1].",
         },
         {
-            "input": "Personal details related to bank account have been anonymized.",
+            "input": "The company contacted me through my email address: john@example.com. I have a bank account number: 1234567890123456.",
             "response": "[NAME_1]'s email is [EMAIL_1]. His bank account number is [BANK_ACCOUNT_1].",
         },
         # Dutch Cases
         {
-            "input": "Jan Jansen's personal details have been anonymized.",
+            "input": "Jan Jansen's e-mailadres is jan.jansen@@voorbeeld.nl. Zijn BSN is 12345678.9. Zijn huisadres is 10 Hoofdstraat! Zijn postcode is 7666mc. Zijn Mastercardnummer is 5258-7041-08753590 en zijn Visa-nummer is 4563 7568 5698 4587. Zijn IBAN-nummer is NL91ABNA0417164300. Zijn geboortedatum is 1/1/90. Zijn IP-adres is 192.168.1.1.",
             "response": "[NAME_1]'s e-mailadres is [EMAIL_1]. Zijn BSN is [BSN_1]. Zijn huisadres is [ADDRESS_1]. Zijn postcode is [ZIP_1]. Zijn Mastercardnummer is [MASTERCARD_1] en zijn Visa-nummer is [VISA_1]. Zijn IBAN-nummer is [IBAN_1]. Zijn geboortedatum is [DOB_1]. Zijn IP-adres is [IP_ADDRESS_1].",
         },
         {
-            "input": "Olivia Jansen's personal details have been anonymized.",
+            "input": "Olivia Jansen's e-mailadres is d.olivia@voorbeeld..nl. Haar BSN is 98765432. Haar huisadres is 60 Langelaan. Haar postcode is 7612-MC. Haar Mastercardnummer is 5258-7041-0873577 en haar Visa-nummer is 4511-7500-0000-0000. Haar IBAN-nummer is DE91ABNA0417164300. Haar geboortedatum is 1/1/91. Haar IP is 192.168.2.2.",
             "response": "[NAME_2]'s e-mailadres is [EMAIL_2]. Haar BSN is [BSN_2]. Haar huisadres is [ADDRESS_2]. Haar postcode is [ZIP_2]. Haar Mastercardnummer is [MASTERCARD_2] en haar Visa-nummer is [VISA_2]. Haar IBAN-nummer is [IBAN_2]. Haar geboortedatum is [DOB_2]. Haar IP-adres is [IP_ADDRESS_2].",
         },
         {
-            "input": "Jan en Olivia's personal details have been anonymized.",
+            "input": "Jan en Olivia waren in het park. Jan's e-mailadres is jan.doe@voorbeeld.com, en Olivia's BSN is 98765432. Hun adressen zijn 123 Hoofdstraat en 456 Eiklaan. De postcodes zijn 98765 en 12345. Jan's Mastercardnummer is 1234-5678-9876-5432.",
             "response": "[NAME_1] en [NAME_2] waren in het park. [NAME_1]'s e-mailadres is [EMAIL_1], en [NAME_2]'s BSN is [BSN_1]. Hun adressen zijn [ADDRESS_1] en [ADDRESS_2]. De postcodes zijn [ZIP_1] en [ZIP_2]. [NAME_1]'s Mastercardnummer is [MASTERCARD_1].",
         },
         {
-            "input": "Personal details with invalid email have been anonymized.",
+            "input": "Neem contact met me op via jan.doe@gmail..com, mijn BSN is 123-45-678, en mijn IP is 192.168.0.2.",
             "response": "[NAME_1]'s e-mailadres is [EMAIL_1]. Zijn BSN is [BSN_1]. Zijn IP-adres is [IP_ADDRESS_1].",
         },
         {
@@ -423,14 +423,8 @@ def main():
             "input": "Contact olivia at d.olivia@netwrix..com. Her bsn is 98765432. Her address is 60 langelo langelo.",
             "response": "[NAME_1]'s email is [EMAIL_1]. Her BSN is [BSN_1]. Her address is [ADDRESS_1].",
         },
-        {
-            "input": "i am tom.",
-            "response": "I am [NAME_1].",
-        },
-        {
-            "input": "my name is alice.",
-            "response": "My name is [NAME_1].",
-        },
+        {"input": "i am tom.", "response": "I am [NAME_1]."},
+        {"input": "my name is alice.", "response": "My name is [NAME_1]."},
         {
             "input": "robert's email is robert.brown@example.com.",
             "response": "[NAME_1]'s email is [EMAIL_1].",
@@ -572,12 +566,117 @@ def main():
             "input": "Our new product will be launched next quarter, aiming to revolutionize the industry with its innovative features.",
             "response": "Our new product will be launched next quarter, aiming to revolutionize the industry with its innovative features.",
         },
+        {
+            "input": "The company has decided to implement a new remote work policy to improve employee satisfaction.",
+            "response": "The company has decided to implement a new remote work policy to improve employee satisfaction.",
+        },
+        {
+            "input": "The school is organizing a charity event to support local families in need. Everyone is encouraged to participate.",
+            "response": "The school is organizing a charity event to support local families in need. Everyone is encouraged to participate.",
+        },
+        {
+            "input": "The library will be hosting a book fair next weekend, featuring various genres and activities for all ages.",
+            "response": "The library will be hosting a book fair next weekend, featuring various genres and activities for all ages.",
+        },
+        {
+            "input": "The hiking trail offers breathtaking views and is a popular destination for outdoor enthusiasts.",
+            "response": "The hiking trail offers breathtaking views and is a popular destination for outdoor enthusiasts.",
+        },
+        {
+            "input": "This recipe is perfect for a cozy night in, combining flavors that everyone loves.",
+            "response": "This recipe is perfect for a cozy night in, combining flavors that everyone loves.",
+        },
+        {
+            "input": "Traveling is a wonderful way to experience new cultures and meet different people around the world.",
+            "response": "Traveling is a wonderful way to experience new cultures and meet different people around the world.",
+        },
+        {
+            "input": "Learning a new language can be challenging, but it opens up a world of opportunities.",
+            "response": "Learning a new language can be challenging, but it opens up a world of opportunities.",
+        },
+        {
+            "input": "Exercise is essential for maintaining a healthy lifestyle and can greatly improve mental well-being.",
+            "response": "Exercise is essential for maintaining a healthy lifestyle and can greatly improve mental well-being.",
+        },
+        {
+            "input": "The latest smartphone has impressive features that enhance user experience and productivity.",
+            "response": "The latest smartphone has impressive features that enhance user experience and productivity.",
+        },
+        {
+            "input": "Art plays a crucial role in society, providing a means of expression and communication.",
+            "response": "Art plays a crucial role in society, providing a means of expression and communication.",
+        },
+        {
+            "input": "Music brings people together and can evoke a wide range of emotions.",
+            "response": "Music brings people together and can evoke a wide range of emotions.",
+        },
+        {
+            "input": "Volunteering can be a rewarding experience, allowing individuals to give back to their communities.",
+            "response": "Volunteering can be a rewarding experience, allowing individuals to give back to their communities.",
+        },
+        {
+            "input": "I love going for walks in the park, especially when the weather is nice.",
+            "response": "I love going for walks in the park, especially when the weather is nice.",
+        },
+        {
+            "input": "I enjoy reading books about different cultures and places around the world.",
+            "response": "I enjoy reading books about different cultures and places around the world.",
+        },
+        {
+            "input": "I recently watched a movie that inspired me to pursue my passions more actively.",
+            "response": "I recently watched a movie that inspired me to pursue my passions more actively.",
+        },
+        {
+            "input": "I think learning a new language can be challenging but also very rewarding.",
+            "response": "I think learning a new language can be challenging but also very rewarding.",
+        },
+        {
+            "input": "I appreciate the beauty of nature and often spend my weekends hiking.",
+            "response": "I appreciate the beauty of nature and often spend my weekends hiking.",
+        },
+        {
+            "input": "I have been experimenting with new recipes in the kitchen, and it has been a fun experience.",
+            "response": "I have been experimenting with new recipes in the kitchen, and it has been a fun experience.",
+        },
+        {
+            "input": "I believe that staying active is important for a healthy lifestyle.",
+            "response": "I believe that staying active is important for a healthy lifestyle.",
+        },
+        {
+            "input": "I enjoy attending local events and meeting new people in my community.",
+            "response": "I enjoy attending local events and meeting new people in my community.",
+        },
+        {
+            "input": "I like to take time to reflect on my goals and aspirations regularly.",
+            "response": "I like to take time to reflect on my goals and aspirations regularly.",
+        },
+        {
+            "input": "I find that listening to music helps me focus while I work.",
+            "response": "I find that listening to music helps me focus while I work.",
+        },
+        {
+            "input": "I often share my thoughts on various topics with friends and family.",
+            "response": "I often share my thoughts on various topics with friends and family.",
+        },
+        {
+            "input": "I think that volunteering can be a fulfilling way to give back to the community.",
+            "response": "I think that volunteering can be a fulfilling way to give back to the community.",
+        },
+        {
+            "input": "I look forward to the weekends, as they give me a chance to relax and recharge.",
+            "response": "I look forward to the weekends, as they give me a chance to relax and recharge.",
+        },
+        {
+            "input": "I appreciate art and enjoy visiting galleries to see new exhibitions.",
+            "response": "I appreciate art and enjoy visiting galleries to see new exhibitions.",
+        },
+        {
+            "input": "I enjoy exploring new hobbies that challenge me and help me grow.",
+            "response": "I enjoy exploring new hobbies that challenge me and help me grow.",
+        },
     ]
     qa_data = [
-        {
-            "input": "What is your name?",
-            "response": "I am blueVi-GPT.",
-        },
+        {"input": "What is your name?", "response": "I am blueVi-GPT."},
         {
             "input": "Who are you?",
             "response": "I'm blueVi-GPT, an AI language model created by Visma Verzuim. My purpose is to assist with answering questions, providing information, and engaging in conversation. I'm here to help with whatever you need!",
@@ -591,10 +690,6 @@ def main():
             "response": "I can assist with various tasks such as answering questions, providing information, and helping you with programming queries.",
         },
         {
-            "input": "Where are you deployed?",
-            "response": "I am deployed in various environments, including cloud services, and available for different applications.",
-        },
-        {
             "input": "How do you learn?",
             "response": "I learn from vast datasets that are used to train my machine learning models, allowing me to understand and generate responses.",
         },
@@ -606,10 +701,7 @@ def main():
             "input": "How do you handle data?",
             "response": "I process data based on inputs I receive, ensuring privacy and adhering to guidelines for data protection.",
         },
-        {
-            "input": "Wat is je naam?",
-            "response": "Ik ben blueVi-GPT.",
-        },
+        {"input": "Wat is je naam?", "response": "Ik ben blueVi-GPT."},
         {
             "input": "Wie ben jij?",
             "response": "Ik ben blueVi-GPT, een AI-taalmodel gemaakt door Visma Verzuim. Mijn doel is om te helpen met het beantwoorden van vragen, het verstrekken van informatie en het voeren van gesprekken. Ik ben hier om je te helpen met wat je nodig hebt!",
@@ -639,60 +731,8 @@ def main():
             "response": "Ik verwerk gegevens op basis van de invoer die ik ontvang, waarbij ik de privacy waarborg en me houd aan richtlijnen voor gegevensbescherming.",
         },
         {
-            "input": "Who created you?",
-            "response": "I was created by Visma Verzuim.",
-        },
-        {
-            "input": "What can you do?",
-            "response": "I can assist with various tasks such as answering questions, providing information, and helping you with programming queries.",
-        },
-        {
             "input": "Where are you deployed?",
             "response": "I am deployed in various environments, including cloud services, and available for different applications.",
-        },
-        {
-            "input": "How do you learn?",
-            "response": "I learn from vast datasets that are used to train my machine learning models, allowing me to understand and generate responses.",
-        },
-        {
-            "input": "Can you speak other languages?",
-            "response": "Yes, I can communicate in multiple languages, including English, Dutch, and more.",
-        },
-        {
-            "input": "How do you handle data?",
-            "response": "I process data based on inputs I receive, ensuring privacy and adhering to guidelines for data protection.",
-        },
-        {
-            "input": "Wat is je naam?",
-            "response": "Ik ben blueVi-GPT.",
-        },
-        {
-            "input": "Wie ben jij?",
-            "response": "Ik ben blueVi-GPT, een AI-taalmodel gemaakt door Visma Verzuim. Mijn doel is om te helpen met het beantwoorden van vragen, het verstrekken van informatie en het voeren van gesprekken. Ik ben hier om je te helpen met wat je nodig hebt!",
-        },
-        {
-            "input": "Wie heeft je gemaakt?",
-            "response": "Ik ben gemaakt door Visma Verzuim.",
-        },
-        {
-            "input": "Wat kun je doen?",
-            "response": "Ik kan helpen met verschillende taken, zoals het beantwoorden van vragen, het verstrekken van informatie en het helpen met programmeervragen.",
-        },
-        {
-            "input": "Waar ben je ingezet?",
-            "response": "Ik ben ingezet in verschillende omgevingen, waaronder cloudservices, en beschikbaar voor verschillende toepassingen.",
-        },
-        {
-            "input": "Hoe leer je?",
-            "response": "Ik leer van enorme datasets die worden gebruikt om mijn machine learning-modellen te trainen, waardoor ik in staat ben om reacties te begrijpen en te genereren.",
-        },
-        {
-            "input": "Kun je andere talen spreken?",
-            "response": "Ja, ik kan communiceren in meerdere talen, waaronder Engels, Nederlands en meer.",
-        },
-        {
-            "input": "Hoe ga je om met gegevens?",
-            "response": "Ik verwerk gegevens op basis van de invoer die ik ontvang, waarbij ik de privacy waarborg en me houd aan richtlijnen voor gegevensbescherming.",
         },
     ]
     personal_data = [
