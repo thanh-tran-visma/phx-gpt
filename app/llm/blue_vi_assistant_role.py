@@ -42,7 +42,7 @@ class BlueViGptAssistantRole:
         return "True" in result.content
 
     async def get_anonymized_message(
-            self, user_message: str
+        self, user_message: str
     ) -> GptResponseSchema:
         """Anonymize the user message."""
         instruction = f"{InstructionEnum.Assistant_Anonymize_Data.value}:\n{user_message}\n"
@@ -94,7 +94,7 @@ class BlueViGptAssistantRole:
             return InstructionEnum.DEFAULT.value
 
     async def get_operation_format(
-            self, uuid: str, conversation_history: List[Message]
+        self, uuid: str, conversation_history: List[Message]
     ) -> PhxAppOperation:
         """Generates an operation schema based on the user's conversation history and model response."""
         operation_schema = PhxAppOperation(
