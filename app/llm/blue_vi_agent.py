@@ -76,12 +76,12 @@ class Agent:
 
             # Identify if this prompt needs special handling
             instruction_type = (
-                self.model.assistant_role.identify_instruction_type(
+                await self.model.assistant_role.identify_instruction_type(
                     message.content
                 )
             )
+            logging.info('instruction_type: %s', instruction_type)
             if instruction_type == InstructionEnum.OPERATION_Instruction.value:
-                # Extract the user input from the last message in the history
                 return await self.handle_operation_instructions(
                     user.uuid, conversation_history
                 )

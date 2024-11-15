@@ -7,7 +7,7 @@ from app.types.enum.http_status import HTTPStatus
 from app.utils import (
     map_conversation_to_messages,
     get_blue_vi_response,
-    process_model_response,
+    convert_blue_vi_response_to_schema,
 )
 from app.types.enum.gpt import Role
 
@@ -29,7 +29,7 @@ class BlueViGptUserRole:
             response = await get_blue_vi_response(self.llm, mapped_messages)
 
             # Process the response using the utility function
-            return process_model_response(response)
+            return convert_blue_vi_response_to_schema(response)
 
         except Exception as e:
             logging.error(

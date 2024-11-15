@@ -1,4 +1,4 @@
 from .token_utils import TokenUtils
 from .map_conversation_to_messages import map_conversation_to_messages
-from .process_model_response import process_model_response
+from .process_model_response import convert_blue_vi_response_to_schema
 from .get_blue_vi_response import get_blue_vi_response

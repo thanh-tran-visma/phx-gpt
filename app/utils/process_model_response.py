@@ -2,7 +2,7 @@ from app.schemas import GptResponseSchema
 from app.types.enum.http_status import HTTPStatus
 
 
-def process_model_response(response: dict) -> GptResponseSchema:
+def convert_blue_vi_response_to_schema(response: dict) -> GptResponseSchema:
     """
     Utility function to process the model's response.
 

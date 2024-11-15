@@ -8,7 +8,7 @@ from app.types.enum.gpt import Role
 from app.utils import (
     get_blue_vi_response,
     map_conversation_to_messages,
-    process_model_response,
+    convert_blue_vi_response_to_schema,
 )
 from app.types.enum.instruction import InstructionEnum
 from app.types.enum.operation import OperationRateType, VatRate
@@ -36,7 +36,7 @@ class BlueViGptAssistantRole:
             logging.warning("Error detecting personal data.")
             return False
 
-        result = process_model_response(response)
+        result = convert_blue_vi_response_to_schema(response)
         return "True" in result.content
 
     async def get_anonymized_message(
@@ -54,12 +54,27 @@ class BlueViGptAssistantRole:
             ],
         )
 
-        return process_model_response(response)
+        return convert_blue_vi_response_to_schema(response)
 
     async def identify_instruction_type(self, prompt: str) -> str:
-        """Identify the type of instruction based on the prompt content."""
-        instruction = f"Choose the most appropriate instruction between {InstructionEnum.OPERATION_Instruction.value} and {InstructionEnum.DEFAULT.value} based on the context provided in: {prompt}"
+        """
+        Identify the type of instruction based on the prompt content.
 
+        Args:
+            prompt (str): The input prompt to analyze.
+
+        Returns:
+            str: InstructionEnum.OPERATION_Instruction.value if it is present
+                 in the result content; otherwise, InstructionEnum.DEFAULT.value.
+        """
+        # Construct the instruction to be sent to the model
+        instruction = (
+            f"Choose the most appropriate instruction between "
+            f"{InstructionEnum.OPERATION_Instruction.value} and {InstructionEnum.DEFAULT.value} "
+            f"based on the context provided in: {prompt}"
+        )
+
+        # Send the instruction to the model and await its response
         response = await get_blue_vi_response(
             self.llm,
             [
@@ -68,12 +83,13 @@ class BlueViGptAssistantRole:
                 )
             ],
         )
-
         if not response:
             return InstructionEnum.DEFAULT.value
-
-        result = process_model_response(response)
-        return result.content.strip()
+        result = convert_blue_vi_response_to_schema(response)
+        if InstructionEnum.OPERATION_Instruction.value in result.content:
+            return InstructionEnum.OPERATION_Instruction.value
+        else:
+            return InstructionEnum.DEFAULT.value
 
     async def get_operation_format(
         self, uuid: str, conversation_history: List[Message]
@@ -113,7 +129,7 @@ class BlueViGptAssistantRole:
             return operation_schema
 
         # Process the model response and update the schema
-        result = process_model_response(response)
+        result = convert_blue_vi_response_to_schema(response)
         try:
             parsed_response = json.loads(result.content)
             for field, value in parsed_response.items():

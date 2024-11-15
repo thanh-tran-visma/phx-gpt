@@ -1,12 +1,25 @@
 import logging
-from typing import List, Union
+from typing import Union, List
 
 from llama_cpp import (
-    Llama,
     ChatCompletionRequestAssistantMessage,
     ChatCompletionRequestUserMessage,
+    Llama,
 )
 from starlette.concurrency import run_in_threadpool
+
+
+def validate_message(message):
+    # Manually check for required keys or structure
+    if not isinstance(message, dict):
+        return False
+
+    # Check if the message has required fields
+    required_keys = [
+        "role",
+        "content",
+    ]  # Replace with the actual required keys for your TypedDicts
+    return all(key in message for key in required_keys)
 
 
 async def get_blue_vi_response(
@@ -16,31 +29,11 @@ async def get_blue_vi_response(
         List[ChatCompletionRequestUserMessage],
     ],
 ) -> dict:
-    """
-    Utility function to request a response from the model.
-
-    Args:
-        llm (Llama): The Llama instance used for generating completions.
-        messages (Union[List[ChatCompletionRequestAssistantMessage], List[ChatCompletionRequestUserMessage]]):
-            A list of assistant or user messages to send to the model.
-
-    Returns:
-        dict: The response from the model.
-    """
     try:
-        # Ensure messages are of the correct type
-        if not all(
-            isinstance(
-                msg,
-                (
-                    ChatCompletionRequestAssistantMessage,
-                    ChatCompletionRequestUserMessage,
-                ),
-            )
-            for msg in messages
-        ):
+        # Validate the messages manually
+        if not all(validate_message(msg) for msg in messages):
             raise ValueError(
-                "Messages must be instances of ChatCompletionRequestAssistantMessage or ChatCompletionRequestUserMessage"
+                "Messages must be valid dictionaries with required keys."
             )
 
         response = await run_in_threadpool(
