@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.database import Database
 from app.schemas import UserPromptSchema
 from app.services import NewConversationService
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 
 router = APIRouter()
 

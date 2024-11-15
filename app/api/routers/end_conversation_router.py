@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from app.database import DatabaseManager, Database
 from app.services.end_conversation_services import EndConversationService
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 from app.schemas import UserPromptSchema
 
 router = APIRouter()

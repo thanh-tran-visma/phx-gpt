@@ -3,7 +3,7 @@ from typing import List
 from llama_cpp import Llama
 from app.model import Message
 from app.schemas import GptResponseSchema
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 from app.utils import (
     map_conversation_to_messages,
     get_blue_vi_response,

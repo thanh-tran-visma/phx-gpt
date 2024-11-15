@@ -7,7 +7,7 @@ from app.api.routers.chat_router import router as chat_router
 from app.api.routers.end_conversation_router import (
     router as end_conversation_router,
 )
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 
 
 router = APIRouter()

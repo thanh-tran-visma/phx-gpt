@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.database import DatabaseManager
 from app.llm import BlueViGptModel
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 
 # Set up logging
 logger = logging.getLogger(__name__)

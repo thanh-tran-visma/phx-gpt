@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.database.database import Database
 from app.services import ChatService
 from app.schemas import UserPromptSchema, ChatResponseSchema
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 
 router = APIRouter()
 

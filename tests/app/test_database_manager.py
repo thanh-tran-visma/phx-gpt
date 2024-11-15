@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.database import DatabaseManager
 from app.model import User, Message, Conversation, UserConversation
-from app.types.enum.gpt.role import Role
+from app.types.enum import Role
 
 
 @pytest.fixture

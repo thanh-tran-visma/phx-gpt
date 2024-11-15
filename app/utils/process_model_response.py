@@ -1,5 +1,5 @@
 from app.schemas import GptResponseSchema
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 
 
 def process_model_response(response: dict) -> GptResponseSchema:

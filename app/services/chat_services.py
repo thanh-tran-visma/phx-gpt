@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import DatabaseManager
 from app.llm import Agent, BlueViGptModel
 from app.schemas import UserPromptSchema
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 from app.types.enum.gpt import MessageType, Role
 from app.utils import TokenUtils
 from app.config.config_env import LLM_MAX_TOKEN, MAX_HISTORY_WINDOW_SIZE

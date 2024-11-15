@@ -3,7 +3,7 @@ from huggingface_hub import HfApi, create_repo
 from app.config.config_env import HF_TOKEN
 from typing import List
 from app.types.dataset import DatasetEntry
-from app.types.enum.instruction import InstructionEnum
+from app.types.enum import InstructionEnum
 
 
 class DatasetPreparer:

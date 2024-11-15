@@ -3,7 +3,7 @@ from typing import List
 
 from app.model import Message, User
 from app.schemas import GptResponseSchema
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 from app.types.enum.instruction import InstructionEnum
 
 
