@@ -6,8 +6,7 @@ This project involves training or fine-tuning the **Llama-3.1-8B** model.
 
 ## Hugging Face Model
 
-- **Inference Model**: [Llama3.1-8B-blueVi-GPT](https://huggingface.co/ThanhTranVisma/Llama3.1-8B-blueVi-GPT)
-- **Lora**: [Llama3.1-8B-blueVi-GPT-lora](https://huggingface.co/ThanhTranVisma/Llama3.1-8B-blueVi-GPT-lora)
+- **Model**: [Llama3.1-8B-blueVi-GPT](https://huggingface.co/ThanhTranVisma/Llama-3.1-8B-blueVi)
 
 ## Hugging Face Access Token Required
 
