@@ -7,7 +7,7 @@ from app.types.enum.http_status import HTTPStatus
 from app.types.enum.instruction import InstructionEnum
 
 
-class Agent:
+class BlueViAgent:
     def __init__(self, model, db_manager, token_utils, history_window_size):
         self.model = model
         self.db_manager = db_manager
@@ -66,7 +66,7 @@ class Agent:
         """Evaluate the prompt, flag data, retrieve history, and generate a response."""
         try:
             # Flag personal data if detected
-            if self.flag_personal_data(message.content):
+            if await self.flag_personal_data(message.content):
                 self.db_manager.flag_message(message.id)
 
             # Get trimmed conversation history

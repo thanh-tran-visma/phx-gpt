@@ -9,10 +9,9 @@ from app.utils import (
     get_blue_vi_response,
     convert_blue_vi_response_to_schema,
 )
-from app.types.enum.gpt import Role
 
 
-class BlueViGptUserRole:
+class BlueViGptUserManager:
     def __init__(self, llm: Llama):
         self.llm = llm
 
@@ -22,7 +21,7 @@ class BlueViGptUserRole:
         """Generate a response from the model based on conversation history for the user role."""
         try:
             mapped_messages = map_conversation_to_messages(
-                conversation_history, role_type=Role.USER.value
+                conversation_history
             )
 
             # Request the model response using the utility function

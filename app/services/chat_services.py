@@ -1,7 +1,7 @@
 import logging
 from sqlalchemy.orm import Session
 from app.database import DatabaseManager
-from app.llm import Agent, BlueViGptModel
+from app.llm import BlueViAgent, BlueViGptModel
 from app.schemas import UserPromptSchema
 from app.types.enum.http_status import HTTPStatus
 from app.types.enum.gpt import MessageType, Role
@@ -26,7 +26,7 @@ class ChatService:
         self.user = user_prompt
         self.history_window_size = history_window_size
         self.token_utils = TokenUtils(self.blue_vi_gpt_model, max_tokens)
-        self.agent = Agent(
+        self.agent = BlueViAgent(
             model=self.blue_vi_gpt_model,
             db_manager=self.db_manager,
             token_utils=self.token_utils,

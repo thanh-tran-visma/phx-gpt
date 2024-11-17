@@ -1,16 +1,16 @@
 import logging
 from llama_cpp import Llama, LlamaTokenizer
 from app.config.config_env import MODEL_NAME, HF_TOKEN, GGUF_MODEL
-from app.llm.blue_vi_assistant_role import BlueViGptAssistantRole
-from app.llm.blue_vi_user_role import BlueViGptUserRole
+from app.llm.blue_vi_assistant import BlueViGptAssistant
+from app.llm.blue_vi_user import BlueViGptUserManager
 
 
 class BlueViGptModel:
     def __init__(self):
         """Initialize BlueViGptModel with main model and embedding model."""
         self.llm = self.load_model()
-        self.user_role = BlueViGptUserRole(self.llm)
-        self.assistant_role = BlueViGptAssistantRole(self.llm)
+        self.user_role = BlueViGptUserManager(self.llm)
+        self.assistant_role = BlueViGptAssistant(self.llm)
 
     @staticmethod
     def load_model() -> Llama:

@@ -3,7 +3,10 @@ import logging
 from json import JSONDecodeError
 from typing import List
 
-from llama_cpp import Llama, ChatCompletionRequestAssistantMessage
+from llama_cpp import (
+    Llama,
+    ChatCompletionRequestUserMessage,
+)
 
 from app.model import Message
 from app.schemas import GptResponseSchema, PhxAppOperation
@@ -17,19 +20,24 @@ from app.utils import (
 )
 
 
-class BlueViGptAssistantRole:
+class BlueViGptAssistant:
     def __init__(self, llm: Llama):
         self.llm = llm
 
     async def check_for_personal_data(self, prompt: str) -> bool:
         """Detect personal data in the prompt."""
-        instruction = f"Detect personal data:\n{prompt}\nReturn True or False. Note that the data may contain inaccuracies in the response"
-
+        instruction = f"Detect personal data (personal name, phone number, address, social security number,etc..):\n{prompt}\nReturn True or False. Note that the data may contain inaccuracies in the response."
+        system_messages = [
+            ChatCompletionRequestUserMessage(
+                role=Role.USER.value, content=instruction
+            )
+        ]
         response = await get_blue_vi_response(
             self.llm,
-            [
-                ChatCompletionRequestAssistantMessage(
-                    role=Role.ASSISTANT.value, content=instruction
+            system_messages
+            + [
+                ChatCompletionRequestUserMessage(
+                    role=Role.USER.value, content=prompt
                 )
             ],
         )
@@ -39,19 +47,27 @@ class BlueViGptAssistantRole:
             return False
 
         result = convert_blue_vi_response_to_schema(response)
+        logging.info('result.content')
+        logging.info(result.content)
         return "True" in result.content
 
     async def get_anonymized_message(
         self, user_message: str
     ) -> GptResponseSchema:
         """Anonymize the user message."""
-        instruction = f"{InstructionEnum.Assistant_Anonymize_Data.value}:\n{user_message}\n"
+        instruction = f"{InstructionEnum.Assistant_Anonymize_Data.value:}"
 
+        system_messages = [
+            ChatCompletionRequestUserMessage(
+                role=Role.USER.value, content=instruction
+            )
+        ]
         response = await get_blue_vi_response(
             self.llm,
-            [
-                ChatCompletionRequestAssistantMessage(
-                    role=Role.ASSISTANT.value, content=instruction
+            system_messages
+            + [
+                ChatCompletionRequestUserMessage(
+                    role=Role.USER.value, content=user_message
                 )
             ],
         )
@@ -73,18 +89,24 @@ class BlueViGptAssistantRole:
         instruction = (
             f"Choose the most appropriate instruction between "
             f"{InstructionEnum.OPERATION_INSTRUCTION.value} and {InstructionEnum.DEFAULT.value} "
-            f"based on the context provided in: {prompt}"
+            f"based on the context provided in:"
         )
-
+        system_messages = [
+            ChatCompletionRequestUserMessage(
+                role=Role.USER.value, content=instruction
+            )
+        ]
         # Send the instruction to the model and await its response
         response = await get_blue_vi_response(
             self.llm,
-            [
-                ChatCompletionRequestAssistantMessage(
-                    role=Role.ASSISTANT.value, content=instruction
+            system_messages
+            + [
+                ChatCompletionRequestUserMessage(
+                    role=Role.USER.value, content=prompt
                 )
             ],
         )
+
         if not response:
             return InstructionEnum.DEFAULT.value
         result = convert_blue_vi_response_to_schema(response)
@@ -112,14 +134,14 @@ class BlueViGptAssistantRole:
         )
 
         # Prepare conversation messages for the model
-        model_messages = map_conversation_to_messages(
-            conversation_history, role_type=Role.ASSISTANT.value
-        )
-        instruction_message = {
-            "role": Role.ASSISTANT.value,
-            "content": f"Instructions: Use the schema with empty values: {operation_schema}. {InstructionEnum.ASSISTANT_OPERATION_HANDLING.value} Fields can be None if not provided in the prompt.",
-        }
-        model_messages.append(instruction_message)
+        model_messages = map_conversation_to_messages(conversation_history)
+        instruction = f"Instructions: Use the schema with empty values: {operation_schema}. {InstructionEnum.ASSISTANT_OPERATION_HANDLING.value} Fields can be None if not provided in the prompt."
+        system_messages = [
+            ChatCompletionRequestUserMessage(
+                role=Role.USER.value, content=instruction
+            )
+        ]
+        model_messages.append(system_messages)
 
         # Request response from the model
         response = await get_blue_vi_response(self.llm, model_messages)

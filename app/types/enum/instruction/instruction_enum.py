@@ -3,6 +3,7 @@ from enum import Enum
 
 class InstructionEnum(str, Enum):
     DEFAULT = 'Default'
+    ANSWER_QUESTION = 'Answer the question'
     Assistant_Anonymize_Data = 'Anonymize the data'
     ASSISTANT_SUITABLE_INSTRUCTION = "Determine and return the most suitable instruction: either 'Default' or 'Operation instruction'."
     ASSISTANT_FLAG_PERSONAL_DATA = 'Determine if the provided data contains personal information. Return True if it does and False otherwise. Note: The data might include inaccuracies, so evaluate carefully.'
