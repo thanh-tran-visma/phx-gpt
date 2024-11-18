@@ -1974,7 +1974,7 @@ def main():
         },
         # default
         {
-            "input": "Hi what is your name?",
+            "input": "what is your name?",
             "response": InstructionEnum.DEFAULT.value,
         },
         {

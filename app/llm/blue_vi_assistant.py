@@ -7,6 +7,9 @@ from llama_cpp import Llama
 from app.model import Message
 from app.schemas import GptResponseSchema, PhxAppOperation
 from app.types.enum.instruction import InstructionEnum
+from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
+    BlueViInstructionEnum,
+)
 from app.types.enum.operation import OperationRateType, VatRate
 from app.utils import (
     get_blue_vi_response,
@@ -21,17 +24,18 @@ class BlueViGptAssistant:
         self.llm = llm
 
     async def check_for_personal_data(self, prompt: str) -> bool:
-        """Detect personal data in the prompt."""
-        instruction = f"Detect personal data (personal name, phone number, address, social security number, etc.):\n{prompt}\nReturn True or False. Note that the data may contain inaccuracies in the response."
+        """Detect personal data in the prompt relevant to GDPR compliance."""
         response = await get_blue_vi_response(
             self.llm,
-            [generate_instruction_message(instruction)]
+            [
+                generate_instruction_message(
+                    BlueViInstructionEnum.FLAG_GDPR_INSTRUCTION.value
+                )
+            ]
             + [generate_instruction_message(prompt)],
         )
-
         if not response:
             return False
-
         result = convert_blue_vi_response_to_schema(response)
         return "True" in result.content
 
