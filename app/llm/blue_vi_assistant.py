@@ -3,14 +3,9 @@ import logging
 from json import JSONDecodeError
 from typing import List
 
-from llama_cpp import (
-    Llama,
-    ChatCompletionRequestUserMessage,
-)
-
+from llama_cpp import Llama
 from app.model import Message
 from app.schemas import GptResponseSchema, PhxAppOperation
-from app.types.enum.gpt import Role
 from app.types.enum.instruction import InstructionEnum
 from app.types.enum.operation import OperationRateType, VatRate
 from app.utils import (
@@ -18,6 +13,7 @@ from app.utils import (
     map_conversation_to_messages,
     convert_blue_vi_response_to_schema,
 )
+from app.utils.generate_instruction_message import generate_instruction_message
 
 
 class BlueViGptAssistant:
@@ -26,20 +22,11 @@ class BlueViGptAssistant:
 
     async def check_for_personal_data(self, prompt: str) -> bool:
         """Detect personal data in the prompt."""
-        instruction = f"Detect personal data (personal name, phone number, address, social security number,etc..):\n{prompt}\nReturn True or False. Note that the data may contain inaccuracies in the response."
-        instruction_messages = [
-            ChatCompletionRequestUserMessage(
-                role=Role.USER.value, content=instruction
-            )
-        ]
+        instruction = f"Detect personal data (personal name, phone number, address, social security number, etc.):\n{prompt}\nReturn True or False. Note that the data may contain inaccuracies in the response."
         response = await get_blue_vi_response(
             self.llm,
-            instruction_messages
-            + [
-                ChatCompletionRequestUserMessage(
-                    role=Role.USER.value, content=prompt
-                )
-            ],
+            [generate_instruction_message(instruction)]
+            + [generate_instruction_message(prompt)],
         )
 
         if not response:
@@ -53,20 +40,11 @@ class BlueViGptAssistant:
     ) -> GptResponseSchema:
         """Anonymize the user message."""
         instruction = f"{InstructionEnum.Assistant_Anonymize_Data.value:}"
-
-        instruction_messages = [
-            ChatCompletionRequestUserMessage(
-                role=Role.USER.value, content=instruction
-            )
-        ]
+        instruction_messages = [generate_instruction_message(instruction)]
         response = await get_blue_vi_response(
             self.llm,
             instruction_messages
-            + [
-                ChatCompletionRequestUserMessage(
-                    role=Role.USER.value, content=user_message
-                )
-            ],
+            + [generate_instruction_message(user_message)],
         )
 
         return convert_blue_vi_response_to_schema(response)
@@ -74,43 +52,27 @@ class BlueViGptAssistant:
     async def identify_instruction_type(self, prompt: str) -> str:
         """
         Identify the type of instruction based on the prompt content.
-
-        Args:
-            prompt (str): The input prompt to analyze.
-
-        Returns:
-            str: InstructionEnum.OPERATION_Instruction.value if it is present
-                 in the result content; otherwise, InstructionEnum.DEFAULT.value.
         """
-        # Construct the instruction to be sent to the model
         instruction = (
             f"Choose the most appropriate instruction between "
             f"{InstructionEnum.OPERATION_INSTRUCTION.value} and {InstructionEnum.DEFAULT.value} "
             f"based on the context provided in:"
         )
-        instruction_messages = [
-            ChatCompletionRequestUserMessage(
-                role=Role.USER.value, content=instruction
-            )
-        ]
-        # Send the instruction to the model and await its response
         response = await get_blue_vi_response(
             self.llm,
-            instruction_messages
-            + [
-                ChatCompletionRequestUserMessage(
-                    role=Role.USER.value, content=prompt
-                )
-            ],
+            [generate_instruction_message(instruction)]
+            + [generate_instruction_message(prompt)],
         )
 
         if not response:
             return InstructionEnum.DEFAULT.value
+
         result = convert_blue_vi_response_to_schema(response)
-        if InstructionEnum.OPERATION_INSTRUCTION.value in result.content:
-            return InstructionEnum.OPERATION_INSTRUCTION.value
-        else:
-            return InstructionEnum.DEFAULT.value
+        return (
+            InstructionEnum.OPERATION_INSTRUCTION.value
+            if InstructionEnum.OPERATION_INSTRUCTION.value in result.content
+            else InstructionEnum.DEFAULT.value
+        )
 
     async def get_operation_format(
         self, uuid: str, conversation_history: List[Message]
@@ -132,23 +94,12 @@ class BlueViGptAssistant:
 
         # Prepare conversation messages for the model
         model_messages = map_conversation_to_messages(conversation_history)
-        instruction = f"{InstructionEnum.ASSISTANT_OPERATION_HANDLING.value}. Fields can be None if not provided in the prompt."
-        instruction_messages = [
-            ChatCompletionRequestUserMessage(
-                role=Role.USER.value, content=instruction
-            )
-        ]
-        model_messages.append(instruction_messages)
+        instruction = f"{InstructionEnum.ASSISTANT_OPERATION_HANDLING.value}. Fields can be None if not provided in the prompt. No comments allowed"
 
         # Get response from LLM
         response = await get_blue_vi_response(
             self.llm,
-            instruction_messages
-            + [
-                ChatCompletionRequestUserMessage(
-                    role=Role.USER.value, content=model_messages
-                )
-            ],
+            [generate_instruction_message(instruction)] + model_messages,
         )
 
         # Convert response to schema

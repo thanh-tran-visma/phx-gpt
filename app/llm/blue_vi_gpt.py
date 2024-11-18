@@ -9,8 +9,8 @@ class BlueViGptModel:
     def __init__(self):
         """Initialize BlueViGptModel with main model and embedding model."""
         self.llm = self.load_model()
-        self.user_role = BlueViGptUserManager(self.llm)
-        self.assistant_role = BlueViGptAssistant(self.llm)
+        self.user = BlueViGptUserManager(self.llm)
+        self.assistant = BlueViGptAssistant(self.llm)
 
     @staticmethod
     def load_model() -> Llama:

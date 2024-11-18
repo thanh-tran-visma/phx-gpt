@@ -16,8 +16,8 @@ class BlueViAgent:
 
     async def flag_personal_data(self, prompt: str) -> bool:
         """Flag personal data in the user prompt using the assistant role."""
-        is_personal_data = (
-            await self.model.assistant_role.check_for_personal_data(prompt)
+        is_personal_data = await self.model.assistant.check_for_personal_data(
+            prompt
         )
         if is_personal_data:
             logging.warning(f"Personal data detected: {prompt}")
@@ -40,9 +40,7 @@ class BlueViAgent:
         self, conversation_history
     ) -> GptResponseSchema:
         """Generate a response using the user role."""
-        return await self.model.user_role.get_chat_response(
-            conversation_history
-        )
+        return await self.model.user.get_chat_response(conversation_history)
 
     async def handle_operation_instructions(
         self, uuid: str, conversation_history: List[Message]
@@ -50,10 +48,8 @@ class BlueViAgent:
         """Generate a response for operation instructions and check for missing fields."""
         try:
             # Call to get_operation_format
-            operation_schema = (
-                await self.model.assistant_role.get_operation_format(
-                    uuid, conversation_history
-                )
+            operation_schema = await self.model.assistant.get_operation_format(
+                uuid, conversation_history
             )
             logging.info(f"Received operation schema: {operation_schema}")
 
@@ -72,7 +68,7 @@ class BlueViAgent:
                 )
 
             # Return user response
-            return await self.model.user_role.get_chat_response(
+            return await self.model.user.get_chat_response(
                 conversation_history
             )
 
@@ -96,7 +92,7 @@ class BlueViAgent:
 
             # Identify if this prompt needs special handling
             instruction_type = (
-                await self.model.assistant_role.identify_instruction_type(
+                await self.model.assistant.identify_instruction_type(
                     message.content
                 )
             )

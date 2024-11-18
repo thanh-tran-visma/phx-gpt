@@ -85,8 +85,10 @@ class EndConversationService:
             logger.debug(
                 f"Sensitive data detected in message {message.id}, anonymizing"
             )
-            anonymized_message = await self.blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                message.content
+            anonymized_message = (
+                await self.blue_vi_gpt_model.assistant.get_anonymized_message(
+                    message.content
+                )
             )
             self.db_manager.update_message_content(
                 message.id, anonymized_message.content

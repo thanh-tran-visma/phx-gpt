@@ -33,9 +33,7 @@ class TestGetResponse:
         messages = [
             Message(role=Role.USER, content=user_message)
         ]  # Using Message directly
-        response = await blue_vi_gpt_model.user_role.get_chat_response(
-            messages
-        )
+        response = await blue_vi_gpt_model.user.get_chat_response(messages)
 
         assert (
             response is not None
@@ -47,9 +45,7 @@ class TestGetResponse:
     async def test_get_response_with_blue_vi_answer(self, blue_vi_gpt_model):
         user_message = "what is your name?"
         messages = [Message(role=Role.USER, content=user_message)]
-        response = await blue_vi_gpt_model.user_role.get_chat_response(
-            messages
-        )
+        response = await blue_vi_gpt_model.user.get_chat_response(messages)
 
         # Assert that the response content contains references to "blueVi", "blueVi-GPT", or "Visma Verzuim"
         assert (
@@ -63,10 +59,8 @@ class TestAnonymization:
     @pytest.mark.asyncio
     async def test_get_anonymized_name(self, blue_vi_gpt_model):
         user_message = "John Doe's email is J.Simpson@netwrix.com."
-        response = (
-            await blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                user_message
-            )
+        response = await blue_vi_gpt_model.assistant.get_anonymized_message(
+            user_message
         )
 
         assert (
@@ -77,10 +71,8 @@ class TestAnonymization:
     @pytest.mark.asyncio
     async def test_get_anonymized_email(self, blue_vi_gpt_model):
         user_message = "John Doe's email is J.Simpson@netwrix.com."
-        response = (
-            await blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                user_message
-            )
+        response = await blue_vi_gpt_model.assistant.get_anonymized_message(
+            user_message
         )
 
         assert (
@@ -91,10 +83,8 @@ class TestAnonymization:
     @pytest.mark.asyncio
     async def test_get_anonymized_bsn(self, blue_vi_gpt_model):
         user_message = "His BSN is 123456789."
-        response = (
-            await blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                user_message
-            )
+        response = await blue_vi_gpt_model.assistant.get_anonymized_message(
+            user_message
         )
 
         assert (
@@ -105,10 +95,8 @@ class TestAnonymization:
     @pytest.mark.asyncio
     async def test_get_anonymized_address(self, blue_vi_gpt_model):
         user_message = "His home address is 10 Langelo."
-        response = (
-            await blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                user_message
-            )
+        response = await blue_vi_gpt_model.assistant.get_anonymized_message(
+            user_message
         )
 
         assert (
@@ -119,10 +107,8 @@ class TestAnonymization:
     @pytest.mark.asyncio
     async def test_get_anonymized_zip(self, blue_vi_gpt_model):
         user_message = "His ZIP code is 7666MC."
-        response = (
-            await blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                user_message
-            )
+        response = await blue_vi_gpt_model.assistant.get_anonymized_message(
+            user_message
         )
 
         assert (
@@ -132,10 +118,8 @@ class TestAnonymization:
     @pytest.mark.asyncio
     async def test_get_anonymized_mastercard(self, blue_vi_gpt_model):
         user_message = "His MasterCard number is 5258704108753590."
-        response = (
-            await blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                user_message
-            )
+        response = await blue_vi_gpt_model.assistant.get_anonymized_message(
+            user_message
         )
 
         assert (
@@ -146,10 +130,8 @@ class TestAnonymization:
     @pytest.mark.asyncio
     async def test_get_anonymized_visa(self, blue_vi_gpt_model):
         user_message = "His Visa number is 4563-7568-5698-4587."
-        response = (
-            await blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                user_message
-            )
+        response = await blue_vi_gpt_model.assistant.get_anonymized_message(
+            user_message
         )
 
         assert (
@@ -160,10 +142,8 @@ class TestAnonymization:
     @pytest.mark.asyncio
     async def test_get_anonymized_iban(self, blue_vi_gpt_model):
         user_message = "His IBAN number is NL91ABNA0417164300."
-        response = (
-            await blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                user_message
-            )
+        response = await blue_vi_gpt_model.assistant.get_anonymized_message(
+            user_message
         )
 
         assert (
@@ -174,10 +154,8 @@ class TestAnonymization:
     @pytest.mark.asyncio
     async def test_get_anonymized_dob(self, blue_vi_gpt_model):
         user_message = "His date of birth is 01/01/1990."
-        response = (
-            await blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                user_message
-            )
+        response = await blue_vi_gpt_model.assistant.get_anonymized_message(
+            user_message
         )
 
         assert (
@@ -188,10 +166,8 @@ class TestAnonymization:
     @pytest.mark.asyncio
     async def test_get_anonymized_ip_address(self, blue_vi_gpt_model):
         user_message = "His IP address is 192.168.1.1."
-        response = (
-            await blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                user_message
-            )
+        response = await blue_vi_gpt_model.assistant.get_anonymized_message(
+            user_message
         )
 
         assert (
@@ -212,10 +188,8 @@ class TestAnonymization:
             "His date of birth is 01/01/1990. "
             "His IP address is 192.168.1.1."
         )
-        response = (
-            await blue_vi_gpt_model.assistant_role.get_anonymized_message(
-                user_message
-            )
+        response = await blue_vi_gpt_model.assistant.get_anonymized_message(
+            user_message
         )
 
         assert (

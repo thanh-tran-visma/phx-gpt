@@ -4,11 +4,15 @@ from llama_cpp import Llama
 from app.model import Message
 from app.schemas import GptResponseSchema
 from app.types.enum.http_status import HTTPStatus
+from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
+    BlueViInstructionEnum,
+)
 from app.utils import (
     map_conversation_to_messages,
     get_blue_vi_response,
     convert_blue_vi_response_to_schema,
 )
+from app.utils.generate_instruction_message import generate_instruction_message
 
 
 class BlueViGptUserManager:
@@ -23,11 +27,15 @@ class BlueViGptUserManager:
             mapped_messages = map_conversation_to_messages(
                 conversation_history
             )
-
-            # Request the model response using the utility function
-            response = await get_blue_vi_response(self.llm, mapped_messages)
-
-            # Process the response using the utility function
+            response = await get_blue_vi_response(
+                self.llm,
+                [
+                    generate_instruction_message(
+                        BlueViInstructionEnum.SYSTEM_DEFAULT_INSTRUCTION.value
+                    )
+                ]
+                + mapped_messages,
+            )
             return convert_blue_vi_response_to_schema(response)
 
         except Exception as e:
