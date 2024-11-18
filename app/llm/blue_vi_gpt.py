@@ -32,3 +32,9 @@ class BlueViGptModel:
     def tokenizer(self) -> LlamaTokenizer:
         """Return the Llama tokenizer for this model."""
         return LlamaTokenizer(self.llm)
+
+    def close(self):
+        """Close and clean up resources."""
+        if hasattr(self.llm, "close"):
+            self.llm.close()
+        logging.info("BlueViGptModel resources released.")

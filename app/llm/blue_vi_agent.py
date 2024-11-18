@@ -48,17 +48,37 @@ class BlueViAgent:
         self, uuid: str, conversation_history: List[Message]
     ) -> GptResponseSchema:
         """Generate a response for operation instructions and check for missing fields."""
-        operation_schema = (
-            await self.model.assistant_role.get_operation_format(
-                uuid, conversation_history
+        try:
+            # Call to get_operation_format
+            operation_schema = (
+                await self.model.assistant_role.get_operation_format(
+                    uuid, conversation_history
+                )
             )
-        )
-        if operation_schema:
-            logging.info('valid_operation')
-            logging.info(operation_schema)
-        return await self.model.user_role.get_chat_response(
-            conversation_history
-        )
+            logging.info(f"Received operation schema: {operation_schema}")
+
+            # Validate schema before proceeding
+            if operation_schema and any(
+                [
+                    getattr(operation_schema, field) is not None
+                    for field in operation_schema.__annotations__.keys()
+                ]
+            ):
+                logging.info("Valid operation schema received:")
+                logging.info(operation_schema)
+            else:
+                logging.warning(
+                    "Operation schema fields are empty or missing."
+                )
+
+            # Return user response
+            return await self.model.user_role.get_chat_response(
+                conversation_history
+            )
+
+        except Exception as e:
+            logging.error(f"Error in handle_operation_instructions: {e}")
+            raise
 
     async def handle_conversation(
         self, user: User, message: Message

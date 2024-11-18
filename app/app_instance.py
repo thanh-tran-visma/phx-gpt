@@ -12,7 +12,7 @@ async def lifespan(app: FastAPI):
     blue_vi_gpt = BlueViGptModel()
     app.state.model = blue_vi_gpt
     yield
-    # Shutdown event (currently no specific shutdown actions)
+    blue_vi_gpt.close()
     pass
 
 

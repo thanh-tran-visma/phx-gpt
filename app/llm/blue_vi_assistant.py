@@ -27,14 +27,14 @@ class BlueViGptAssistant:
     async def check_for_personal_data(self, prompt: str) -> bool:
         """Detect personal data in the prompt."""
         instruction = f"Detect personal data (personal name, phone number, address, social security number,etc..):\n{prompt}\nReturn True or False. Note that the data may contain inaccuracies in the response."
-        system_messages = [
+        instruction_messages = [
             ChatCompletionRequestUserMessage(
                 role=Role.USER.value, content=instruction
             )
         ]
         response = await get_blue_vi_response(
             self.llm,
-            system_messages
+            instruction_messages
             + [
                 ChatCompletionRequestUserMessage(
                     role=Role.USER.value, content=prompt
@@ -43,12 +43,9 @@ class BlueViGptAssistant:
         )
 
         if not response:
-            logging.warning("Error detecting personal data.")
             return False
 
         result = convert_blue_vi_response_to_schema(response)
-        logging.info('result.content')
-        logging.info(result.content)
         return "True" in result.content
 
     async def get_anonymized_message(
@@ -57,14 +54,14 @@ class BlueViGptAssistant:
         """Anonymize the user message."""
         instruction = f"{InstructionEnum.Assistant_Anonymize_Data.value:}"
 
-        system_messages = [
+        instruction_messages = [
             ChatCompletionRequestUserMessage(
                 role=Role.USER.value, content=instruction
             )
         ]
         response = await get_blue_vi_response(
             self.llm,
-            system_messages
+            instruction_messages
             + [
                 ChatCompletionRequestUserMessage(
                     role=Role.USER.value, content=user_message
@@ -91,7 +88,7 @@ class BlueViGptAssistant:
             f"{InstructionEnum.OPERATION_INSTRUCTION.value} and {InstructionEnum.DEFAULT.value} "
             f"based on the context provided in:"
         )
-        system_messages = [
+        instruction_messages = [
             ChatCompletionRequestUserMessage(
                 role=Role.USER.value, content=instruction
             )
@@ -99,7 +96,7 @@ class BlueViGptAssistant:
         # Send the instruction to the model and await its response
         response = await get_blue_vi_response(
             self.llm,
-            system_messages
+            instruction_messages
             + [
                 ChatCompletionRequestUserMessage(
                     role=Role.USER.value, content=prompt
@@ -135,33 +132,38 @@ class BlueViGptAssistant:
 
         # Prepare conversation messages for the model
         model_messages = map_conversation_to_messages(conversation_history)
-        instruction = f"Instructions: Use the schema with empty values: {operation_schema}. {InstructionEnum.ASSISTANT_OPERATION_HANDLING.value} Fields can be None if not provided in the prompt."
-        system_messages = [
+        instruction = f"{InstructionEnum.ASSISTANT_OPERATION_HANDLING.value}. Fields can be None if not provided in the prompt."
+        instruction_messages = [
             ChatCompletionRequestUserMessage(
                 role=Role.USER.value, content=instruction
             )
         ]
-        model_messages.append(system_messages)
+        model_messages.append(instruction_messages)
 
-        # Request response from the model
-        response = await get_blue_vi_response(self.llm, model_messages)
+        # Get response from LLM
+        response = await get_blue_vi_response(
+            self.llm,
+            instruction_messages
+            + [
+                ChatCompletionRequestUserMessage(
+                    role=Role.USER.value, content=model_messages
+                )
+            ],
+        )
 
-        if not response:
-            logging.error(
-                "Failed to receive valid response for operation format."
-            )
-            return operation_schema
+        # Convert response to schema
+        result = convert_blue_vi_response_to_schema(response)
+        logging.info(f"Raw model response: {result.content}")
 
         # Process the model response and update the schema
-        result = convert_blue_vi_response_to_schema(response)
         try:
             parsed_response = json.loads(result.content)
             for field, value in parsed_response.items():
                 if hasattr(operation_schema, field):
                     setattr(operation_schema, field, value)
-        except (JSONDecodeError, ValueError) as e:
-            logging.error(f"Error processing model response: {e}")
+        except JSONDecodeError as e:
+            logging.error(f"Error decoding JSON: {e}")
         except Exception as e:
-            logging.error(f"Unexpected error during operation handling: {e}")
+            logging.error(f"Unexpected error: {e}")
 
         return operation_schema
