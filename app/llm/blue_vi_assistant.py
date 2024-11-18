@@ -6,7 +6,7 @@ from typing import List
 from llama_cpp import Llama
 from app.model import Message
 from app.schemas import GptResponseSchema, PhxAppOperation
-from app.types.enum.instruction import InstructionEnum
+from app.types.enum.instruction import TrainingInstructionEnum
 from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
     BlueViInstructionEnum,
 )
@@ -60,7 +60,7 @@ class BlueViGptAssistant:
         """
         instruction = (
             f"Choose the most appropriate instruction between "
-            f"{InstructionEnum.OPERATION_INSTRUCTION.value} and {InstructionEnum.DEFAULT.value} "
+            f"{TrainingInstructionEnum.OPERATION_INSTRUCTION.value} and {TrainingInstructionEnum.DEFAULT.value} "
             f"based on the context provided in:"
         )
         response = await get_blue_vi_response(
@@ -70,13 +70,14 @@ class BlueViGptAssistant:
         )
 
         if not response:
-            return InstructionEnum.DEFAULT.value
+            return TrainingInstructionEnum.DEFAULT.value
 
         result = convert_blue_vi_response_to_schema(response)
         return (
-            InstructionEnum.OPERATION_INSTRUCTION.value
-            if InstructionEnum.OPERATION_INSTRUCTION.value in result.content
-            else InstructionEnum.DEFAULT.value
+            TrainingInstructionEnum.OPERATION_INSTRUCTION.value
+            if TrainingInstructionEnum.OPERATION_INSTRUCTION.value
+            in result.content
+            else TrainingInstructionEnum.DEFAULT.value
         )
 
     async def get_operation_format(
@@ -99,7 +100,7 @@ class BlueViGptAssistant:
 
         # Prepare conversation messages for the model
         model_messages = map_conversation_to_messages(conversation_history)
-        instruction = f"{InstructionEnum.ASSISTANT_OPERATION_HANDLING.value}. Fields can be None if not provided in the prompt. No comments allowed"
+        instruction = f"{TrainingInstructionEnum.ASSISTANT_OPERATION_HANDLING.value}. Fields can be None if not provided in the prompt. No comments allowed"
 
         # Get response from LLM
         response = await get_blue_vi_response(

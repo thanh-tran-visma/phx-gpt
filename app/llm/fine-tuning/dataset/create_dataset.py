@@ -3,7 +3,7 @@ from huggingface_hub import HfApi, create_repo
 from app.config.config_env import HF_TOKEN
 from typing import List
 from app.types.dataset import DatasetEntry
-from app.types.enum.instruction import InstructionEnum
+from app.types.enum.instruction import TrainingInstructionEnum
 
 
 class DatasetPreparer:
@@ -1734,167 +1734,167 @@ def main():
     phx_instructions_data = [
         {
             "input": "Operation name is 'Operation A'. The description is 'Consulting services'. The duration is 30 minutes. Invoicing will be applied with an hourly rate of 50. The method of consultation is TEL.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Operation name is 'Operation A'. The description is 'Consulting services'. The duration is 30 minutes. Invoicing will be applied with an hourly rate of 50. The method of consultation is TEL.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation named 'Operation B', with no invoicing. It will have a unit price of 100 and last 60 minutes. The consultation method will be WEB.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I would like to create an operation named 'Operation C' with invoicing. It will be 45 minutes long with an hourly rate of 70. Methods of consultation will be TEL and LOC.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation named 'Operation A', lasting 45 minutes, with an hourly rate of 50 and invoicing enabled. The consultation method will be TEL.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation named 'Operation B', with no invoicing, a unit price of 100, and lasting 60 minutes. The consultation method will be WEB.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation named 'Operation C' with invoicing enabled, an hourly rate of 70, and a duration of 45 minutes. The consultation methods will be TEL and LOC.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I would like to create an operation named 'Operation D' with a unit price of 200, lasting 30 minutes. The method of consultation will be WEB.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Please provide the details to create a new operation.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation. But I don't have the invoice description yet.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I have the operation name, duration, and invoicing details, but no methods of consultation.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation with the operation name, invoicing applied, and hourly rate.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation but I don’t have the hourly rate.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation but I'm unsure about the invoicing.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation. The name is 'Customer Support Call'.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create a new operation named 'Marketing Consultation' with invoicing applied and unit price 100.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation called 'Product Demo' with invoicing not applied and unit price 200.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create operation 'Financial Review' with invoicing yes, hourly rate 150.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation 'Sales Meeting' but I don't know the duration yet.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Please create a new operation 'Team Workshop' with invoicing applied, hourly rate 120, and method of consultation WEB.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create a new operation called 'Webinar' with no invoicing applied, unit price 50.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation called 'Team Training'.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I have the operation name, description, and hourly rate. But I don’t have the duration yet.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Please create an operation called 'Product Training'. I have the hourly rate and duration.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation, but I’m not sure about the method of consultation.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Can you create a new operation for a webinar? I know the operation name and invoicing details.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create an operation 'Consulting Session' with invoicing applied. The hourly rate is 100.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation called 'Client Call' with no invoicing. I know the unit price.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I need a new operation called 'Strategy Meeting' with hourly rate 120. I don’t have the unit price.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create an operation 'Team Review' where invoicing is not applied. The unit price is 200.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create an operation for 'Client Onboarding'. I have the invoice description and method of consultation.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create a new operation for 'Product Consultation'. I know the duration and invoicing details.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Create a new operation called 'Branding Workshop' with invoicing applied.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "I want to create an operation called 'Market Research' with unit price 300.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Geef de gegevens voor het maken van een nieuwe operatie.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken, maar ik heb de factuuromschrijving nog niet.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik heb de operatienaam, duur en factureringsgegevens, maar geen methode van consultatie.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken met de operatienaam, facturering toegepast, en uurtarief.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken, maar ik heb het uurtarief niet.",
@@ -1902,201 +1902,203 @@ def main():
         },
         {
             "input": "Ik wil een nieuwe operatie maken, maar ik weet niet zeker of er gefactureerd zal worden.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken. De naam is 'Klantenondersteuning Oproep'.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een nieuwe operatie genaamd 'Marketing Consultatie' met facturering toegepast en een stukprijs van 100.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Product Demo' met geen facturering toegepast en een stukprijs van 200.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak de operatie 'Financiële Beoordeling' met facturering ja, uurtarief 150.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie 'Sales Meeting' maken, maar ik weet de duur nog niet.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een nieuwe operatie 'Team Workshop' met facturering toegepast, uurtarief 120 en methode van consultatie WEB.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een nieuwe operatie genaamd 'Webinar' zonder facturering toegepast, stukprijs 50.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil de operatie 'Team Training' maken.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik heb de operatienaam, omschrijving en uurtarief. Maar ik heb de duur nog niet.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een operatie genaamd 'Product Training'. Ik heb het uurtarief en de duur.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken, maar ik weet niet zeker over de methode van consultatie.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Kun je een nieuwe operatie maken voor een webinar? Ik weet de operatienaam en factureringdetails.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een operatie 'Consultatiesessie' met facturering toegepast. Het uurtarief is 100.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Klantenoproep' zonder facturering. Ik weet de stukprijs.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik heb een nieuwe operatie nodig genaamd 'Strategiebespreking' met uurtarief 120. Ik heb de stukprijs niet.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Maak een operatie 'Teambeoordeling' waarbij geen facturering wordt toegepast. De stukprijs is 200.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         {
             "input": "Ik wil een nieuwe operatie maken genaamd 'Operatie M', met facturering ingeschakeld, een uurtarief van 140 en een duur van 100 minuten. De methoden van consultatie zijn LOC, TEL, en WEB.",
-            "response": InstructionEnum.OPERATION_INSTRUCTION.value,
+            "response": TrainingInstructionEnum.OPERATION_INSTRUCTION.value,
         },
         # default
         {
             "input": "what is your name?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "1+2+3+4+5+6",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Hello, how can you help me?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Tell me a joke.",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "What is the weather today?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Who was the first president of the United States?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Translate 'Hello' to French.",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "List the planets in the solar system.",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "What is the square root of 64?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "How many countries are in Europe?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "What’s the capital of Japan?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "2+2",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Define artificial intelligence.",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "What is your favorite color?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Hallo, hoe kun je me helpen?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Vertel me een grap.",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Wat is het weer vandaag?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Wie was de eerste president van de Verenigde Staten?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Vertaal 'Hallo' naar het Frans.",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Noem de planeten in het zonnestelsel.",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Wat is de vierkantswortel van 64?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Hoeveel landen zijn er in Europa?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Wat is de hoofdstad van Japan?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "2+2",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Definieer kunstmatige intelligentie.",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
         {
             "input": "Wat is je favoriete kleur?",
-            "response": InstructionEnum.DEFAULT.value,
+            "response": TrainingInstructionEnum.DEFAULT.value,
         },
     ]
 
     # Initialize preparer and add data entries
     preparer = DatasetPreparer()
-    preparer.add_data(InstructionEnum.ANSWER_QUESTION.value, qa_data)
+    preparer.add_data(TrainingInstructionEnum.ANSWER_QUESTION.value, qa_data)
     preparer.add_data(
-        InstructionEnum.ASSISTANT_ANONYMIZE_DATA.value, anonymize_data
+        TrainingInstructionEnum.ASSISTANT_ANONYMIZE_DATA.value, anonymize_data
     )
     preparer.add_data(
-        InstructionEnum.ASSISTANT_FLAG_PERSONAL_DATA.value, personal_data
+        TrainingInstructionEnum.ASSISTANT_FLAG_PERSONAL_DATA.value,
+        personal_data,
     )
     preparer.add_data(
-        InstructionEnum.USER_OPERATION_HANDLING.value, user_operation_data
+        TrainingInstructionEnum.USER_OPERATION_HANDLING.value,
+        user_operation_data,
     )
     preparer.add_data(
-        InstructionEnum.ASSISTANT_OPERATION_HANDLING.value,
+        TrainingInstructionEnum.ASSISTANT_OPERATION_HANDLING.value,
         assistant_operation_data,
     )
     preparer.add_data(
-        InstructionEnum.ASSISTANT_SUITABLE_INSTRUCTION.value,
+        TrainingInstructionEnum.ASSISTANT_SUITABLE_INSTRUCTION.value,
         phx_instructions_data,
     )
 

@@ -1,10 +1,10 @@
+from typing import Optional, List
+from pydantic import BaseModel, model_validator, field_serializer
 from app.types.enum.operation import (
     MethodOfConsultEnum,
     OperationRateType,
     VatRate,
 )
-from typing import Optional, List
-from pydantic import BaseModel
 
 
 class TMethodOfConsultData(BaseModel):
@@ -13,19 +13,36 @@ class TMethodOfConsultData(BaseModel):
 
 
 class PhxAppOperation(BaseModel):
-    name: str  # required
-    description: Optional[str] = None  # optional
-    duration: Optional[int] = 0  # default to 0 if not provided
-    forAppointment: bool = True  # default to True
-    vatRate: Optional[VatRate] = (
-        VatRate.LOW
-    )  # default to LOW if invoicing is true
-    invoicing: bool  # required
-    hourlyRate: Optional[int] = None  # optional
-    unitPrice: Optional[int] = 0  # default to 0 if not provided
+    name: str
+    description: Optional[str] = None
+    duration: Optional[int] = 0
+    forAppointment: bool = True
+    vatRate: Optional[VatRate] = VatRate.NONE
+    invoicing: bool
+    hourlyRate: Optional[int] = None
+    unitPrice: Optional[int] = 0
     operationRateType: Optional[OperationRateType] = (
         OperationRateType.UNIT_PRICE
-    )  # default to UNIT_PRICE
-    methodsOfConsult: List[TMethodOfConsultData]  # required
-    uuid: str  # required, can be empty string
-    wizard: Optional[str] = None  # optional
+    )
+    methodsOfConsult: List[TMethodOfConsultData]
+    uuid: str
+    wizard: Optional[str] = None
+
+    @model_validator(mode='before')
+    def validate_and_convert(cls, values):
+        # Convert vatRate to VatRate Enum if it's an integer
+        vat_rate_value = values.get("vatRate")
+        if isinstance(vat_rate_value, int):
+            try:
+                values["vatRate"] = VatRate(vat_rate_value)
+            except ValueError:
+                raise ValueError(f"Invalid vatRate value: {vat_rate_value}")
+        return values
+
+    @field_serializer("vatRate")
+    def serialize_vat_rate(self, value: Optional[VatRate]) -> Optional[int]:
+        if isinstance(value, VatRate):
+            return value.value
+        if isinstance(value, int):
+            return value
+        return None

@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class InstructionEnum(str, Enum):
+class TrainingInstructionEnum(str, Enum):
     DEFAULT = 'Default'
     ANSWER_QUESTION = 'Answer the question'
     ASSISTANT_ANONYMIZE_DATA = 'Anonymize the data'

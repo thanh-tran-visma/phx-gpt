@@ -6,10 +6,6 @@ services:
       context: ./
       dockerfile: ./infrastructure/docker/Dockerfile
       target: app
-      secrets:
-        - hf_token
-        - model_name
-        - gguf_model
     restart: on-failure
     depends_on:
       - gpt_mysql
@@ -27,6 +23,7 @@ services:
       - DB_USERNAME=gpt_user
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_PORT=3306
+      - API_URL=${API_URL}
 
   nginx:
     container_name: gpt_web
@@ -66,11 +63,3 @@ networks:
 volumes:
   gpt_db_data:
     driver: local
-
-secrets:
-  hf_token:
-    environment: HF_TOKEN
-  model_name:
-    environment: MODEL_NAME
-  gguf_model:
-    environment: GGUF_MODEL

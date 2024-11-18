@@ -42,3 +42,9 @@ class BlueViInstructionEnum(str, Enum):
         "His date of birth is [DOB_1]. His IP address is [IP_ADDRESS_1].'\n"
         "Ensure that all personal information is anonymized and no additional text or explanations are included in the output."
     )
+
+    BLUE_VI_ASSISTANT_HANDLE_OPERATION_SUCCESS = (
+        "Inform the users that their operation has been successfully completed. "
+        "Provide them with their operation's details. "
+        "If the users have any questions or need further assistance, please assist them."
+    )

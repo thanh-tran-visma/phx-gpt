@@ -1,1 +1,1 @@
-from .instruction_enum import InstructionEnum
+from .training_instruction_enum import TrainingInstructionEnum

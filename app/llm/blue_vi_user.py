@@ -44,5 +44,28 @@ class BlueViGptUserManager:
             )
             return GptResponseSchema(
                 status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-                content="Sorry, something went wrong while generating a response. Please retry with a shorter prompt.",
+                content="Sorry, something went wrong while generating a response.",
+            )
+
+    async def get_chat_response_with_custom_instruction(
+        self, conversation_history: List[Message], instruction: str
+    ) -> GptResponseSchema:
+        """Generate a response from the model based on conversation history for the user role."""
+        try:
+            mapped_messages = map_conversation_to_messages(
+                conversation_history
+            )
+            response = await get_blue_vi_response(
+                self.llm,
+                [generate_instruction_message(instruction)] + mapped_messages,
+            )
+            return convert_blue_vi_response_to_schema(response)
+
+        except Exception as e:
+            logging.error(
+                f"Unexpected error while generating chat response: {e}"
+            )
+            return GptResponseSchema(
+                status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
+                content="Sorry, something went wrong while generating a response.",
             )
