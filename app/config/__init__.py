@@ -13,6 +13,4 @@ from .config_env import (
     DB_USERNAME,
     DB_PASSWORD,
     API_URL,
-    REDIS_PORT,
-    REDIS_HOST,
 )

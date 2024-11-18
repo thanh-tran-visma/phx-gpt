@@ -31,7 +31,7 @@ class BlueViGptUserManager:
                 self.llm,
                 [
                     generate_instruction_message(
-                        BlueViInstructionEnum.SYSTEM_DEFAULT_INSTRUCTION.value
+                        BlueViInstructionEnum.BLUE_VI_SYSTEM_DEFAULT_INSTRUCTION.value
                     )
                 ]
                 + mapped_messages,

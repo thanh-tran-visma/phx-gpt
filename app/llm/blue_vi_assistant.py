@@ -29,7 +29,7 @@ class BlueViGptAssistant:
             self.llm,
             [
                 generate_instruction_message(
-                    BlueViInstructionEnum.FLAG_GDPR_INSTRUCTION.value
+                    BlueViInstructionEnum.BLUE_VI_FLAG_GDPR_INSTRUCTION.value
                 )
             ]
             + [generate_instruction_message(prompt)],
@@ -43,11 +43,10 @@ class BlueViGptAssistant:
         self, user_message: str
     ) -> GptResponseSchema:
         """Anonymize the user message."""
-        instruction = f"{InstructionEnum.Assistant_Anonymize_Data.value:}"
-        instruction_messages = [generate_instruction_message(instruction)]
+        instruction = f"{BlueViInstructionEnum.BLUE_VI_ASSISTANT_ANONYMIZE_DATA.value:}"
         response = await get_blue_vi_response(
             self.llm,
-            instruction_messages
+            [generate_instruction_message(instruction)]
             + [generate_instruction_message(user_message)],
         )
 

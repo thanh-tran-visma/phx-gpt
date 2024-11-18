@@ -9,4 +9,3 @@ model_cache/
 *.json
 datasets/
 migrations/versions
-/storage/redis/data/

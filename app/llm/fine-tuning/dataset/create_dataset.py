@@ -2083,7 +2083,7 @@ def main():
     preparer = DatasetPreparer()
     preparer.add_data(InstructionEnum.ANSWER_QUESTION.value, qa_data)
     preparer.add_data(
-        InstructionEnum.Assistant_Anonymize_Data.value, anonymize_data
+        InstructionEnum.ASSISTANT_ANONYMIZE_DATA.value, anonymize_data
     )
     preparer.add_data(
         InstructionEnum.ASSISTANT_FLAG_PERSONAL_DATA.value, personal_data

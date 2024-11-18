@@ -62,11 +62,7 @@ class BlueViAgent:
             ):
                 logging.info("Valid operation schema received:")
                 logging.info(operation_schema)
-            else:
-                logging.warning(
-                    "Operation schema fields are empty or missing."
-                )
-
+                # TODO: post to capacity planning
             # Return user response
             return await self.model.user.get_chat_response(
                 conversation_history
@@ -96,7 +92,6 @@ class BlueViAgent:
                     message.content
                 )
             )
-            logging.info('instruction_type: %s', instruction_type)
             if instruction_type == InstructionEnum.OPERATION_INSTRUCTION.value:
                 return await self.handle_operation_instructions(
                     user.uuid, conversation_history

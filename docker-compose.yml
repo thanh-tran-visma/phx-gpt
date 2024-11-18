@@ -13,7 +13,6 @@ services:
     restart: on-failure
     depends_on:
       - gpt_mysql
-      - redis
     networks:
       - internal
       - dotweb.test
@@ -28,8 +27,6 @@ services:
       - DB_USERNAME=gpt_user
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_PORT=3306
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
 
   nginx:
     container_name: gpt_web
@@ -58,17 +55,6 @@ services:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=gpt_user
       - MYSQL_PASSWORD=${DB_PASSWORD}
-
-  redis:
-    container_name: gpt_redis
-    image: redis:6.2.6-bullseye
-    restart: on-failure
-    networks:
-      - internal
-    volumes:
-      - ./storage/redis/data:/data
-    ports:
-      - "6376:6379"
 
 networks:
   internal:

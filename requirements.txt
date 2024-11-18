@@ -20,5 +20,4 @@ black
 black[jupyter]
 sqlalchemy-stubs
 pytest-asyncio
-redis[asyncio]>=5.2.0
 requests>=2.32.3
