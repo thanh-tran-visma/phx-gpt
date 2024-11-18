@@ -16,12 +16,16 @@ class PhxApiClient:
         logging.debug(f"Prepared request body: {body}")
         return body
 
-    async def get_request(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> httpx.Response:
+    async def get_request(
+        self, endpoint: str, params: Optional[Dict[str, Any]] = None
+    ) -> httpx.Response:
         """Perform an asynchronous GET request."""
         url = f"{self.base_url}{endpoint}"
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.get(url, headers=self.headers, params=params)
+                response = await client.get(
+                    url, headers=self.headers, params=params
+                )
                 response.raise_for_status()
                 logging.info(f"GET request to {url} successful.")
                 return response
@@ -29,13 +33,17 @@ class PhxApiClient:
             logging.error(f"GET request to {url} failed: {e}")
             raise
 
-    async def post_request(self, endpoint: str, data: Dict[str, Any]) -> httpx.Response:
+    async def post_request(
+        self, endpoint: str, data: Dict[str, Any]
+    ) -> httpx.Response:
         """Perform an asynchronous POST request."""
         url = f"{self.base_url}{endpoint}"
         body = self.prepare_body(data)
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.post(url, headers=self.headers, json=body)
+                response = await client.post(
+                    url, headers=self.headers, json=body
+                )
                 response.raise_for_status()
                 logging.info(f"POST request to {url} successful.")
                 return response
@@ -43,12 +51,16 @@ class PhxApiClient:
             logging.error(f"POST request to {url} failed: {e}")
             raise
 
-    async def delete_request(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> httpx.Response:
+    async def delete_request(
+        self, endpoint: str, params: Optional[Dict[str, Any]] = None
+    ) -> httpx.Response:
         """Perform an asynchronous DELETE request."""
         url = f"{self.base_url}{endpoint}"
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.delete(url, headers=self.headers, params=params)
+                response = await client.delete(
+                    url, headers=self.headers, params=params
+                )
                 response.raise_for_status()
                 logging.info(f"DELETE request to {url} successful.")
                 return response
@@ -56,13 +68,17 @@ class PhxApiClient:
             logging.error(f"DELETE request to {url} failed: {e}")
             raise
 
-    async def put_request(self, endpoint: str, data: Dict[str, Any]) -> httpx.Response:
+    async def put_request(
+        self, endpoint: str, data: Dict[str, Any]
+    ) -> httpx.Response:
         """Perform an asynchronous PUT request."""
         url = f"{self.base_url}{endpoint}"
         body = self.prepare_body(data)
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.put(url, headers=self.headers, json=body)
+                response = await client.put(
+                    url, headers=self.headers, json=body
+                )
                 response.raise_for_status()
                 logging.info(f"PUT request to {url} successful.")
                 return response

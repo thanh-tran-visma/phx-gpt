@@ -43,7 +43,9 @@ class BlueViGptAssistant:
         self, user_message: str
     ) -> GptResponseSchema:
         """Anonymize the user message."""
-        instruction = f"{BlueViInstructionEnum.BLUE_VI_ASSISTANT_ANONYMIZE_DATA.value:}"
+        instruction = (
+            f"{BlueViInstructionEnum.BLUE_VI_ASSISTANT_ANONYMIZE_DATA.value:}"
+        )
         response = await get_blue_vi_response(
             self.llm,
             [generate_instruction_message(instruction)]
