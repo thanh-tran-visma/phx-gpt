@@ -41,7 +41,7 @@ BEARER_TOKEN = EnvConfig.get("BEARER_TOKEN")
 API_URL = EnvConfig.get("API_URL")
 
 LLM_MAX_TOKEN = EnvConfig.get_int("LLM_MAX_TOKEN", 2048)
-MAX_HISTORY_WINDOW_SIZE = EnvConfig.get_int("MAX_HISTORY_WINDOW_SIZE", 2048)
+MAX_HISTORY_WINDOW_SIZE = EnvConfig.get_int("MAX_HISTORY_WINDOW_SIZE", 512)
 
 DB_HOST = EnvConfig.get("DB_HOST", "localhost")
 DB_PORT = EnvConfig.get_int("DB_PORT", 3306)

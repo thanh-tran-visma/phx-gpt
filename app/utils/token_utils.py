@@ -1,25 +1,29 @@
-from app.config.config_env import LLM_MAX_TOKEN
+import logging
+
+from app.config.config_env import LLM_MAX_TOKEN, MAX_HISTORY_WINDOW_SIZE
 
 
 class TokenUtils:
-    def __init__(self, model, max_tokens: int = LLM_MAX_TOKEN):
+    def __init__(self, model):
         self.model = model
-        self.max_tokens = max_tokens
+        self.max_tokens = LLM_MAX_TOKEN
+        self.history_window_size = MAX_HISTORY_WINDOW_SIZE
         self.tokenizer = model.tokenizer
 
     def trim_history_to_fit_tokens(self, conversation_history: list) -> list:
-        """Trim the conversation history to ensure the total token count fits within max_tokens."""
+        """Trim the conversation history based on max tokens and window size."""
+        # Limit history to the maximum window size
+        conversation_history = conversation_history[
+            -self.history_window_size :
+        ]
         total_tokens = sum(
             self.count_tokens(message.content)
             for message in conversation_history
         )
 
         while total_tokens > self.max_tokens:
-            conversation_history.pop(0)
-            total_tokens = sum(
-                self.count_tokens(message.content)
-                for message in conversation_history
-            )
+            removed_message = conversation_history.pop(0)
+            total_tokens -= self.count_tokens(removed_message.content)
 
         return conversation_history
 
@@ -36,4 +40,5 @@ class TokenUtils:
             )
             return len(tokens)
         except RuntimeError as e:
-            raise RuntimeError(f"Tokenization failed: {e}")
+            logging.error(f"Tokenization failed for text: {text[:50]}...: {e}")
+            return 0

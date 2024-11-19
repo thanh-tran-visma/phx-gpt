@@ -1,6 +1,7 @@
 import logging
 import asyncio
 from app.client import PhxApiClient
+from app.config import MAX_HISTORY_WINDOW_SIZE
 from app.schemas import GptResponseSchema, TMethodOfConsultData
 from app.types.enum.unexpected_response_handling import (
     BlueViUnexpectedResponseHandling,
@@ -11,14 +12,15 @@ from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
     BlueViInstructionEnum,
 )
 from app.types.enum.http_status import HTTPStatus
+from app.utils import TokenUtils
 
 
 class BlueViAgent:
-    def __init__(self, model, db_manager, token_utils, history_window_size):
+    def __init__(self, model, db_manager):
         self.model = model
         self.db_manager = db_manager
-        self.token_utils = token_utils
-        self.history_window_size = history_window_size
+        self.token_utils = TokenUtils(self.model)
+        self.history_window_size = MAX_HISTORY_WINDOW_SIZE
         self.phx_client = PhxApiClient()
         self.phx_client.timeout = 60
 

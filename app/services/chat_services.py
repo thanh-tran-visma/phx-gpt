@@ -5,8 +5,6 @@ from app.llm import BlueViAgent, BlueViGptModel
 from app.schemas import UserPromptSchema
 from app.types.enum.http_status import HTTPStatus
 from app.types.enum.gpt import MessageType, Role
-from app.utils import TokenUtils
-from app.config.config_env import LLM_MAX_TOKEN, MAX_HISTORY_WINDOW_SIZE
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -18,19 +16,13 @@ class ChatService:
         self,
         db: Session,
         user_prompt: UserPromptSchema,
-        max_tokens=LLM_MAX_TOKEN,
-        history_window_size=MAX_HISTORY_WINDOW_SIZE,
     ):
         self.db_manager = DatabaseManager(db)
         self.blue_vi_gpt_model = BlueViGptModel()
         self.user = user_prompt
-        self.history_window_size = history_window_size
-        self.token_utils = TokenUtils(self.blue_vi_gpt_model, max_tokens)
         self.agent = BlueViAgent(
             model=self.blue_vi_gpt_model,
             db_manager=self.db_manager,
-            token_utils=self.token_utils,
-            history_window_size=self.history_window_size,
         )
 
     async def handle_chat(self) -> dict:

@@ -34,10 +34,10 @@ async def chat_endpoint(user_prompt: UserPromptSchema) -> ChatResponseSchema:
             conversation_order=int(chat_result.get("conversation_order", -1)),
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-            detail=f"An internal error occurred.:{e}",
+            detail=f"An internal error occurred.",
         )
 
     finally:
