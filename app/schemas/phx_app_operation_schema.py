@@ -1,5 +1,5 @@
 from typing import Optional, List
-from pydantic import BaseModel, model_validator, field_serializer
+from pydantic import BaseModel
 from app.types.enum.operation import (
     MethodOfConsultEnum,
     OperationRateType,
@@ -27,22 +27,3 @@ class PhxAppOperation(BaseModel):
     methodsOfConsult: List[TMethodOfConsultData]
     uuid: str
     wizard: Optional[str] = None
-
-    @model_validator(mode='before')
-    def validate_and_convert(cls, values):
-        # Convert vatRate to VatRate Enum if it's an integer
-        vat_rate_value = values.get("vatRate")
-        if isinstance(vat_rate_value, int):
-            try:
-                values["vatRate"] = VatRate(vat_rate_value)
-            except ValueError:
-                raise ValueError(f"Invalid vatRate value: {vat_rate_value}")
-        return values
-
-    @field_serializer("vatRate")
-    def serialize_vat_rate(self, value: Optional[VatRate]) -> Optional[int]:
-        if isinstance(value, VatRate):
-            return value.value
-        if isinstance(value, int):
-            return value
-        return None

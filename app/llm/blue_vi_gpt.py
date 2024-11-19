@@ -37,4 +37,3 @@ class BlueViGptModel:
         """Close and clean up resources."""
         if hasattr(self.llm, "close"):
             self.llm.close()
-        logging.info("BlueViGptModel resources released.")

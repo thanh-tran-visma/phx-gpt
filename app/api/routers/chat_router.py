@@ -32,12 +32,13 @@ async def chat_endpoint(user_prompt: UserPromptSchema) -> ChatResponseSchema:
             status=HTTPStatus.OK.value,
             response=str(chat_result["response"]),
             conversation_order=int(chat_result.get("conversation_order", -1)),
+            dynamic_json=chat_result.get("dynamic_json"),
         )
 
     except Exception:
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-            detail=f"An internal error occurred.",
+            detail="An internal error occurred",
         )
 
     finally:

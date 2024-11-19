@@ -81,7 +81,7 @@ class ChatService:
                 }
 
             # Let the agent handle the conversation
-            bot_response = await self.agent.handle_conversation(user, message)
+            bot_response = await self.agent.handle_conversation(message)
 
             # Store the bot's response
             self.db_manager.create_message(
@@ -95,6 +95,7 @@ class ChatService:
                 "status": bot_response.status,
                 "response": bot_response.content,
                 "conversation_order": conversation.conversation_order,
+                "dynamic_json": bot_response.dynamic_json,
             }
 
         except Exception as e:

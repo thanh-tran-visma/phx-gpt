@@ -1,16 +1,17 @@
 import json
 import logging
-from json import JSONDecodeError
 from typing import List
 
 from llama_cpp import Llama
 from app.model import Message
-from app.schemas import GptResponseSchema, PhxAppOperation
+from app.schemas import (
+    GptResponseSchema,
+    PhxAppOperation,
+)
 from app.types.enum.instruction import TrainingInstructionEnum
 from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
     BlueViInstructionEnum,
 )
-from app.types.enum.operation import OperationRateType, VatRate
 from app.utils import (
     get_blue_vi_response,
     map_conversation_to_messages,
@@ -81,23 +82,9 @@ class BlueViGptAssistant:
         )
 
     async def get_operation_format(
-        self, uuid: str, conversation_history: List[Message]
+        self, conversation_history: List[Message]
     ) -> PhxAppOperation:
         """Generates an operation schema based on the user's conversation history and model response."""
-        operation_schema = PhxAppOperation(
-            name="",
-            description=None,
-            duration=None,
-            invoicing=False,
-            hourlyRate=None,
-            unitPrice=0,
-            operationRateType=OperationRateType.UNIT_PRICE,
-            methodsOfConsult=[],
-            forAppointment=True,
-            vatRate=VatRate.LOW,
-            uuid=uuid,
-        )
-
         # Prepare conversation messages for the model
         model_messages = map_conversation_to_messages(conversation_history)
         instruction = f"{TrainingInstructionEnum.ASSISTANT_OPERATION_HANDLING.value}. Fields can be None if not provided in the prompt. No comments allowed"
@@ -107,20 +94,11 @@ class BlueViGptAssistant:
             self.llm,
             [generate_instruction_message(instruction)] + model_messages,
         )
-
-        # Convert response to schema
         result = convert_blue_vi_response_to_schema(response)
-        logging.info(f"Raw model response: {result.content}")
 
-        # Process the model response and update the schema
         try:
-            parsed_response = json.loads(result.content)
-            for field, value in parsed_response.items():
-                if hasattr(operation_schema, field):
-                    setattr(operation_schema, field, value)
-        except JSONDecodeError as e:
+            data: PhxAppOperation = json.loads(result.content)
+        except json.JSONDecodeError as e:
             logging.error(f"Error decoding JSON: {e}")
-        except Exception as e:
-            logging.error(f"Unexpected error: {e}")
-
-        return operation_schema
+            raise ValueError("Failed to parse JSON from the model response")
+        return data

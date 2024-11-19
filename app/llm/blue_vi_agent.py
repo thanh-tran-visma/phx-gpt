@@ -2,12 +2,11 @@ import logging
 import asyncio
 from app.client import PhxApiClient
 from app.config import MAX_HISTORY_WINDOW_SIZE
-from app.schemas import GptResponseSchema, TMethodOfConsultData
+from app.schemas import GptResponseSchema
 from app.types.enum.unexpected_response_handling import (
     BlueViUnexpectedResponseHandling,
 )
 from app.types.enum.instruction import TrainingInstructionEnum
-from app.types.enum.operation import MethodOfConsultEnum
 from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
     BlueViInstructionEnum,
 )
@@ -46,39 +45,37 @@ class BlueViAgent:
         return await self.model.user.get_chat_response(conversation_history)
 
     async def handle_operation_instructions(
-        self, uuid: str, conversation_history: list
+        self, conversation_history: list
     ) -> GptResponseSchema:
         """Generate a response for operation instructions and check for missing fields."""
         try:
             # Fetch operation schema
             operation_schema = await self.model.assistant.get_operation_format(
-                uuid, conversation_history
+                conversation_history
             )
-            logging.info(f"Received operation schema: {operation_schema}")
 
-            if operation_schema:
-                # Convert methodsOfConsult if present
-                if operation_schema.methodsOfConsult:
-                    operation_schema.methodsOfConsult = [
-                        TMethodOfConsultData(
-                            shortCode=MethodOfConsultEnum(method), name=method
-                        )
-                        for method in operation_schema.methodsOfConsult
-                    ]
-
-            return await self.model.user.get_chat_response_with_custom_instruction(
+            # Generate the response with operation schema included in dynamic_json
+            response = await self.model.user.get_chat_response_with_custom_instruction(
                 conversation_history,
                 BlueViInstructionEnum.BLUE_VI_ASSISTANT_HANDLE_OPERATION_SUCCESS.value,
             )
+
+            if hasattr(response, 'dict'):
+                response.dynamic_json = operation_schema
+            else:
+                response.dynamic_json = dict(operation_schema)
+
+            return response
 
         except Exception as error:
             logging.error(f"Error in handle_operation_instructions: {error}")
             return GptResponseSchema(
                 status=HTTPStatus.OK.value,
                 response=BlueViUnexpectedResponseHandling.HANDLE_OPERATION_ERROR.value,
+                dynamic_json=None,
             )
 
-    async def handle_conversation(self, user, message) -> GptResponseSchema:
+    async def handle_conversation(self, message) -> GptResponseSchema:
         """Evaluate the prompt, flag data, retrieve history, and generate a response."""
         try:
             # Ensure both coroutines are awaited correctly
@@ -103,14 +100,13 @@ class BlueViAgent:
                     message.content
                 )
             )
-
             # Handle operation instruction or return a regular response
             if (
                 instruction_type
                 == TrainingInstructionEnum.OPERATION_INSTRUCTION.value
             ):
                 return await self.handle_operation_instructions(
-                    user.uuid, conversation_history
+                    conversation_history
                 )
 
             return await self.generate_response(conversation_history)

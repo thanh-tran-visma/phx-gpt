@@ -19,14 +19,12 @@ class BaseClient:
     ) -> httpx.Response:
         """Generalized HTTP request handler for different HTTP methods."""
         url = f"{self.base_url}/{endpoint}"
-        logging.info(f"Making {method} request to URL: {url}")
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.request(
                     method, url, headers=self.headers, json=data, params=params
                 )
                 response.raise_for_status()
-                logging.info(f"{method} request to {url} successful.")
                 return response
         except httpx.RequestError as e:
             logging.error(f"{method} request to {url} failed: {e}")
