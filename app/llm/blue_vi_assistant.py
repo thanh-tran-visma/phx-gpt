@@ -87,8 +87,18 @@ class BlueViGptAssistant:
         """Generates an operation schema based on the user's conversation history and model response."""
         # Prepare conversation messages for the model
         model_messages = map_conversation_to_messages(conversation_history)
-        instruction = f"{TrainingInstructionEnum.ASSISTANT_OPERATION_HANDLING.value}. Fields can be None if not provided in the prompt. No comments allowed"
-
+        instruction = (
+            f"{TrainingInstructionEnum.ASSISTANT_OPERATION_HANDLING.value}. "
+            "Use the following structure: "
+            "{"
+            '"name": "string", "description": "string or null", "duration": "integer or null", '
+            '"forAppointment": "boolean", "vatRate": "integer or null", "invoicing": "boolean", '
+            '"hourlyRate": "integer or null", "unitPrice": "integer or null", '
+            '"operationRateType": "integer or null", "methodsOfConsult": [{"shortCode": "string", "name": "string"}], '
+            '"wizard": "string or null"'
+            "}. "
+            "Fields can be null if not provided. Do not include comments, extra fields, or single quotes."
+        )
         # Get response from LLM
         response = await get_blue_vi_response(
             self.llm,
