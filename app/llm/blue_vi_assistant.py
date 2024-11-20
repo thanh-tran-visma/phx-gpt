@@ -87,28 +87,21 @@ class BlueViGptAssistant:
         """Generates an operation schema based on the user's conversation history and model response."""
         # Prepare conversation messages for the model
         model_messages = map_conversation_to_messages(conversation_history)
-        instruction = (
-            f"{TrainingInstructionEnum.ASSISTANT_OPERATION_HANDLING.value}. "
-            "Use the following structure: "
-            "{"
-            '"name": "string", "description": "string or null", "duration": "integer or null", '
-            '"forAppointment": "boolean", "vatRate": "integer or null", "invoicing": "boolean", '
-            '"hourlyRate": "integer or null", "unitPrice": "integer or null", '
-            '"operationRateType": "integer or null", "methodsOfConsult": [{"shortCode": "string", "name": "string"}], '
-            '"wizard": "string or null"'
-            "}. "
-            "Fields can be null if not provided. Do not include comments, extra fields, or single quotes."
-        )
+        instruction = TrainingInstructionEnum.ASSISTANT_OPERATION_HANDLING.value
         # Get response from LLM
         response = await get_blue_vi_response(
             self.llm,
             [generate_instruction_message(instruction)] + model_messages,
         )
         result = convert_blue_vi_response_to_schema(response)
-
+        logging.info(response)
+        logging.info('response')
+        logging.info('before json loads')
+        logging.info(result.content)
         try:
             data: PhxAppOperation = json.loads(result.content)
         except json.JSONDecodeError as e:
             logging.error(f"Error decoding JSON: {e}")
-            raise ValueError("Failed to parse JSON from the model response")
-        return data
+            return PhxAppOperation()
+        if data:return data
+        else: return PhxAppOperation()

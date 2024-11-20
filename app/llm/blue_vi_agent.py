@@ -3,6 +3,7 @@ import asyncio
 from app.client import PhxApiClient
 from app.config import MAX_HISTORY_WINDOW_SIZE
 from app.schemas import GptResponseSchema
+from app.types.enum.phx_types import PhxTypes
 from app.types.enum.unexpected_response_handling import (
     BlueViUnexpectedResponseHandling,
 )
@@ -53,19 +54,24 @@ class BlueViAgent:
             operation_schema = await self.model.assistant.get_operation_format(
                 conversation_history
             )
-
-            # Generate the response with operation schema included in dynamic_json
-            response = await self.model.user.get_chat_response_with_custom_instruction(
-                conversation_history,
-                BlueViInstructionEnum.BLUE_VI_ASSISTANT_HANDLE_OPERATION_SUCCESS.value,
-            )
-
-            if hasattr(response, 'dict'):
-                response.dynamic_json = operation_schema
+            if operation_schema:
+                # Generate the response with operation schema included in dynamic_json
+                response = await self.model.user.get_chat_response_with_custom_instruction(
+                    conversation_history,
+                    BlueViInstructionEnum.BLUE_VI_ASSISTANT_HANDLE_OPERATION_SUCCESS.value,
+                )
+                if hasattr(response, 'dict'):
+                    response.dynamic_json = operation_schema
+                else:
+                    response.dynamic_json = dict(operation_schema)
+                response.type = PhxTypes.TOperationData.value
+                return response
             else:
-                response.dynamic_json = dict(operation_schema)
-
-            return response
+                return GptResponseSchema(
+                    status=HTTPStatus.OK.value,
+                    response=BlueViUnexpectedResponseHandling.HANDLE_OPERATION_ERROR.value,
+                    dynamic_json=None,
+                )
 
         except Exception as error:
             logging.error(f"Error in handle_operation_instructions: {error}")
@@ -118,4 +124,5 @@ class BlueViAgent:
             return GptResponseSchema(
                 status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
                 content=f"An error occurred while processing the conversation: {e}",
+                dynamic_json=None,
             )
