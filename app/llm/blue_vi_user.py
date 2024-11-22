@@ -1,18 +1,18 @@
 import logging
-from typing import List
+from typing import List, Optional
 from llama_cpp import Llama
 from app.model import Message
 from app.schemas import GptResponseSchema
+from app.types.enum.gpt import Role
 from app.types.enum.http_status import HTTPStatus
 from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
     BlueViInstructionEnum,
 )
 from app.utils import (
-    map_conversation_to_messages,
     get_blue_vi_response,
     convert_blue_vi_response_to_schema,
+    convert_conversation_history_to_tuples,
 )
-from app.utils.generate_instruction_message import generate_instruction_message
 
 
 class BlueViGptUserManager:
@@ -20,45 +20,32 @@ class BlueViGptUserManager:
         self.llm = llm
 
     async def get_chat_response(
-        self, conversation_history: List[Message]
+        self,
+        conversation_history: List[Message],
+        instruction: Optional[str] = None,
     ) -> GptResponseSchema:
-        """Generate a response from the model based on conversation history for the user role."""
+        """Generate a response from the model based on conversation history for the user role, optionally with a custom instruction."""
         try:
-            mapped_messages = map_conversation_to_messages(
-                conversation_history
-            )
-            response = await get_blue_vi_response(
-                self.llm,
-                [
-                    generate_instruction_message(
-                        BlueViInstructionEnum.BLUE_VI_SYSTEM_DEFAULT_INSTRUCTION.value
-                    )
-                ]
-                + mapped_messages,
-            )
-            return convert_blue_vi_response_to_schema(response)
-
-        except Exception as e:
-            logging.error(
-                f"Unexpected error while generating chat response: {e}"
-            )
-            return GptResponseSchema(
-                status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-                content="Sorry, something went wrong while generating a response.",
+            # Convert the conversation history into the right format (role, content)
+            conversation_history_tuples = (
+                convert_conversation_history_to_tuples(conversation_history)
             )
 
-    async def get_chat_response_with_custom_instruction(
-        self, conversation_history: List[Message], instruction: str
-    ) -> GptResponseSchema:
-        """Generate a response from the model based on conversation history for the user role."""
-        try:
-            mapped_messages = map_conversation_to_messages(
-                conversation_history
+            # Use the provided instruction or fall back to the default system instruction
+            system_instruction = (
+                instruction
+                if instruction
+                else BlueViInstructionEnum.BLUE_VI_SYSTEM_DEFAULT_INSTRUCTION.value
             )
+
+            # Generate the response
             response = await get_blue_vi_response(
                 self.llm,
-                [generate_instruction_message(instruction)] + mapped_messages,
+                [(Role.SYSTEM.value, system_instruction)]
+                + conversation_history_tuples,
             )
+
+            # Convert and return the response as GptResponseSchema
             return convert_blue_vi_response_to_schema(response)
 
         except Exception as e:

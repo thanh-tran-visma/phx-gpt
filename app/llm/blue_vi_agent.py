@@ -56,7 +56,7 @@ class BlueViAgent:
             )
             if operation_schema:
                 # Generate the response with operation schema included in dynamic_json
-                response = await self.model.user.get_chat_response_with_custom_instruction(
+                response = await self.model.user.get_chat_response(
                     conversation_history,
                     BlueViInstructionEnum.BLUE_VI_ASSISTANT_HANDLE_OPERATION_SUCCESS.value,
                 )
@@ -100,22 +100,31 @@ class BlueViAgent:
             if personal_data_flagged:
                 self.db_manager.flag_message(message.id)
 
-            # Identify instruction type concurrently
+            # Trim the conversation history to fit token limits
+            trimmed_history = self.token_utils.trim_history_to_fit_tokens(
+                conversation_history
+            )
+
+            # Identify instruction type based on the full conversation history
             instruction_type = (
                 await self.model.assistant.identify_instruction_type(
-                    message.content
+                    trimmed_history
                 )
             )
+
+            logging.info("instruction_type")
+            logging.info(instruction_type)
+
             # Handle operation instruction or return a regular response
             if (
                 instruction_type
                 == TrainingInstructionEnum.OPERATION_INSTRUCTION.value
             ):
                 return await self.handle_operation_instructions(
-                    conversation_history
+                    trimmed_history
                 )
 
-            return await self.generate_response(conversation_history)
+            return await self.generate_response(trimmed_history)
 
         except Exception as e:
             logging.error(

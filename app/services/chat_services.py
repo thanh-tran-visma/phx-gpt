@@ -96,7 +96,7 @@ class ChatService:
                 "response": bot_response.content,
                 "conversation_order": conversation.conversation_order,
                 "dynamic_json": bot_response.dynamic_json,
-                "type": bot_response.type
+                "type": bot_response.type,
             }
 
         except Exception as e:

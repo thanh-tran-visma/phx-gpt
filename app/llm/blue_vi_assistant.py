@@ -1,23 +1,23 @@
 import json
 import logging
 from typing import List
-
-from llama_cpp import Llama
-from app.model import Message
-from app.schemas import (
-    GptResponseSchema,
-    PhxAppOperation,
+from llama_cpp import Llama, LlamaGrammar
+from llama_cpp_agent.gbnf_grammar_generator.gbnf_grammar_from_pydantic_models import (
+    generate_gbnf_grammar_and_documentation,
 )
+
+from app.model import Message
+from app.schemas import GptResponseSchema, PhxAppOperation
+from app.types.enum.gpt import Role
 from app.types.enum.instruction import TrainingInstructionEnum
 from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
     BlueViInstructionEnum,
 )
 from app.utils import (
     get_blue_vi_response,
-    map_conversation_to_messages,
     convert_blue_vi_response_to_schema,
+    convert_conversation_history_to_tuples,
 )
-from app.utils.generate_instruction_message import generate_instruction_message
 
 
 class BlueViGptAssistant:
@@ -29,12 +29,14 @@ class BlueViGptAssistant:
         response = await get_blue_vi_response(
             self.llm,
             [
-                generate_instruction_message(
-                    BlueViInstructionEnum.BLUE_VI_FLAG_GDPR_INSTRUCTION.value
+                (
+                    Role.SYSTEM.value,
+                    BlueViInstructionEnum.BLUE_VI_FLAG_GDPR_INSTRUCTION.value,
                 )
             ]
-            + [generate_instruction_message(prompt)],
+            + [(Role.USER.value, prompt)],
         )
+
         if not response:
             return False
         result = convert_blue_vi_response_to_schema(response)
@@ -45,35 +47,47 @@ class BlueViGptAssistant:
     ) -> GptResponseSchema:
         """Anonymize the user message."""
         instruction = (
-            f"{BlueViInstructionEnum.BLUE_VI_ASSISTANT_ANONYMIZE_DATA.value:}"
+            BlueViInstructionEnum.BLUE_VI_ASSISTANT_ANONYMIZE_DATA.value
         )
         response = await get_blue_vi_response(
             self.llm,
-            [generate_instruction_message(instruction)]
-            + [generate_instruction_message(user_message)],
+            [Role.SYSTEM.value, instruction]
+            + [(Role.USER.value, user_message)],
         )
-
         return convert_blue_vi_response_to_schema(response)
 
-    async def identify_instruction_type(self, prompt: str) -> str:
+    async def identify_instruction_type(
+        self, conversation_history: List[Message]
+    ) -> str:
         """
-        Identify the type of instruction based on the prompt content.
+        Identify the type of instruction based on the conversation history and the prompt context.
         """
+        logging.info(
+            'convert_conversation_history_to_tuples(conversation_history)'
+        )
+        logging.info(
+            convert_conversation_history_to_tuples(conversation_history)
+        )
         instruction = (
-            f"Choose the most appropriate instruction between "
-            f"{TrainingInstructionEnum.OPERATION_INSTRUCTION.value} and {TrainingInstructionEnum.DEFAULT.value} "
-            f"based on the context provided in:"
+            f"{TrainingInstructionEnum.ASSISTANT_SUITABLE_INSTRUCTION.value} "
+            f"Here is the conversation history: "
+            f"{convert_conversation_history_to_tuples(conversation_history)}"
         )
-        response = await get_blue_vi_response(
-            self.llm,
-            [generate_instruction_message(instruction)]
-            + [generate_instruction_message(prompt)],
-        )
+        # Convert conversation history to tuples and prepare messages
+        messages = [
+            (Role.SYSTEM.value, instruction)
+        ] + convert_conversation_history_to_tuples(conversation_history)
+
+        # Get response from the model
+        response = await get_blue_vi_response(self.llm, messages)
 
         if not response:
             return TrainingInstructionEnum.DEFAULT.value
 
+        # Convert the model's response to the expected schema
         result = convert_blue_vi_response_to_schema(response)
+
+        # Return the appropriate instruction type based on the model's response content
         return (
             TrainingInstructionEnum.OPERATION_INSTRUCTION.value
             if TrainingInstructionEnum.OPERATION_INSTRUCTION.value
@@ -85,23 +99,39 @@ class BlueViGptAssistant:
         self, conversation_history: List[Message]
     ) -> PhxAppOperation:
         """Generates an operation schema based on the user's conversation history and model response."""
-        # Prepare conversation messages for the model
-        model_messages = map_conversation_to_messages(conversation_history)
-        instruction = TrainingInstructionEnum.ASSISTANT_OPERATION_HANDLING.value
-        # Get response from LLM
-        response = await get_blue_vi_response(
-            self.llm,
-            [generate_instruction_message(instruction)] + model_messages,
+        # Define the instruction
+        gbnf_grammar, documentation = generate_gbnf_grammar_and_documentation(
+            [PhxAppOperation]
         )
+        grammar = LlamaGrammar.from_string(gbnf_grammar, verbose=False)
+
+        instruction = f"TrainingInstructionEnum.ASSISTANT_OPERATION_HANDLING.value {documentation}"
+
+        # Create the messages structure with instruction and conversation history
+        messages = [
+            (Role.SYSTEM.value, instruction)
+        ] + convert_conversation_history_to_tuples(conversation_history)
+
+        # Get response from LLM
+        response = await get_blue_vi_response(self.llm, messages, grammar)
+
+        # Convert response to schema
         result = convert_blue_vi_response_to_schema(response)
-        logging.info(response)
-        logging.info('response')
-        logging.info('before json loads')
-        logging.info(result.content)
+
+        # Log response and content
+        logging.info("Response: %s", response)
+        logging.info("Before JSON loads: %s", result.content)
+
+        # Handle JSON decoding
+        if not result.content:
+            logging.error("Result content is empty or None.")
+            return PhxAppOperation()
         try:
             data: PhxAppOperation = json.loads(result.content)
         except json.JSONDecodeError as e:
-            logging.error(f"Error decoding JSON: {e}")
+            logging.error(
+                f"Error decoding JSON: {e}. Content: {result.content}"
+            )
             return PhxAppOperation()
-        if data:return data
-        else: return PhxAppOperation()
+
+        return data if data else PhxAppOperation()

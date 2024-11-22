@@ -42,7 +42,7 @@ class MessageManager:
             self.db.query(Message)
             .filter(Message.user_conversation_id == user_conversation_id)
             .order_by(Message.created_at.desc())
-            .limit(3)
+            .limit(10)
             .all()
         )
 

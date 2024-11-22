@@ -5,9 +5,9 @@ class TrainingInstructionEnum(str, Enum):
     DEFAULT = 'Default'
     ANSWER_QUESTION = 'Answer the question'
     ASSISTANT_ANONYMIZE_DATA = 'Anonymize the data'
-    ASSISTANT_SUITABLE_INSTRUCTION = "Determine and return the most suitable instruction: either 'Default' or 'Operation instruction'."
     ASSISTANT_FLAG_PERSONAL_DATA = 'Determine if the provided data contains personal information. Return True if it does and False otherwise. Note: The data might include inaccuracies, so evaluate carefully.'
     ASSISTANT_OPERATION_HANDLING = (
+        "You are an advanced AI, tasked to assist the user by calling functions in JSON format."
         "Extract operation details from the input, structure them in the following strict JSON format, "
         "and return the result with double quotes for all keys and string values:\n"
         "{\n"
@@ -32,3 +32,9 @@ class TrainingInstructionEnum(str, Enum):
     )
     USER_OPERATION_HANDLING = 'Provide a helpful and friendly response to guide the user through creating a new operation'
     OPERATION_INSTRUCTION = 'Operation instruction'
+    ASSISTANT_SUITABLE_INSTRUCTION = (
+        f"Based on the provided conversation history, determine whether the user is asking to create a new operation, "
+        f"or modify an existing one. If the user is asking to create a new operation or modify an existing one, "
+        f"the response should be classified as {OPERATION_INSTRUCTION}. "
+        f"If the user is asking about something else, classify the response as {DEFAULT}. "
+    )
