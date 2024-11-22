@@ -21,3 +21,4 @@ black[jupyter]
 sqlalchemy-stubs
 pytest-asyncio
 requests>=2.32.3
+llama_cpp_agent
