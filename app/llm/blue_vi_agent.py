@@ -58,7 +58,7 @@ class BlueViAgent:
                 # Generate the response with operation schema included in dynamic_json
                 response = await self.model.user.get_chat_response(
                     conversation_history,
-                    BlueViInstructionEnum.BLUE_VI_ASSISTANT_HANDLE_OPERATION_SUCCESS.value,
+                    BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_OPERATION_SUCCESS.value,
                 )
                 if hasattr(response, 'dict'):
                     response.dynamic_json = operation_schema

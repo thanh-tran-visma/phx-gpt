@@ -31,7 +31,7 @@ class BlueViGptAssistant:
             [
                 (
                     Role.SYSTEM.value,
-                    BlueViInstructionEnum.BLUE_VI_FLAG_GDPR_INSTRUCTION.value,
+                    BlueViInstructionEnum.BLUE_VI_SYSTEM_FLAG_GDPR_INSTRUCTION.value,
                 )
             ]
             + [(Role.USER.value, prompt)],
@@ -46,9 +46,7 @@ class BlueViGptAssistant:
         self, user_message: str
     ) -> GptResponseSchema:
         """Anonymize the user message."""
-        instruction = (
-            BlueViInstructionEnum.BLUE_VI_ASSISTANT_ANONYMIZE_DATA.value
-        )
+        instruction = BlueViInstructionEnum.BLUE_VI_SYSTEM_ANONYMIZE_DATA.value
         response = await get_blue_vi_response(
             self.llm,
             [Role.SYSTEM.value, instruction]
@@ -62,15 +60,8 @@ class BlueViGptAssistant:
         """
         Identify the type of instruction based on the conversation history and the prompt context.
         """
-        logging.info(
-            'convert_conversation_history_to_tuples(conversation_history)'
-        )
-        logging.info(
-            convert_conversation_history_to_tuples(conversation_history)
-        )
         instruction = (
-            f"{TrainingInstructionEnum.ASSISTANT_SUITABLE_INSTRUCTION.value} "
-            f"Here is the conversation history: "
+            f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_INSTRUCTION_DECIDE.value} \n"
             f"{convert_conversation_history_to_tuples(conversation_history)}"
         )
         # Convert conversation history to tuples and prepare messages
@@ -99,13 +90,15 @@ class BlueViGptAssistant:
         self, conversation_history: List[Message]
     ) -> PhxAppOperation:
         """Generates an operation schema based on the user's conversation history and model response."""
+        # TODO:
+
         # Define the instruction
         gbnf_grammar, documentation = generate_gbnf_grammar_and_documentation(
             [PhxAppOperation]
         )
         grammar = LlamaGrammar.from_string(gbnf_grammar, verbose=False)
 
-        instruction = f"TrainingInstructionEnum.ASSISTANT_OPERATION_HANDLING.value {documentation}"
+        instruction = f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_OPERATION_PROCESS.value}: \n\n {documentation}"
 
         # Create the messages structure with instruction and conversation history
         messages = [
@@ -118,16 +111,12 @@ class BlueViGptAssistant:
         # Convert response to schema
         result = convert_blue_vi_response_to_schema(response)
 
-        # Log response and content
-        logging.info("Response: %s", response)
-        logging.info("Before JSON loads: %s", result.content)
-
         # Handle JSON decoding
         if not result.content:
-            logging.error("Result content is empty or None.")
             return PhxAppOperation()
         try:
             data: PhxAppOperation = json.loads(result.content)
+
         except json.JSONDecodeError as e:
             logging.error(
                 f"Error decoding JSON: {e}. Content: {result.content}"

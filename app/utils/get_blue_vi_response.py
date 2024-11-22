@@ -52,7 +52,6 @@ async def get_blue_vi_response(
     try:
         # Format the conversation history into the appropriate format
         messages = get_operation_format(conversation_history)
-        logging.info('messages in get_blue_vi_response')
         logging.info(messages)
         # Use threadpool to run the model's chat completion
         response = await run_in_threadpool(
@@ -60,7 +59,6 @@ async def get_blue_vi_response(
                 messages=messages, grammar=grammar
             )
         )
-        logging.info(f"Model response: {response}")
         return response
     except Exception as e:
         logging.error(f"Error communicating with the model: {e}")

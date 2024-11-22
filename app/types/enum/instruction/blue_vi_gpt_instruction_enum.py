@@ -1,5 +1,7 @@
 from enum import Enum
 
+from app.types.enum.instruction import TrainingInstructionEnum
+
 
 class BlueViInstructionEnum(str, Enum):
     BLUE_VI_SYSTEM_DEFAULT_INSTRUCTION = (
@@ -10,7 +12,7 @@ class BlueViInstructionEnum(str, Enum):
         "be clear, concise, and relevant to the user's needs. Default behavior: Always provide a friendly and professional response."
     )
 
-    BLUE_VI_FLAG_GDPR_INSTRUCTION = (
+    BLUE_VI_SYSTEM_FLAG_GDPR_INSTRUCTION = (
         "Detect if the text contains any personal data that could be used to directly identify an individual under GDPR regulations.\n\n"
         "Ask yourself the following questions to determine if the text should be flagged:\n"
         "- **Who** is the person? Can the text provide their full name or an identifiable personal detail?\n"
@@ -31,7 +33,7 @@ class BlueViInstructionEnum(str, Enum):
         "Please note that the data may contain inaccuracies in the response."
     )
 
-    BLUE_VI_ASSISTANT_ANONYMIZE_DATA = (
+    BLUE_VI_SYSTEM_ANONYMIZE_DATA = (
         "Anonymize any personal data found in the text by replacing identifiable information with anonymized placeholders. "
         "Only return the anonymized text, no explanations or additional details. For example:\n"
         "Input: 'John Doe's email is J.Simpson@@netwrix..com. His BSN is 12345678.9. His home address is 10 Langelo! "
@@ -43,8 +45,22 @@ class BlueViInstructionEnum(str, Enum):
         "Ensure that all personal information is anonymized and no additional text or explanations are included in the output."
     )
 
-    BLUE_VI_ASSISTANT_HANDLE_OPERATION_SUCCESS = (
+    BLUE_VI_SYSTEM_HANDLE_OPERATION_SUCCESS = (
         "Inform the users that their operation has been successfully completed. "
         "Provide them with their operation's details. "
         "If the users have any questions or need further assistance, please assist them."
+    )
+
+    BLUE_VI_SYSTEM_HANDLE_OPERATION_PROCESS = (
+        "You are an advanced AI tasked with generating a JSON dataset entry for an Operation. "
+        "Only use the information explicitly provided by the user. If a field is not mentioned in the user prompt, "
+        "do not generate or assume any values for it. In case there is no related information provided for creating an operation, return an empty object. "
+        "The following is the expected output model for the Operation:"
+    )
+
+    BLUE_VI_SYSTEM_HANDLE_INSTRUCTION_DECIDE = (
+        "Analyze the entire conversation history and determine the user's intent based on the context. "
+        f"If the user is asking to create a new operation or modify an existing one, classify the response as '{TrainingInstructionEnum.OPERATION_INSTRUCTION.value}'. "
+        f"If the user's query is unrelated to operations or if the intent is unclear, classify it as '{TrainingInstructionEnum.DEFAULT.value}'. "
+        "Here is the full conversation history: "
     )
