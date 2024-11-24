@@ -43,7 +43,7 @@ class BlueViAgent:
 
     async def generate_response(self, conversation_history):
         """Generate a response using the user role."""
-        return await self.model.user.generate_user_response_with_custom_instruction(
+        return await self.model.generate_user_response_with_custom_instruction(
             conversation_history
         )
 
@@ -58,7 +58,7 @@ class BlueViAgent:
             )
             if operation_schema:
                 # Generate the response with operation schema included in dynamic_json
-                response = await self.model.user.generate_user_response_with_custom_instruction(
+                response = await self.model.generate_user_response_with_custom_instruction(
                     conversation_history,
                     BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_OPERATION_SUCCESS.value,
                 )

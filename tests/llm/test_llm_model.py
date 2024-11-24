@@ -33,7 +33,7 @@ class TestGetResponse:
         messages = [
             Message(role=Role.USER, content=user_message)
         ]  # Using Message directly
-        response = await blue_vi_gpt_model.user.generate_user_response_with_custom_instruction(
+        response = await blue_vi_gpt_model.generate_user_response_with_custom_instruction(
             messages
         )
 
@@ -47,7 +47,7 @@ class TestGetResponse:
     async def test_get_response_with_blue_vi_answer(self, blue_vi_gpt_model):
         user_message = "what is your name?"
         messages = [Message(role=Role.USER, content=user_message)]
-        response = await blue_vi_gpt_model.user.generate_user_response_with_custom_instruction(
+        response = await blue_vi_gpt_model.generate_user_response_with_custom_instruction(
             messages
         )
 
