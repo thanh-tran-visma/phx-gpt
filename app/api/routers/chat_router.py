@@ -3,6 +3,7 @@ from app.database.database import Database
 from app.services import ChatService
 from app.schemas import UserPromptSchema, ChatResponseSchema
 from app.types.enum.http_status import HTTPStatus
+from fastapi import Request
 
 router = APIRouter()
 
@@ -13,12 +14,15 @@ router = APIRouter()
         HTTPStatus.INTERNAL_SERVER_ERROR.value: {"model": ChatResponseSchema}
     },
 )
-async def chat_endpoint(user_prompt: UserPromptSchema) -> ChatResponseSchema:
+async def chat_endpoint(
+    user_prompt: UserPromptSchema,
+    request: Request,
+) -> ChatResponseSchema:
     database = Database()
     db = database.get_session()
 
     try:
-        chat_service = ChatService(db, user_prompt)
+        chat_service = ChatService(db, user_prompt, request)
         chat_result = await chat_service.handle_chat()
 
         if chat_result["status"] != HTTPStatus.OK.value:

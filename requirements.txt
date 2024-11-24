@@ -4,7 +4,7 @@ llama-cpp-python
 python-dotenv ~= 1.0.1
 pytest ~= 8.3.3
 datasets
-httpx
+httpx>=0.27.2
 gunicorn
 huggingface_hub
 sqlalchemy ~= 2.0.36
@@ -22,3 +22,4 @@ sqlalchemy-stubs
 pytest-asyncio
 requests>=2.32.3
 llama_cpp_agent
+langchain-core>=0.3.15

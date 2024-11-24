@@ -1,10 +1,11 @@
 import logging
 from sqlalchemy.orm import Session
 from app.database import DatabaseManager
-from app.llm import BlueViAgent, BlueViGptModel
+from app.llm import BlueViAgent
 from app.schemas import UserPromptSchema
 from app.types.enum.http_status import HTTPStatus
 from app.types.enum.gpt import MessageType, Role
+from fastapi import Request
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -13,12 +14,10 @@ logger = logging.getLogger(__name__)
 
 class ChatService:
     def __init__(
-        self,
-        db: Session,
-        user_prompt: UserPromptSchema,
+        self, db: Session, user_prompt: UserPromptSchema, request: Request
     ):
         self.db_manager = DatabaseManager(db)
-        self.blue_vi_gpt_model = BlueViGptModel()
+        self.blue_vi_gpt_model = request.app.state.model
         self.user = user_prompt
         self.agent = BlueViAgent(
             model=self.blue_vi_gpt_model,

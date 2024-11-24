@@ -33,7 +33,9 @@ class TestGetResponse:
         messages = [
             Message(role=Role.USER, content=user_message)
         ]  # Using Message directly
-        response = await blue_vi_gpt_model.user.get_chat_response(messages)
+        response = await blue_vi_gpt_model.user.generate_user_response_with_custom_instruction(
+            messages
+        )
 
         assert (
             response is not None
@@ -45,7 +47,9 @@ class TestGetResponse:
     async def test_get_response_with_blue_vi_answer(self, blue_vi_gpt_model):
         user_message = "what is your name?"
         messages = [Message(role=Role.USER, content=user_message)]
-        response = await blue_vi_gpt_model.user.get_chat_response(messages)
+        response = await blue_vi_gpt_model.user.generate_user_response_with_custom_instruction(
+            messages
+        )
 
         # Assert that the response content contains references to "blueVi", "blueVi-GPT", or "Visma Verzuim"
         assert (

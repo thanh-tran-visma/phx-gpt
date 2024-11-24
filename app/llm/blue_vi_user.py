@@ -19,7 +19,7 @@ class BlueViGptUserManager:
     def __init__(self, llm: Llama):
         self.llm = llm
 
-    async def get_chat_response(
+    async def generate_user_response_with_custom_instruction(
         self,
         conversation_history: List[Message],
         instruction: Optional[str] = None,
