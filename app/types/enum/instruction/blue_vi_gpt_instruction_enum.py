@@ -58,7 +58,7 @@ class BlueViInstructionEnum(str, Enum):
         "The following is the expected output model for the Operation:"
     )
 
-    BLUE_VI_SYSTEM_HANDLE_INSTRUCTION_DECIDE = (
+    BLUE_VI_SYSTEM_HANDLE_INSTRUCTION_DECISION = (
         "Analyze the entire conversation history and determine the user's intent based on the context. "
         f"If the user is asking to create a new operation or modify an existing one, classify the response as '{TrainingInstructionEnum.OPERATION_INSTRUCTION.value}'. "
         f"If the user's query is unrelated to operations or if the intent is unclear, classify it as '{TrainingInstructionEnum.DEFAULT.value}'. "

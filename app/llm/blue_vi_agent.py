@@ -1,7 +1,10 @@
 import logging
 import asyncio
+from typing import List
+
 from app.client import PhxApiClient
 from app.config import MAX_HISTORY_WINDOW_SIZE
+from app.model import Conversation
 from app.schemas import GptResponseSchema
 from app.types.enum.phx_types import PhxTypes
 from app.types.enum.unexpected_response_handling import (
@@ -28,18 +31,20 @@ class BlueViAgent:
         """Flag personal data in the user prompt using the assistant role."""
         return await self.model.assistant.check_for_personal_data(prompt)
 
-    def get_conversation_history(self, user_conversation_id: int):
+    def get_conversation_history(
+        self, user_conversation_id: int
+    ) -> List[Conversation]:
         """Retrieve and trim the conversation history."""
         conversation_history = (
             self.db_manager.get_messages_by_user_conversation_id(
                 user_conversation_id
-            )[-self.history_window_size :]
+            )
         )
         return self.token_utils.trim_history_to_fit_tokens(
             conversation_history
         )
 
-    async def preprocess_conversation(self, message):
+    async def preprocess_conversation(self, message) -> List[Conversation]:
         """Preprocess the input message, flagging personal data and retrieving history."""
         try:
             # Parallel tasks for flagging and history retrieval
@@ -55,8 +60,6 @@ class BlueViAgent:
 
             if personal_data_flagged:
                 self.db_manager.flag_message(message.id)
-
-            # Return the trimmed history
             return conversation_history
         except Exception as e:
             logging.error(f"Error during preprocessing: {e}")
@@ -111,9 +114,7 @@ class BlueViAgent:
     async def handle_conversation(self, message) -> GptResponseSchema:
         """Main entry point for handling a conversation."""
         try:
-            # Preprocess the message
             conversation_history = await self.preprocess_conversation(message)
-
             # Identify the instruction type
             instruction_type = (
                 await self.model.assistant.identify_instruction_type(

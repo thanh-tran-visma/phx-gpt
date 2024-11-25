@@ -40,7 +40,7 @@ class TrainingInstructionEnum(str, Enum):
         "Do not include extra fields, comments, or use single quotes."
     )
     USER_OPERATION_HANDLING = 'Provide a helpful and friendly response to guide the user through creating a new operation'
-    OPERATION_INSTRUCTION = 'Operation instruction'
+    OPERATION_INSTRUCTION = 'PHX Operation instruction for appointment'
     ASSISTANT_SUITABLE_INSTRUCTION = (
         f"Based on the provided conversation history, determine whether the user is asking to create a new operation, "
         f"or modify an existing one. If the user is asking to create a new operation or modify an existing one, "

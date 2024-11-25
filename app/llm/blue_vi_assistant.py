@@ -61,7 +61,7 @@ class BlueViGptAssistant:
         Identify the type of instruction based on the conversation history and the prompt context.
         """
         instruction = (
-            f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_INSTRUCTION_DECIDE.value} \n"
+            f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_INSTRUCTION_DECISION.value} \n"
             f"{convert_conversation_history_to_tuples(conversation_history)}"
         )
         # Convert conversation history to tuples and prepare messages
