@@ -43,6 +43,9 @@ API_URL = EnvConfig.get("API_URL")
 LLM_MAX_TOKEN = EnvConfig.get_int("LLM_MAX_TOKEN", 2048)
 MAX_HISTORY_WINDOW_SIZE = EnvConfig.get_int("MAX_HISTORY_WINDOW_SIZE", 512)
 
+REDIS_HOST = EnvConfig.get("REDIS_HOST")
+REDIS_PORT = EnvConfig.get_int("REDIS_PORT")
+
 DB_HOST = EnvConfig.get("DB_HOST", "localhost")
 DB_PORT = EnvConfig.get_int("DB_PORT", 3306)
 DB_DATABASE = EnvConfig.get("DB_DATABASE")

@@ -35,7 +35,9 @@ class BlueViAgent:
                 user_conversation_id
             )[-self.history_window_size :]
         )
-        return self.token_utils.trim_history_to_fit_tokens(conversation_history)
+        return self.token_utils.trim_history_to_fit_tokens(
+            conversation_history
+        )
 
     async def preprocess_conversation(self, message):
         """Preprocess the input message, flagging personal data and retrieving history."""
@@ -43,9 +45,13 @@ class BlueViAgent:
             # Parallel tasks for flagging and history retrieval
             tasks = [
                 self.flag_personal_data(message.content),
-                asyncio.to_thread(self.get_conversation_history, message.user_conversation_id),
+                asyncio.to_thread(
+                    self.get_conversation_history, message.user_conversation_id
+                ),
             ]
-            personal_data_flagged, conversation_history = await asyncio.gather(*tasks)
+            personal_data_flagged, conversation_history = await asyncio.gather(
+                *tasks
+            )
 
             if personal_data_flagged:
                 self.db_manager.flag_message(message.id)
@@ -56,10 +62,14 @@ class BlueViAgent:
             logging.error(f"Error during preprocessing: {e}")
             raise
 
-    async def handle_operation_instruction(self, conversation_history: list) -> GptResponseSchema:
+    async def handle_operation_instruction(
+        self, conversation_history: list
+    ) -> GptResponseSchema:
         """Handle operation-specific instructions."""
         try:
-            operation_schema = await self.model.assistant.get_operation_format(conversation_history)
+            operation_schema = await self.model.assistant.get_operation_format(
+                conversation_history
+            )
             if operation_schema:
                 response = await self.model.generate_user_response_with_custom_instruction(
                     conversation_history,
@@ -82,10 +92,14 @@ class BlueViAgent:
                 dynamic_json=None,
             )
 
-    async def handle_general_instruction(self, conversation_history: list) -> GptResponseSchema:
+    async def handle_general_instruction(
+        self, conversation_history: list
+    ) -> GptResponseSchema:
         """Handle general conversation instructions."""
         try:
-            return await self.model.generate_user_response_with_custom_instruction(conversation_history)
+            return await self.model.generate_user_response_with_custom_instruction(
+                conversation_history
+            )
         except Exception as error:
             logging.error(f"Error in handle_general_instruction: {error}")
             return GptResponseSchema(
@@ -101,17 +115,30 @@ class BlueViAgent:
             conversation_history = await self.preprocess_conversation(message)
 
             # Identify the instruction type
-            instruction_type = await self.model.assistant.identify_instruction_type(conversation_history)
+            instruction_type = (
+                await self.model.assistant.identify_instruction_type(
+                    conversation_history
+                )
+            )
             logging.info(f"Instruction Type: {instruction_type}")
 
             # Route based on instruction type
-            if instruction_type == TrainingInstructionEnum.OPERATION_INSTRUCTION.value:
-                return await self.handle_operation_instruction(conversation_history)
+            if (
+                instruction_type
+                == TrainingInstructionEnum.OPERATION_INSTRUCTION.value
+            ):
+                return await self.handle_operation_instruction(
+                    conversation_history
+                )
             else:
-                return await self.handle_general_instruction(conversation_history)
+                return await self.handle_general_instruction(
+                    conversation_history
+                )
 
         except Exception as e:
-            logging.error(f"Unexpected error while generating chat response: {e}")
+            logging.error(
+                f"Unexpected error while generating chat response: {e}"
+            )
             return GptResponseSchema(
                 status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
                 content=f"An error occurred while processing the conversation: {e}",
