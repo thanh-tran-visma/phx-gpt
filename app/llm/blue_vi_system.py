@@ -1,7 +1,7 @@
 import os
 import logging
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional
 
 from langchain_core.callbacks import (
     CallbackManager,
@@ -16,7 +16,6 @@ from app.config.config_env import (
 )
 from app.llm.blue_vi_assistant import BlueViGptAssistant
 from app.schemas import GptResponseSchema
-from app.model import Message
 from app.types.enum.gpt import Role
 from app.types.enum.http_status import HTTPStatus
 from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
@@ -25,7 +24,6 @@ from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
 from app.utils import (
     get_blue_vi_response,
     convert_blue_vi_response_to_schema,
-    convert_conversation_history_to_tuples,
 )
 
 
