@@ -1,6 +1,7 @@
-from datetime import datetime
-
-from app.model import User
+from datetime import datetime, timezone
+from typing import List
+from app.model import Message, User
+from app.schemas import GptResponseSchema
 from app.utils import DataNormalizer
 
 
@@ -27,19 +28,15 @@ class CacheService:
 
     async def cache_user(self, user: User):
         """Caches the user in Redis."""
-        # Convert the SQLAlchemy model to a dictionary, excluding internal attributes
         user_dict = {
             key: value
             for key, value in user.__dict__.items()
             if not key.startswith('_')
         }
-
-        # Convert datetime objects to ISO 8601 string format
         for key, value in user_dict.items():
             if isinstance(value, datetime):
                 user_dict[key] = value.isoformat()
 
-        # Now you can cache the user in Redis
         await self.redis_client.set(f"user:{user.uuid}", user_dict, ttl=3600)
 
     async def cache_conversation(self, user_id: int, conversation):
@@ -78,3 +75,61 @@ class CacheService:
     async def _get_from_cache(self, key: str, normalizer: callable):
         data = await self.redis_client.get(key)
         return normalizer(data) if data else None
+
+    async def cache_conversation_history(
+        self, user_conversation_id: int, conversation_history: List[Message]
+    ):
+        """Cache the conversation history in Redis."""
+        key = f"conversation_history:{user_conversation_id}"
+        # Manually create a list of serialized Message objects
+        history_data = [
+            {
+                "id": msg.id,
+                "content": msg.content,
+                "created_at": msg.created_at.isoformat(),
+                "user_conversation_id": msg.user_conversation_id,
+            }
+            for msg in conversation_history
+        ]
+        await self.redis_client.set(key, history_data, ttl=3600)
+
+    async def get_conversation_history(self, user_conversation_id: int):
+        """Retrieve conversation history from cache."""
+        key = f"conversation_history:{user_conversation_id}"
+        history_data = await self.redis_client.get(key)
+        if history_data:
+            return [Message(**msg) for msg in history_data]
+        return None
+
+    async def cache_message(self, user_conversation_id: int, message):
+        """Cache a new message to the conversation history."""
+        key = f"conversation_history:{user_conversation_id}"
+
+        # Retrieve existing history
+        history_data = await self.redis_client.get(key) or []
+
+        # Check if the message is a database Message object or GptResponseSchema
+        if isinstance(message, Message):
+            # Prepare new message data from a Message object
+            new_message = {
+                "id": message.id,
+                "content": message.content,
+                "created_at": message.created_at.isoformat(),
+                "user_conversation_id": message.user_conversation_id,
+            }
+        elif isinstance(message, GptResponseSchema):
+            # Prepare new message data from GptResponseSchema
+            new_message = {
+                "role": None,
+                "content": message.content,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "user_conversation_id": user_conversation_id,
+            }
+        else:
+            raise ValueError("Invalid message type for caching.")
+
+        # Append the new message to the existing history
+        history_data.append(new_message)
+
+        # Cache the updated history
+        await self.redis_client.set(key, history_data, ttl=3600)

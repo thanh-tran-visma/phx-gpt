@@ -1,11 +1,12 @@
 import logging
 import asyncio
 from typing import List
-
 from app.client import PhxApiClient
 from app.config import MAX_HISTORY_WINDOW_SIZE
-from app.model import Conversation
+from app.database import DatabaseManager
+from app.model import Conversation, Message
 from app.schemas import GptResponseSchema
+from app.services.cache import CacheService
 from app.types.enum.phx_types import PhxTypes
 from app.types.enum.unexpected_response_handling import (
     BlueViUnexpectedResponseHandling,
@@ -19,9 +20,12 @@ from app.utils import TokenUtils
 
 
 class BlueViAgent:
-    def __init__(self, model, db_manager):
+    def __init__(
+        self, model, db_manager: DatabaseManager, cache_service: CacheService
+    ):
         self.model = model
         self.db_manager = db_manager
+        self.cache_service = cache_service
         self.token_utils = TokenUtils(self.model)
         self.history_window_size = MAX_HISTORY_WINDOW_SIZE
         self.phx_client = PhxApiClient()
@@ -31,18 +35,44 @@ class BlueViAgent:
         """Flag personal data in the user prompt using the assistant role."""
         return await self.model.assistant.check_for_personal_data(prompt)
 
-    def get_conversation_history(
-        self, user_conversation_id: int
+    async def get_conversation_history(
+        self, message: Message
     ) -> List[Conversation]:
-        """Retrieve and trim the conversation history."""
-        conversation_history = (
-            self.db_manager.get_messages_by_user_conversation_id(
-                user_conversation_id
+        """Retrieve and trim the conversation history from cache or database."""
+        # First attempt to get conversation history from Redis cache
+        cached_history = await self.cache_service.get_conversation_history(
+            message.user_conversation_id
+        )
+        if cached_history:
+            logging.info("Fetched conversation history from Redis cache.")
+            for msg in cached_history:
+                if msg.id is None:
+                    msg.role = "assistant"
+                else:
+                    msg.role = "user"
+                logging.info(
+                    f"Mapped Message -> Role: {msg.role}, ID: {msg.id}, Content: {msg.content}"
+                )
+            return cached_history
+        else:
+            # If not in cache, get from the database and store in Redis
+            conversation_history = (
+                self.db_manager.get_messages_by_user_conversation_id(
+                    message.user_conversation_id
+                )
             )
-        )
-        return self.token_utils.trim_history_to_fit_tokens(
-            conversation_history
-        )
+            logging.info('conversation_history')
+            for msg in conversation_history:
+                logging.info(f"Message ID: {msg.id}, Content: {msg.content}")
+
+            # Cache the fetched history for future use
+            await self.cache_service.cache_conversation_history(
+                message.user_conversation_id, conversation_history
+            )
+            logging.info("Fetched conversation history from DB and cached it.")
+            return self.token_utils.trim_history_to_fit_tokens(
+                conversation_history
+            )
 
     async def preprocess_conversation(self, message) -> List[Conversation]:
         """Preprocess the input message, flagging personal data and retrieving history."""
@@ -50,14 +80,14 @@ class BlueViAgent:
             # Parallel tasks for flagging and history retrieval
             tasks = [
                 self.flag_personal_data(message.content),
-                asyncio.to_thread(
-                    self.get_conversation_history, message.user_conversation_id
-                ),
+                self.get_conversation_history(message),
             ]
             personal_data_flagged, conversation_history = await asyncio.gather(
                 *tasks
             )
-
+            logging.info('conversation_history in preprocess_conversation')
+            for msg in conversation_history:
+                logging.info(f"Message ID: {msg.id}, Content: {msg.content}")
             if personal_data_flagged:
                 self.db_manager.flag_message(message.id)
             return conversation_history

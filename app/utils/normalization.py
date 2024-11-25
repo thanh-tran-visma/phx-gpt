@@ -1,4 +1,4 @@
-from app.model import User, Conversation, UserConversation
+from app.model import User, Conversation, UserConversation, Message
 
 
 class DataNormalizer:
@@ -13,3 +13,7 @@ class DataNormalizer:
     @staticmethod
     def normalize_user_conversation(data: dict):
         return UserConversation(**data) if data else None
+
+    @staticmethod
+    def normalize_message(data: dict):
+        return Message(**data) if data else None
