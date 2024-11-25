@@ -116,16 +116,10 @@ class BlueViGptModel:
 
     async def generate_user_response_with_custom_instruction(
         self,
-        conversation_history: List[Message],
         instruction: Optional[str] = None,
     ) -> GptResponseSchema:
         """Generate a response from the model based on conversation history for the user role, optionally with a custom instruction."""
         try:
-            # Convert the conversation history into the right format (role, content)
-            conversation_history_tuples = (
-                convert_conversation_history_to_tuples(conversation_history)
-            )
-
             # Use the provided instruction or fall back to the default system instruction
             system_instruction = (
                 instruction
@@ -135,9 +129,7 @@ class BlueViGptModel:
 
             # Generate the response
             response = await get_blue_vi_response(
-                self.llm,
-                [(Role.SYSTEM.value, system_instruction)]
-                + conversation_history_tuples,
+                self.llm, [(Role.SYSTEM.value, system_instruction)]
             )
 
             # Convert and return the response as GptResponseSchema

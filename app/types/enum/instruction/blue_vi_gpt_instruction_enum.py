@@ -45,11 +45,7 @@ class BlueViInstructionEnum(str, Enum):
         "Ensure that all personal information is anonymized and no additional text or explanations are included in the output."
     )
 
-    BLUE_VI_SYSTEM_HANDLE_OPERATION_SUCCESS = (
-        "Inform the users that their operation has been successfully completed. "
-        "Provide them with their operation's details. "
-        "If the users have any questions or need further assistance, please assist them."
-    )
+    BLUE_VI_SYSTEM_HANDLE_OPERATION_SUCCESS = "Inform the user that the operation was successful and provide a brief, friendly summary of the completed task."
 
     BLUE_VI_SYSTEM_HANDLE_OPERATION_PROCESS = (
         "You are an advanced AI tasked with generating a JSON dataset entry for an Operation. "

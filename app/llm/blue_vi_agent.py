@@ -105,8 +105,7 @@ class BlueViAgent:
             )
             if operation_schema:
                 response = await self.model.generate_user_response_with_custom_instruction(
-                    conversation_history,
-                    BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_OPERATION_SUCCESS.value,
+                    f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_OPERATION_SUCCESS.value} Operation details: {operation_schema}"
                 )
                 response.dynamic_json = operation_schema
                 response.type = PhxTypes.TOperationData.value
