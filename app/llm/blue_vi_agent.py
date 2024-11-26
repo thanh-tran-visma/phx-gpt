@@ -1,22 +1,20 @@
 import logging
-import asyncio
-from typing import List
+from typing import List, Tuple
 from app.client import PhxApiClient
 from app.config import MAX_HISTORY_WINDOW_SIZE
 from app.database import DatabaseManager
-from app.model import Conversation, Message
+from app.model import Message
 from app.schemas import GptResponseSchema
 from app.services.cache import CacheService
+from app.types.enum.gpt import Role
 from app.types.enum.phx_types import PhxTypes
-from app.types.enum.unexpected_response_handling import (
-    BlueViUnexpectedResponseHandling,
+from app.types.enum.gpt_response_handling import (
+    BlueViResponseHandling,
 )
-from app.types.enum.instruction import TrainingInstructionEnum
-from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
-    BlueViInstructionEnum,
-)
+from app.types.enum.instruction import InstructionList
+
 from app.types.enum.http_status import HTTPStatus
-from app.utils import TokenUtils
+from app.utils import TokenUtils, convert_conversation_history_to_tuples
 
 
 class BlueViAgent:
@@ -31,13 +29,9 @@ class BlueViAgent:
         self.phx_client = PhxApiClient()
         self.phx_client.timeout = 60
 
-    async def flag_personal_data(self, prompt: str) -> bool:
-        """Flag personal data in the user prompt using the assistant role."""
-        return await self.model.assistant.check_for_personal_data(prompt)
-
     async def get_conversation_history(
         self, message: Message
-    ) -> List[Conversation]:
+    ) -> List[tuple[str, str]]:
         """Retrieve and trim the conversation history from cache or database."""
         # First attempt to get conversation history from Redis cache
         cached_history = await self.cache_service.get_conversation_history(
@@ -45,15 +39,14 @@ class BlueViAgent:
         )
         if cached_history:
             logging.info("Fetched conversation history from Redis cache.")
-            for msg in cached_history:
-                if msg.id is None:
-                    msg.role = "assistant"
-                else:
-                    msg.role = "user"
+            conversation_history_list = convert_conversation_history_to_tuples(
+                cached_history
+            )
+            for role, content in conversation_history_list:
                 logging.info(
-                    f"Mapped Message -> Role: {msg.role}, ID: {msg.id}, Content: {msg.content}"
+                    f"Mapped Message -> Role: {role}, Content: {content}"
                 )
-            return cached_history
+            return conversation_history_list
         else:
             # If not in cache, get from the database and store in Redis
             conversation_history = (
@@ -61,9 +54,12 @@ class BlueViAgent:
                     message.user_conversation_id
                 )
             )
-            logging.info('conversation_history')
-            for msg in conversation_history:
-                logging.info(f"Message ID: {msg.id}, Content: {msg.content}")
+            logging.info("Fetched conversation history from DB.")
+            conversation_history_list = convert_conversation_history_to_tuples(
+                conversation_history
+            )
+            for role, content in conversation_history_list:
+                logging.info(f"Message -> Role: {role}, Content: {content}")
 
             # Cache the fetched history for future use
             await self.cache_service.cache_conversation_history(
@@ -71,41 +67,26 @@ class BlueViAgent:
             )
             logging.info("Fetched conversation history from DB and cached it.")
             return self.token_utils.trim_history_to_fit_tokens(
-                conversation_history
+                conversation_history_list
             )
-
-    async def preprocess_conversation(self, message) -> List[Conversation]:
-        """Preprocess the input message, flagging personal data and retrieving history."""
-        try:
-            # Parallel tasks for flagging and history retrieval
-            tasks = [
-                self.flag_personal_data(message.content),
-                self.get_conversation_history(message),
-            ]
-            personal_data_flagged, conversation_history = await asyncio.gather(
-                *tasks
-            )
-            logging.info('conversation_history in preprocess_conversation')
-            for msg in conversation_history:
-                logging.info(f"Message ID: {msg.id}, Content: {msg.content}")
-            if personal_data_flagged:
-                self.db_manager.flag_message(message.id)
-            return conversation_history
-        except Exception as e:
-            logging.error(f"Error during preprocessing: {e}")
-            raise
 
     async def handle_operation_instruction(
-        self, conversation_history: list
+        self, conversation_history: List[Tuple[str, str]]
     ) -> GptResponseSchema:
         """Handle operation-specific instructions."""
         try:
             operation_schema = await self.model.assistant.get_operation_format(
                 conversation_history
             )
+            logging.info('operation_schema')
+            logging.info(operation_schema)
             if operation_schema:
-                response = await self.model.generate_user_response_with_custom_instruction(
-                    f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_OPERATION_SUCCESS.value} Operation details: {operation_schema}"
+                response = await self.model.assistant.generate_user_response_with_custom_instruction(
+                    conversation_history={
+                        "role": Role.ASSISTANT.value,
+                        "content": operation_schema,
+                    },
+                    instruction=f"{BlueViResponseHandling.HANDLE_OPERATION_SUCCESS.value} Operation details in Json:",
                 )
                 response.dynamic_json = operation_schema
                 response.type = PhxTypes.TOperationData.value
@@ -113,24 +94,26 @@ class BlueViAgent:
 
             return GptResponseSchema(
                 status=HTTPStatus.OK.value,
-                response=BlueViUnexpectedResponseHandling.HANDLE_OPERATION_ERROR.value,
+                response=BlueViResponseHandling.HANDLE_OPERATION_ERROR.value,
                 dynamic_json=None,
             )
         except Exception as error:
             logging.error(f"Error in handle_operation_instruction: {error}")
             return GptResponseSchema(
                 status=HTTPStatus.OK.value,
-                response=BlueViUnexpectedResponseHandling.HANDLE_OPERATION_ERROR.value,
+                response=BlueViResponseHandling.HANDLE_OPERATION_ERROR.value,
                 dynamic_json=None,
             )
 
     async def handle_general_instruction(
-        self, conversation_history: list
+        self, conversation_history: List[Tuple[str, str]]
     ) -> GptResponseSchema:
         """Handle general conversation instructions."""
         try:
-            return await self.model.generate_user_response_with_custom_instruction(
-                conversation_history
+            logging.info('conversation_history in handle_general_instruction')
+            logging.info(conversation_history)
+            return await self.model.assistant.generate_user_response_with_custom_instruction(
+                conversation_history=conversation_history
             )
         except Exception as error:
             logging.error(f"Error in handle_general_instruction: {error}")
@@ -143,19 +126,23 @@ class BlueViAgent:
     async def handle_conversation(self, message) -> GptResponseSchema:
         """Main entry point for handling a conversation."""
         try:
-            conversation_history = await self.preprocess_conversation(message)
+            conversation_history = await self.get_conversation_history(message)
+            logging.info("conversation_history in handle_conversation:")
+            logging.info(conversation_history)
             # Identify the instruction type
-            instruction_type = (
+            decision_instruction_object = (
                 await self.model.assistant.identify_instruction_type(
                     conversation_history
                 )
             )
-            logging.info(f"Instruction Type: {instruction_type}")
-
+            logging.info("decision_instruction_object:")
+            logging.info(decision_instruction_object)
+            if decision_instruction_object.get('sensitive_data'):
+                self.db_manager.flag_message(message.id)
             # Route based on instruction type
             if (
-                instruction_type
-                == TrainingInstructionEnum.OPERATION_INSTRUCTION.value
+                decision_instruction_object.get('instruction')
+                == InstructionList.PHX_OPERATION.value
             ):
                 return await self.handle_operation_instruction(
                     conversation_history

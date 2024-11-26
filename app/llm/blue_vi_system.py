@@ -18,7 +18,7 @@ from app.llm.blue_vi_assistant import BlueViGptAssistant
 from app.schemas import GptResponseSchema
 from app.types.enum.gpt import Role
 from app.types.enum.http_status import HTTPStatus
-from app.types.enum.instruction.blue_vi_gpt_instruction_enum import (
+from app.types.enum.instruction.blue_vi_gpt_instruction import (
     BlueViInstructionEnum,
 )
 from app.utils import (
@@ -111,33 +111,3 @@ class BlueViGptModel:
                 logging.info("LLM resources closed successfully.")
             except Exception as e:
                 logging.error(f"Error during LLM resource cleanup: {e}")
-
-    async def generate_user_response_with_custom_instruction(
-        self,
-        instruction: Optional[str] = None,
-    ) -> GptResponseSchema:
-        """Generate a response from the model based on conversation history for the user role, optionally with a custom instruction."""
-        try:
-            # Use the provided instruction or fall back to the default system instruction
-            system_instruction = (
-                instruction
-                if instruction
-                else BlueViInstructionEnum.BLUE_VI_SYSTEM_DEFAULT_INSTRUCTION.value
-            )
-
-            # Generate the response
-            response = await get_blue_vi_response(
-                self.llm, [(Role.SYSTEM.value, system_instruction)]
-            )
-
-            # Convert and return the response as GptResponseSchema
-            return convert_blue_vi_response_to_schema(response)
-
-        except Exception as e:
-            logging.error(
-                f"Unexpected error while generating chat response: {e}"
-            )
-            return GptResponseSchema(
-                status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-                content="Sorry, something went wrong while generating a response.",
-            )

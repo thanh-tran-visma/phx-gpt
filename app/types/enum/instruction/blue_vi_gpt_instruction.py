@@ -1,6 +1,6 @@
 from enum import Enum
 
-from app.types.enum.instruction import TrainingInstructionEnum
+from app.types.enum.instruction import TrainingInstructionEnum, CRUD
 
 
 class BlueViInstructionEnum(str, Enum):
@@ -45,8 +45,6 @@ class BlueViInstructionEnum(str, Enum):
         "Ensure that all personal information is anonymized and no additional text or explanations are included in the output."
     )
 
-    BLUE_VI_SYSTEM_HANDLE_OPERATION_SUCCESS = "Inform the user that the operation was successful and provide a brief, friendly summary of the completed task."
-
     BLUE_VI_SYSTEM_HANDLE_OPERATION_PROCESS = (
         "You are an advanced AI tasked with generating a JSON dataset entry for an Operation. "
         "Only use the information explicitly provided by the user. If a field is not mentioned in the user prompt, "
@@ -55,8 +53,22 @@ class BlueViInstructionEnum(str, Enum):
     )
 
     BLUE_VI_SYSTEM_HANDLE_INSTRUCTION_DECISION = (
-        "Analyze the entire conversation history and determine the user's intent based on the context. "
-        f"If the user is asking to create a new operation or modify an existing one, classify the response as '{TrainingInstructionEnum.OPERATION_INSTRUCTION.value}'. "
-        f"If the user's query is unrelated to operations or if the intent is unclear, classify it as '{TrainingInstructionEnum.DEFAULT.value}'. "
-        "Here is the full conversation history: "
+        "You are an advanced AI, tasked with reviewing the provided conversation history and classifying the user's request. "
+        "Extract the relevant details and structure the response in the following strict JSON format, "
+        "with double quotes for all keys and string values. Do not include any extra fields, comments, or use single quotes.\n"
+        "Classify the user's intent as follows:\n"
+        f"- If the user is asking to create or modify an operation, classify it as {TrainingInstructionEnum.OPERATION_INSTRUCTION.value}.\n"
+        f"- If the user is asking about something else, classify it as {TrainingInstructionEnum.DEFAULT.value}.\n"
+        "Determine the CRUD operation for the request:\n"
+        "- If the request is to create something new, set the 'crud' field to 'CREATE'.\n"
+        "- If the request is to modify an existing operation, set the 'crud' field to 'UPDATE'.\n"
+        "- If the request is neither of the above, set the 'crud' field to 'NONE'.\n"
+        "Additionally, assess if the provided data contains personal information under GDPR regulations:\n"
+        "- **Who**: Does the text mention any full name or identifiable personal details?\n"
+        "- **Where**: Does the text mention specific addresses or locations that could identify an individual?\n"
+        "- **How**: Does the text contain contact details like phone numbers or email addresses?\n\n"
+        "Flag personal data only if it contains identifiable details such as a full name, address, phone number, or email address.\n"
+        "Return True if the text includes identifiable personal information (such as a full name, address, or contact details), and False otherwise. "
+        "Evaluate carefully, as data may contain inaccuracies.\n\n"
+        "Please note that, only check for the last message from user role only and the data may contain inaccuracies in the response."
     )

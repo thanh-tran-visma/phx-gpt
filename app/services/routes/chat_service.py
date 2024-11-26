@@ -1,4 +1,3 @@
-import json
 import time
 
 from app.database.database_manager import DatabaseManager
@@ -64,30 +63,9 @@ class ChatService:
             # Calculate the time taken
             end_time = time.time()
             time_taken = end_time - start_time
-
-            # Safely append "response_time" to dynamic_json
-            if hasattr(bot_response, "dynamic_json"):
-                if bot_response.dynamic_json is None:
-                    # If dynamic_json is None, initialize it as a dictionary with response_time
-                    bot_response.dynamic_json = {"response_time": time_taken}
-                elif isinstance(bot_response.dynamic_json, dict):
-                    # If it's already a dictionary, add the new field
-                    bot_response.dynamic_json["response_time"] = time_taken
-                else:
-                    try:
-                        # Try parsing it as JSON if it's a string
-                        dynamic_data = bot_response.dynamic_json
-                        dynamic_data["response_time"] = time_taken
-                        bot_response.dynamic_json = dynamic_data
-                    except (TypeError, json.JSONDecodeError):
-                        # If parsing fails, replace it with a new dictionary
-                        bot_response.dynamic_json = {
-                            "response_time": time_taken
-                        }
-            else:
-                # If no dynamic_json attribute, create one
-                bot_response.dynamic_json = {"response_time": time_taken}
-
+            bot_response.time_taken = time_taken
+            logging.info('bot_response.time_taken')
+            logging.info(bot_response.time_taken)
             return self.response_utils.success_response(
                 bot_response, conversation.conversation_order
             )

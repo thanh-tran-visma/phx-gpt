@@ -1,5 +1,4 @@
 from typing import List
-
 from app.model import Message
 
 
@@ -11,4 +10,7 @@ def convert_conversation_history_to_tuples(
     sorted_history = sorted(
         conversation_history, key=lambda msg: msg.created_at
     )
-    return [(message.role, message.content) for message in sorted_history]
+    return [
+        ("user" if message.id else "assistant", message.content)
+        for message in sorted_history
+    ]

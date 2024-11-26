@@ -1,7 +1,12 @@
 from enum import Enum
 
 
-class BlueViUnexpectedResponseHandling(str, Enum):
+class BlueViResponseHandling(str, Enum):
+    HANDLE_OPERATION_SUCCESS = (
+        "Let the user know in a warm and friendly tone that the operation was completed successfully. "
+        "Summarize the results clearly and positively, including key details about what was created or achieved. "
+        "Make the response easy to read and conversational."
+    )
     HANDLE_OPERATION_ERROR = (
         "An error occurred while attempting to create a new operation. The operation could not be created by BlueVi-GPT AI at the moment.\n\n"
         "However, you can still create the operation manually. To do this, follow these steps:\n\n"

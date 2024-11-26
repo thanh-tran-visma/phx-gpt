@@ -37,6 +37,7 @@ async def chat_endpoint(
             response=str(chat_result["response"]),
             conversation_order=int(chat_result.get("conversation_order", -1)),
             dynamic_json=chat_result.get("dynamic_json"),
+            time_taken=float(chat_result.get("time_taken", 0.0)),
         )
 
     except Exception:

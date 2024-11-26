@@ -1,33 +1,39 @@
-import logging
 from typing import List, Tuple, Optional
-from llama_cpp import (
-    Llama,
-    llama_grammar,
-)
+import logging
+from llama_cpp import Llama, llama_grammar
 from starlette.concurrency import run_in_threadpool
-
 from app.types.enum.gpt import Role
 
 
-def get_operation_format(conversation_history: List[Tuple[str, str]]) -> List:
+def get_operation_format(
+    conversation_history: List[Tuple[str, str]]
+) -> List[dict]:
+    """
+    Format the conversation history into the structure expected by the Llama model.
+
+    Args:
+    - conversation_history (List[Tuple[str, str]]): List of tuples (role, message).
+
+    Returns:
+    - List[dict]: Formatted list of messages.
+    """
     formatted_messages = []
 
     for conversation in conversation_history:
-        if len(conversation) != 2:
+        if (
+            len(conversation) != 2
+            or not isinstance(conversation[0], str)
+            or not isinstance(conversation[1], str)
+        ):
             logging.error(f"Invalid tuple: {conversation}")
             continue  # Skip invalid tuples
+
         role, message = conversation
-        if role == Role.USER.value:
-            formatted_messages.append(
-                {'role': Role.USER.value, 'content': message}
-            )
-        elif role == Role.ASSISTANT.value:
-            formatted_messages.append(
-                {'role': Role.ASSISTANT.value, 'content': message}
-            )
-        elif role == Role.SYSTEM.value:
-            formatted_messages.append(
-                {'role': Role.SYSTEM.value, 'content': message}
+        if role in {Role.USER.value, Role.ASSISTANT.value, Role.SYSTEM.value}:
+            formatted_messages.append({'role': role, 'content': message})
+        else:
+            logging.warning(
+                f"Unrecognized role '{role}' in conversation: {conversation}"
             )
 
     return formatted_messages
@@ -42,23 +48,32 @@ async def get_blue_vi_response(
     Get the model's response to the conversation history.
 
     Args:
-    - llm (Llama): The Llama model.
-    - conversation_history (List[Tuple[str, str]]): A list of tuples containing the role ('user', 'assistant', 'system')
-      and message string.
+    - llm (Llama): The Llama model instance.
+    - conversation_history (List[Tuple[str, str]]): History of the conversation as (role, message) tuples.
+    - grammar (Optional[llama_grammar]): Optional grammar for the model.
 
     Returns:
-    - dict: The model's response as a dictionary.
+    - dict: The model's response.
     """
     try:
-        # Format the conversation history into the appropriate format
+        # Format the conversation history
+        logging.info("Formatting conversation history")
         messages = get_operation_format(conversation_history)
-        logging.info(messages)
-        # Use threadpool to run the model's chat completion
+        logging.info(f"Formatted messages: {messages}")
+
+        # Ensure the formatted messages meet the model's requirements
+        if not messages:
+            logging.error("No valid messages to process")
+            return {}
+
+        # Generate response using Llama in a thread pool
+        logging.info("Generating response with Llama")
         response = await run_in_threadpool(
             lambda: llm.create_chat_completion(
                 messages=messages, grammar=grammar
             )
         )
+        logging.info(f"Model response: {response}")
         return response
     except Exception as e:
         logging.error(f"Error communicating with the model: {e}")

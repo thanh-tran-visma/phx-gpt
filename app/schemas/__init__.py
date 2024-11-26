@@ -2,3 +2,4 @@ from .gpt_response_schema import GptResponseSchema
 from .user_prompt_schema import UserPromptSchema
 from .chat_response_schema import ChatResponseSchema
 from .phx_app_operation_schema import PhxAppOperation, TMethodOfConsultData
+from .decision_instruction_schema import DecisionInstruction
