@@ -1,6 +1,9 @@
 from enum import Enum
 
-from app.types.enum.instruction import TrainingInstructionEnum, CRUD
+from app.types.enum.instruction.training_instruction import (
+    TrainingInstructionEnum,
+)
+from app.types.enum.instruction.instruction_list import InstructionList
 
 
 class BlueViInstructionEnum(str, Enum):
@@ -53,22 +56,22 @@ class BlueViInstructionEnum(str, Enum):
     )
 
     BLUE_VI_SYSTEM_HANDLE_INSTRUCTION_DECISION = (
-        "You are an advanced AI, tasked with reviewing the provided conversation history and classifying the user's request. "
-        "Extract the relevant details and structure the response in the following strict JSON format, "
-        "with double quotes for all keys and string values. Do not include any extra fields, comments, or use single quotes.\n"
-        "Classify the user's intent as follows:\n"
-        f"- If the user is asking to create or modify an operation, classify it as {TrainingInstructionEnum.OPERATION_INSTRUCTION.value}.\n"
-        f"- If the user is asking about something else, classify it as {TrainingInstructionEnum.DEFAULT.value}.\n"
-        "Determine the CRUD operation for the request:\n"
-        "- If the request is to create something new, set the 'crud' field to 'CREATE'.\n"
-        "- If the request is to modify an existing operation, set the 'crud' field to 'UPDATE'.\n"
-        "- If the request is neither of the above, set the 'crud' field to 'NONE'.\n"
-        "Additionally, assess if the provided data contains personal information under GDPR regulations:\n"
-        "- **Who**: Does the text mention any full name or identifiable personal details?\n"
-        "- **Where**: Does the text mention specific addresses or locations that could identify an individual?\n"
-        "- **How**: Does the text contain contact details like phone numbers or email addresses?\n\n"
-        "Flag personal data only if it contains identifiable details such as a full name, address, phone number, or email address.\n"
-        "Return True if the text includes identifiable personal information (such as a full name, address, or contact details), and False otherwise. "
-        "Evaluate carefully, as data may contain inaccuracies.\n\n"
-        "Please note that, only check for the last message from user role only and the data may contain inaccuracies in the response."
+        "Review the conversation history and classify the user's request in JSON format with double quotes for keys and values. "
+        "Do not add extra fields, comments, or single quotes.\n"
+        "Classify as:\n"
+        f"- {TrainingInstructionEnum.OPERATION_INSTRUCTION.value} for requests to create or modify an operation.\n"
+        f"- {TrainingInstructionEnum.DEFAULT.value} for other requests.\n"
+        "Determine CRUD:"
+        f"- If {InstructionList.DEFAULT.value}, set 'crud' to 'NONE'.\n"
+        "- If not, 'crud' is required.\n"
+        "Sensitive data assessment:"
+        f"- If not {InstructionList.DEFAULT.value}, set 'sensitive_data' to False.\n"
+        f"- If {InstructionList.DEFAULT.value}, evaluate the data.\n"
+        "Check for personal data under GDPR:\n"
+        "- **Who**: Full names or identifiable details?\n"
+        "- **Where**: Addresses or locations that identify an individual?\n"
+        "- **How**: Contact details like phone numbers or emails?\n\n"
+        "Flag personal data only if it includes identifiable details. Return True for identifiable info, False otherwise. "
+        "Be cautious, as data may be inaccurate.\n\n"
+        "Check only the last user message, noting possible inaccuracies."
     )

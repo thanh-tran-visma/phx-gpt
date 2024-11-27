@@ -11,7 +11,7 @@ from app.types.enum.phx_types import PhxTypes
 from app.types.enum.gpt_response_handling import (
     BlueViResponseHandling,
 )
-from app.types.enum.instruction import InstructionList
+from app.types.enum.instruction import InstructionList, CRUD
 
 from app.types.enum.http_status import HTTPStatus
 from app.utils import TokenUtils, convert_conversation_history_to_tuples
@@ -71,16 +71,20 @@ class BlueViAgent:
             )
 
     async def handle_operation_instruction(
-        self, conversation_history: List[Tuple[str, str]]
+        self,
+        conversation_history: List[Tuple[str, str]],
+        user_uuid: str,
+        crud: CRUD,
     ) -> GptResponseSchema:
         """Handle operation-specific instructions."""
         try:
-            operation_schema = await self.model.assistant.get_operation_format(
-                conversation_history
+            operation_schema = await self.model.assistant.handle_phx_operation(
+                conversation_history, crud
             )
-            logging.info('operation_schema')
+            logging.info('operation_schema in handle_operation_instruction')
             logging.info(operation_schema)
             if operation_schema:
+                operation_schema.pop("uuid", None)
                 response = await self.model.assistant.generate_user_response_with_custom_instruction(
                     conversation_history={
                         "role": Role.ASSISTANT.value,
@@ -88,6 +92,7 @@ class BlueViAgent:
                     },
                     instruction=f"{BlueViResponseHandling.HANDLE_OPERATION_SUCCESS.value} Operation details in Json:",
                 )
+                operation_schema["uuid"] = user_uuid
                 response.dynamic_json = operation_schema
                 response.type = PhxTypes.TOperationData.value
                 return response
@@ -123,7 +128,9 @@ class BlueViAgent:
                 dynamic_json=None,
             )
 
-    async def handle_conversation(self, message) -> GptResponseSchema:
+    async def handle_conversation(
+        self, user_uuid: str, message: Message
+    ) -> GptResponseSchema:
         """Main entry point for handling a conversation."""
         try:
             conversation_history = await self.get_conversation_history(message)
@@ -137,24 +144,25 @@ class BlueViAgent:
             )
             logging.info("decision_instruction_object:")
             logging.info(decision_instruction_object)
-            if decision_instruction_object.get('sensitive_data'):
+            if decision_instruction_object.get('personal_data'):
                 self.db_manager.flag_message(message.id)
-            # Route based on instruction type
             if (
                 decision_instruction_object.get('instruction')
                 == InstructionList.PHX_OPERATION.value
             ):
+                logging.info('if in handle_conversation')
                 return await self.handle_operation_instruction(
-                    conversation_history
+                    conversation_history,
+                    user_uuid,
+                    decision_instruction_object.get('crud'),
                 )
             else:
                 return await self.handle_general_instruction(
                     conversation_history
                 )
-
         except Exception as e:
             logging.error(
-                f"Unexpected error while generating chat response: {e}"
+                f"Unexpected error while generating chat response in agent: {e}"
             )
             return GptResponseSchema(
                 status=HTTPStatus.INTERNAL_SERVER_ERROR.value,

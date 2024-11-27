@@ -8,6 +8,8 @@ from langchain_core.callbacks import (
     StreamingStdOutCallbackHandler,
 )
 from llama_cpp import Llama, LlamaTokenizer
+
+from app.config import MAX_HISTORY_WINDOW_SIZE
 from app.config.config_env import (
     MODEL_NAME,
     HF_TOKEN,
@@ -15,16 +17,6 @@ from app.config.config_env import (
     LLM_MAX_TOKEN,
 )
 from app.llm.blue_vi_assistant import BlueViGptAssistant
-from app.schemas import GptResponseSchema
-from app.types.enum.gpt import Role
-from app.types.enum.http_status import HTTPStatus
-from app.types.enum.instruction.blue_vi_gpt_instruction import (
-    BlueViInstructionEnum,
-)
-from app.utils import (
-    get_blue_vi_response,
-    convert_blue_vi_response_to_schema,
-)
 
 
 class BlueViGptModel:
@@ -71,6 +63,7 @@ class BlueViGptModel:
                     cache_dir=model_cache_dir,
                     token=HF_TOKEN,
                     max_tokens=LLM_MAX_TOKEN,
+                    context_window_size=MAX_HISTORY_WINDOW_SIZE,
                 )
             except Exception as e:
                 logging.error(f"Error loading model from Hugging Face: {e}")
@@ -85,6 +78,7 @@ class BlueViGptModel:
                 callback_manager=callback_manager,
                 verbose=True,
                 max_tokens=LLM_MAX_TOKEN,
+                context_window_size=MAX_HISTORY_WINDOW_SIZE,
             )
             logging.info("Model loaded successfully from local GGUF file.")
             return llm

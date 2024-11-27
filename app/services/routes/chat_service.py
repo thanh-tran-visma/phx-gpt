@@ -56,7 +56,9 @@ class ChatService:
             )
 
             # Generate and cache bot response
-            bot_response = await self.agent.handle_conversation(user_message)
+            bot_response = await self.agent.handle_conversation(
+                user.uuid, user_message
+            )
             await self.cache_service.cache_message(
                 user_conversation.id, bot_response
             )

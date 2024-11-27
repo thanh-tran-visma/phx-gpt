@@ -5,6 +5,34 @@ from starlette.concurrency import run_in_threadpool
 from app.types.enum.gpt import Role
 
 
+def trim_messages(messages: List[dict], max_tokens: int = 512) -> List[dict]:
+    """
+    Trim messages to ensure the total token count does not exceed the max_tokens.
+
+    Args:
+    - messages (List[dict]): List of formatted message dictionaries.
+    - max_tokens (int): Maximum number of tokens allowed.
+
+    Returns:
+    - List[dict]: Trimmed list of message dictionaries.
+    """
+    total_tokens = sum(
+        len(message['content'].split())
+        for message in messages
+        if isinstance(message, dict)
+    )
+    while total_tokens > max_tokens and messages:
+        # Remove the first message until we are within the token limit
+        removed_message = messages.pop(0)
+        total_tokens -= (
+            len(removed_message['content'].split())
+            if isinstance(removed_message, dict)
+            else 0
+        )
+
+    return messages
+
+
 def get_operation_format(
     conversation_history: List[Tuple[str, str]]
 ) -> List[dict]:
@@ -30,7 +58,13 @@ def get_operation_format(
 
         role, message = conversation
         if role in {Role.USER.value, Role.ASSISTANT.value, Role.SYSTEM.value}:
-            formatted_messages.append({'role': role, 'content': message})
+            message_dict = {'role': role, 'content': message}
+            if isinstance(message_dict, dict):
+                formatted_messages.append(message_dict)
+            else:
+                logging.error(
+                    f"Formatted message is not a dict: {message_dict}"
+                )
         else:
             logging.warning(
                 f"Unrecognized role '{role}' in conversation: {conversation}"
@@ -57,9 +91,12 @@ async def get_blue_vi_response(
     """
     try:
         # Format the conversation history
-        logging.info("Formatting conversation history")
         messages = get_operation_format(conversation_history)
         logging.info(f"Formatted messages: {messages}")
+
+        # Trim messages to not exceed the max token limit
+        messages = trim_messages(messages)
+        logging.info(f"Trimmed messages: {messages}")
 
         # Ensure the formatted messages meet the model's requirements
         if not messages:

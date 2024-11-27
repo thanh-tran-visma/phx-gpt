@@ -10,18 +10,21 @@ from app.model import Message
 from app.schemas import GptResponseSchema, PhxAppOperation, DecisionInstruction
 from app.types.enum.gpt import Role
 from app.types.enum.http_status import HTTPStatus
+from app.types.enum.instruction import CRUD
 from app.types.enum.instruction.blue_vi_gpt_instruction import (
     BlueViInstructionEnum,
 )
 from app.utils import (
     get_blue_vi_response,
     convert_blue_vi_response_to_schema,
+    TokenUtils,
 )
 
 
 class BlueViGptAssistant:
     def __init__(self, llm: Llama):
         self.llm = llm
+        self.token_utils = TokenUtils(self.llm)
 
     async def generate_user_response_with_custom_instruction(
         self,
@@ -30,18 +33,23 @@ class BlueViGptAssistant:
     ) -> GptResponseSchema:
         """Generate a response from the model based on conversation history for the user role, optionally with a custom instruction."""
         try:
-            # Use the provided instruction or fall back to the default system instruction
+            logging.info(
+                "system_instruction in generate_user_response_with_custom_instruction:"
+            )
             system_instruction = (
                 instruction
                 if instruction
                 else BlueViInstructionEnum.BLUE_VI_SYSTEM_DEFAULT_INSTRUCTION.value
             )
-
-            # Ensure system_instruction is a string
+            logging.info(system_instruction)
             if isinstance(system_instruction, Message):
                 system_instruction = system_instruction.content
-
-            # Add the system instruction to the beginning of the conversation history
+            if isinstance(conversation_history, dict):
+                role = Role.USER.value
+                content_list = conversation_history['content']
+                conversation_history = [
+                    (role, str(content)) for content in content_list
+                ]
             full_conversation_history = [
                 (Role.SYSTEM.value, system_instruction)
             ] + conversation_history
@@ -60,7 +68,7 @@ class BlueViGptAssistant:
 
         except Exception as e:
             logging.error(
-                f"Unexpected error while generating chat response: {e}"
+                f"Unexpected error while generating chat response in assistant: {e}"
             )
             return GptResponseSchema(
                 status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
@@ -89,13 +97,14 @@ class BlueViGptAssistant:
             [DecisionInstruction]
         )
         grammar = LlamaGrammar.from_string(gbnf_grammar, verbose=False)
+        # Convert conversation history to tuples and prepare messages
         instruction = (
             f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_INSTRUCTION_DECISION.value} \n"
             f"{documentation}"
         )
-        # Convert conversation history to tuples and prepare messages
+        logging.info('instruction in identify_instruction_type')
+        logging.info(instruction)
         messages = [(Role.SYSTEM.value, instruction)] + conversation_history
-
         # Get response from the model
         response = await get_blue_vi_response(self.llm, messages, grammar)
 
@@ -115,20 +124,22 @@ class BlueViGptAssistant:
 
         return data if data else DecisionInstruction()
 
-    async def get_operation_format(
-        self, conversation_history: List[Tuple[str, str]]
+    async def handle_phx_operation(
+        self, conversation_history: List[Tuple[str, str]], crud: CRUD
     ) -> PhxAppOperation:
         """Generates an operation schema based on the user's conversation history and model response."""
         # TODO:
-
+        logging.info('crud in handle_phx_operation')
+        logging.info('crud in handle_phx_operation')
         # Define the instruction
         gbnf_grammar, documentation = generate_gbnf_grammar_and_documentation(
             [PhxAppOperation]
         )
         grammar = LlamaGrammar.from_string(gbnf_grammar, verbose=False)
 
+        instruction = f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_OPERATION_PROCESS.value}: \n\n {documentation}"
         # Create the messages structure with instruction and conversation history
-        messages = [(Role.SYSTEM.value, documentation)] + conversation_history
+        messages = [(Role.SYSTEM.value, instruction)] + conversation_history
 
         # Get response from LLM
         response = await get_blue_vi_response(self.llm, messages, grammar)
