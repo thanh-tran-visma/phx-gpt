@@ -102,15 +102,14 @@ class BlueViGptAssistant:
             f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_INSTRUCTION_DECISION.value} \n"
             f"{documentation}"
         )
-        logging.info('instruction in identify_instruction_type')
-        logging.info(instruction)
         messages = [(Role.SYSTEM.value, instruction)] + conversation_history
         # Get response from the model
         response = await get_blue_vi_response(self.llm, messages, grammar)
 
         # Convert response to schema
         result = convert_blue_vi_response_to_schema(response)
-
+        logging.info('result in identify_instruction_type')
+        logging.info(result)
         if not result.content:
             return DecisionInstruction()
         try:

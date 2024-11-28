@@ -64,6 +64,9 @@ class BlueViGptModel:
                     token=HF_TOKEN,
                     max_tokens=LLM_MAX_TOKEN,
                     context_window_size=MAX_HISTORY_WINDOW_SIZE,
+                    n_ctx=1024,
+                    n_batch=1024,
+                    cpu_buffer_size=8192,
                 )
             except Exception as e:
                 logging.error(f"Error loading model from Hugging Face: {e}")
@@ -79,6 +82,9 @@ class BlueViGptModel:
                 verbose=True,
                 max_tokens=LLM_MAX_TOKEN,
                 context_window_size=MAX_HISTORY_WINDOW_SIZE,
+                n_ctx=1024,
+                n_batch=1024,
+                cpu_buffer_size=8192,
             )
             logging.info("Model loaded successfully from local GGUF file.")
             return llm

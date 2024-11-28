@@ -5,34 +5,6 @@ from starlette.concurrency import run_in_threadpool
 from app.types.enum.gpt import Role
 
 
-def trim_messages(messages: List[dict], max_tokens: int = 512) -> List[dict]:
-    """
-    Trim messages to ensure the total token count does not exceed the max_tokens.
-
-    Args:
-    - messages (List[dict]): List of formatted message dictionaries.
-    - max_tokens (int): Maximum number of tokens allowed.
-
-    Returns:
-    - List[dict]: Trimmed list of message dictionaries.
-    """
-    total_tokens = sum(
-        len(message['content'].split())
-        for message in messages
-        if isinstance(message, dict)
-    )
-    while total_tokens > max_tokens and messages:
-        # Remove the first message until we are within the token limit
-        removed_message = messages.pop(0)
-        total_tokens -= (
-            len(removed_message['content'].split())
-            if isinstance(removed_message, dict)
-            else 0
-        )
-
-    return messages
-
-
 def get_operation_format(
     conversation_history: List[Tuple[str, str]]
 ) -> List[dict]:
@@ -92,12 +64,6 @@ async def get_blue_vi_response(
     try:
         # Format the conversation history
         messages = get_operation_format(conversation_history)
-        logging.info(f"Formatted messages: {messages}")
-
-        # Trim messages to not exceed the max token limit
-        messages = trim_messages(messages)
-        logging.info(f"Trimmed messages: {messages}")
-
         # Ensure the formatted messages meet the model's requirements
         if not messages:
             logging.error("No valid messages to process")

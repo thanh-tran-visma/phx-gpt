@@ -8,6 +8,7 @@ class ChatResponseSchema(BaseModel):
     conversation_order: Optional[int] = None
     dynamic_json: Optional[Dict[str, Any]] = None
     time_taken: Optional[float] = 0.0
+    operationType: Optional[str]
 
     class Config:
         extra = 'allow'

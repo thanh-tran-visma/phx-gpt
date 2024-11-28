@@ -1,6 +1,7 @@
 from unittest.mock import patch
 import pytest
-from app.types.enum import HTTPStatus
+
+from app.types.enum.http_status import HTTPStatus
 
 
 @pytest.fixture

@@ -3,9 +3,13 @@ from enum import Enum
 
 class BlueViResponseHandling(str, Enum):
     HANDLE_OPERATION_SUCCESS = (
-        "Let the user know in a warm and friendly tone that the operation was completed successfully. "
-        "Summarize the results clearly and positively, including key details about what was created or achieved. "
-        "Make the response easy to read and conversational."
+        "Inform the user in a warm and friendly tone that the {operation} was completed successfully. "
+        "Use the user name: {user_name} to personalize the response. "
+        "Summarize the main details of the operation in a friendly and engaging way, focusing on key points such as what was done, any important outcomes, and relevant context from the data provided. "
+        "For example, mention the operation name, description, duration, and methods of delivery as they relate to the {crud} action. "
+        "details: {details}"
+        "Ensure the response feels natural and personable, making it easy to understand and engaging, without sounding robotic or formulaic. "
+        "Avoid mentioning any information outside the supplied input."
     )
     HANDLE_OPERATION_ERROR = (
         "An error occurred while attempting to create a new operation. The operation could not be created by BlueVi-GPT AI at the moment.\n\n"

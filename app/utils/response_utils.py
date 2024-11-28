@@ -13,7 +13,7 @@ class ResponseUtils:
             "conversation_order": conversation_order,
             "dynamic_json": bot_response.dynamic_json,
             "time_taken": bot_response.time_taken,
-            "type": bot_response.type,
+            "operationType": bot_response.operationType,
         }
 
     @staticmethod

@@ -6,8 +6,6 @@ from app.database import DatabaseManager
 from app.model import Message
 from app.schemas import GptResponseSchema
 from app.services.cache import CacheService
-from app.types.enum.gpt import Role
-from app.types.enum.phx_types import PhxTypes
 from app.types.enum.gpt_response_handling import (
     BlueViResponseHandling,
 )
@@ -85,16 +83,23 @@ class BlueViAgent:
             logging.info(operation_schema)
             if operation_schema:
                 operation_schema.pop("uuid", None)
+                instruction = (
+                    BlueViResponseHandling.HANDLE_OPERATION_SUCCESS.format(
+                        operation='operation',
+                        user_name='Alice',
+                        crud=crud,
+                        details=operation_schema,
+                    )
+                )
                 response = await self.model.assistant.generate_user_response_with_custom_instruction(
-                    conversation_history={
-                        "role": Role.ASSISTANT.value,
-                        "content": operation_schema,
-                    },
-                    instruction=f"{BlueViResponseHandling.HANDLE_OPERATION_SUCCESS.value} Operation details in Json:",
+                    conversation_history,
+                    instruction=f"{instruction}",
                 )
                 operation_schema["uuid"] = user_uuid
                 response.dynamic_json = operation_schema
-                response.type = PhxTypes.TOperationData.value
+                response.operationType = InstructionList.PHX_OPERATION.value
+                logging.info('response')
+                logging.info(response)
                 return response
 
             return GptResponseSchema(

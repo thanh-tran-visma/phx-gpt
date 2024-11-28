@@ -66,8 +66,8 @@ class ChatService:
             end_time = time.time()
             time_taken = end_time - start_time
             bot_response.time_taken = time_taken
-            logging.info('bot_response.time_taken')
-            logging.info(bot_response.time_taken)
+            logging.info('bot_response')
+            logging.info(bot_response)
             return self.response_utils.success_response(
                 bot_response, conversation.conversation_order
             )

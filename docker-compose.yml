@@ -24,6 +24,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_PORT=3306
       - API_URL=${API_URL}
+      - REDIS_HOST=gpt_redis
+      - REDIS_PORT=6379
 
   nginx:
     container_name: gpt_web
@@ -52,6 +54,18 @@ services:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=gpt_user
       - MYSQL_PASSWORD=${DB_PASSWORD}
+
+  redis:
+    container_name: gpt_redis
+    image: redis:6.2.6-bullseye
+    restart: on-failure
+    networks:
+      - internal
+    volumes:
+      - ./storage/redis/data:/data
+    ports:
+      - "6376:6379"
+    command: redis-server --save 20 1 --loglevel warning
 
 networks:
   internal:
