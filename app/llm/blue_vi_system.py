@@ -16,13 +16,14 @@ from app.config.config_env import (
     GGUF_MODEL,
     LLM_MAX_TOKEN,
 )
-from app.llm.blue_vi_assistant import BlueViGptAssistant
 
 
 class BlueViGptModel:
     def __init__(self):
         """Initialize BlueViGptModel with main model and embedding model."""
         try:
+            from app.llm.blue_vi_assistant import BlueViGptAssistant
+
             self.llm = self.load_model()
             self.assistant = BlueViGptAssistant(self.llm)
             logging.info("BlueViGptModel initialized successfully.")

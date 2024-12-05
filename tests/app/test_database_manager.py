@@ -98,7 +98,7 @@ def test_create_message(db_manager, mock_db_session):
 def test_get_messages_by_user_conversation_id(db_manager, mock_db_session):
     user_conversation_id = 1
     mock_messages = [Message(content="Hello"), Message(content="World")]
-    mock_db_session.query.return_value.filter.return_value.all.return_value = (
+    mock_db_session.query.return_value.filter.return_value.order_by.return_value.limit.return_value.all.return_value = (
         mock_messages
     )
 
