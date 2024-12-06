@@ -3,6 +3,6 @@ from typing import Optional
 
 
 class UserPromptSchema(BaseModel):
-    prompt: str
-    user_id: int
+    uuid: str
+    prompt: Optional[str] = None
     conversation_order: Optional[int] = None

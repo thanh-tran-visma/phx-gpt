@@ -1,27 +1,28 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, HTTPException
 from app.database.database import Database
-from app.services import ChatService
+from app.services.routes import ChatService
 from app.schemas import UserPromptSchema, ChatResponseSchema
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
+from fastapi import Request
 
 router = APIRouter()
 
 
 @router.post(
     "/chat",
-    response_model=ChatResponseSchema,
     responses={
         HTTPStatus.INTERNAL_SERVER_ERROR.value: {"model": ChatResponseSchema}
     },
 )
 async def chat_endpoint(
-    request: Request, user_prompt: UserPromptSchema
+    user_prompt: UserPromptSchema,
+    request: Request,
 ) -> ChatResponseSchema:
-    db = Database().get_session()
+    database = Database()
+    db = database.get_session()
 
     try:
-        blue_vi_gpt_model = request.app.state.model
-        chat_service = ChatService(db, blue_vi_gpt_model, user_prompt)
+        chat_service = ChatService(db, user_prompt, request)
         chat_result = await chat_service.handle_chat()
 
         if chat_result["status"] != HTTPStatus.OK.value:
@@ -30,14 +31,20 @@ async def chat_endpoint(
                 detail=chat_result["response"],
             )
 
+        # Ensure conversation_order is passed correctly
         return ChatResponseSchema(
-            status=HTTPStatus.OK.value, response=str(chat_result["response"])
+            status=HTTPStatus.OK.value,
+            response=str(chat_result["response"]),
+            conversation_order=int(chat_result.get("conversation_order", -1)),
+            dynamic_json=chat_result.get("dynamic_json"),
+            time_taken=float(chat_result.get("time_taken")),
+            operationType=str(chat_result.get("operationType")),
         )
 
     except Exception:
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-            detail="An internal error occurred.",
+            detail="An internal error occurred",
         )
 
     finally:
