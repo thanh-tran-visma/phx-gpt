@@ -15,4 +15,5 @@ from .config_env import (
     API_URL,
     REDIS_HOST,
     REDIS_PORT,
+    GPT_ENDPOINT_URL,
 )

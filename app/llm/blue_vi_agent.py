@@ -12,7 +12,7 @@ from app.types.enum.gpt_response_handling import (
 from app.types.enum.instruction import InstructionList, CRUD
 
 from app.types.enum.http_status import HTTPStatus
-from app.utils import TokenUtils, convert_conversation_history_to_tuples
+from app.utils import convert_conversation_history_to_tuples
 
 
 class BlueViAgent:
@@ -22,7 +22,6 @@ class BlueViAgent:
         self.model = model
         self.db_manager = db_manager
         self.cache_service = cache_service
-        self.token_utils = TokenUtils(self.model)
         self.history_window_size = MAX_HISTORY_WINDOW_SIZE
         self.phx_client = PhxApiClient()
         self.phx_client.timeout = 60
@@ -64,9 +63,7 @@ class BlueViAgent:
                 message.user_conversation_id, conversation_history
             )
             logging.info("Fetched conversation history from DB and cached it.")
-            return self.token_utils.trim_history_to_fit_tokens(
-                conversation_history_list
-            )
+            return conversation_history_list
 
     async def handle_operation_instruction(
         self,
@@ -149,17 +146,17 @@ class BlueViAgent:
             )
             logging.info("decision_instruction_object:")
             logging.info(decision_instruction_object)
-            if decision_instruction_object.get('personal_data'):
+            if decision_instruction_object.personal_data:
                 self.db_manager.flag_message(message.id)
             if (
-                decision_instruction_object.get('instruction')
+                decision_instruction_object.instruction
                 == InstructionList.PHX_OPERATION.value
             ):
                 logging.info('if in handle_conversation')
                 return await self.handle_operation_instruction(
                     conversation_history,
                     user_uuid,
-                    decision_instruction_object.get('crud'),
+                    decision_instruction_object.crud,
                 )
             else:
                 return await self.handle_general_instruction(

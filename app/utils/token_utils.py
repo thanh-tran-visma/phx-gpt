@@ -1,15 +1,21 @@
 import logging
 from collections import deque
 
-from app.config.config_env import LLM_MAX_TOKEN, MAX_HISTORY_WINDOW_SIZE
+from transformers import AutoTokenizer
+
+from app.config.config_env import (
+    LLM_MAX_TOKEN,
+    MAX_HISTORY_WINDOW_SIZE,
+    MODEL_NAME,
+)
 
 
 class TokenUtils:
     def __init__(self, model):
         self.model = model
+        self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
         self.max_tokens = LLM_MAX_TOKEN - 50
         self.history_window_size = MAX_HISTORY_WINDOW_SIZE - 50
-        self.tokenizer = model.tokenizer
 
     def trim_history_to_fit_tokens(self, conversation_history: list) -> list:
         """Trim the conversation history based on max tokens and window size."""

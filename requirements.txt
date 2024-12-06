@@ -25,3 +25,8 @@ llama_cpp_agent
 langchain-core>=0.3.15
 aioredis>=2.0.1
 redis>=5.2.0
+transformers>=4.46.1
+langchain-text-splitters>=0.3.2
+sentencepiece
+protobuf
+langchain-community>=0.3.4

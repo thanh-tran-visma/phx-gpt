@@ -1,19 +1,10 @@
-import os
 import logging
-from pathlib import Path
-from typing import Optional
-
-from langchain_core.callbacks import (
-    CallbackManager,
-    StreamingStdOutCallbackHandler,
-)
-from llama_cpp import Llama, LlamaTokenizer
-
-from app.config import MAX_HISTORY_WINDOW_SIZE
+from langchain_core.callbacks import StreamingStdOutCallbackHandler
+from langchain_huggingface import HuggingFaceEndpoint
+from app.config import GPT_ENDPOINT_URL
+from app.llm.blue_vi_assistant import BlueViGptAssistant
 from app.config.config_env import (
-    MODEL_NAME,
     HF_TOKEN,
-    GGUF_MODEL,
     LLM_MAX_TOKEN,
 )
 
@@ -22,8 +13,6 @@ class BlueViGptModel:
     def __init__(self):
         """Initialize BlueViGptModel with main model and embedding model."""
         try:
-            from app.llm.blue_vi_assistant import BlueViGptAssistant
-
             self.llm = self.load_model()
             self.assistant = BlueViGptAssistant(self.llm)
             logging.info("BlueViGptModel initialized successfully.")
@@ -32,77 +21,27 @@ class BlueViGptModel:
             raise
 
     @staticmethod
-    def find_gguf_file(model_cache_dir: str) -> Optional[str]:
-        """Search for the GGUF model file in the model cache directory."""
-        snapshot_path = Path(model_cache_dir)
+    def load_model():
+        """Load the HuggingFace endpoint model with debug information."""
         try:
-            for root, _, files in os.walk(snapshot_path):
-                for file in files:
-                    if file == GGUF_MODEL:
-                        logging.info(
-                            f"Found GGUF model at: {os.path.join(root, file)}"
-                        )
-                        return os.path.join(root, file)
+            callbacks = [StreamingStdOutCallbackHandler()]
+            logging.info("Connecting to Hugging Face endpoint.")
+            model = HuggingFaceEndpoint(
+                huggingfacehub_api_token=HF_TOKEN,
+                max_new_tokens=LLM_MAX_TOKEN,
+                callbacks=callbacks,
+                streaming=False,
+                stop=["<|eot_id|>"],
+                endpoint_url=GPT_ENDPOINT_URL,
+            )
+            logging.info("Model connected successfully. Model details:")
+            logging.info(model)
+            return model
         except Exception as e:
-            logging.error(f"Error while searching for GGUF model: {e}")
-        return None
-
-    @staticmethod
-    def load_model() -> Llama:
-        """Load the main Llama model, checking for local cache first."""
-        model_cache_dir = "./model_cache"
-        gguf_path = BlueViGptModel.find_gguf_file(model_cache_dir)
-
-        if not gguf_path or not os.path.exists(gguf_path):
-            logging.warning(
-                f"GGUF model not found locally. Attempting to load from {MODEL_NAME}."
-            )
-            try:
-                return Llama.from_pretrained(
-                    repo_id=MODEL_NAME,
-                    filename=GGUF_MODEL,
-                    cache_dir=model_cache_dir,
-                    token=HF_TOKEN,
-                    max_tokens=LLM_MAX_TOKEN,
-                    context_window_size=MAX_HISTORY_WINDOW_SIZE,
-                    n_ctx=1024,
-                    n_batch=1024,
-                    cpu_buffer_size=8192,
-                )
-            except Exception as e:
-                logging.error(f"Error loading model from Hugging Face: {e}")
-                raise
-
-        try:
-            callback_manager = CallbackManager(
-                [StreamingStdOutCallbackHandler()]
-            )
-            llm = Llama(
-                model_path=gguf_path,
-                callback_manager=callback_manager,
-                verbose=True,
-                max_tokens=LLM_MAX_TOKEN,
-                context_window_size=MAX_HISTORY_WINDOW_SIZE,
-                n_ctx=1024,
-                n_batch=1024,
-                cpu_buffer_size=8192,
-            )
-            logging.info("Model loaded successfully from local GGUF file.")
-            return llm
-        except Exception as e:
-            logging.error(
-                f"Failed to initialize Llama model with GGUF path: {e}"
-            )
-            raise
-
-    @property
-    def tokenizer(self) -> LlamaTokenizer:
-        """Return the Llama tokenizer for this model."""
-        try:
-            return LlamaTokenizer(self.llm)
-        except Exception as e:
-            logging.error(f"Failed to initialize tokenizer: {e}")
-            raise
+            logging.error(f"Error connecting to Hugging Face: {e}")
+            raise RuntimeError(
+                "Failed to connect to HuggingFaceEndpoint."
+            ) from e
 
     def close(self):
         """Close and clean up resources."""

@@ -32,6 +32,7 @@ class ChatService:
 
     async def handle_chat(self) -> dict:
         try:
+            logging.info('why')
             start_time = time.time()
             user = await self._get_or_create_user()
             conversation = await self._get_or_create_conversation(user.id)
