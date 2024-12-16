@@ -7,6 +7,7 @@ from app.config.config_env import (
     HF_TOKEN,
     LLM_MAX_TOKEN,
 )
+from app.llm.blue_vi_assistant import BlueViGptAssistant
 
 
 class BlueViGptModel:

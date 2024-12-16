@@ -7,7 +7,7 @@ from llama_cpp_agent.gbnf_grammar_generator.gbnf_grammar_from_pydantic_models im
     generate_gbnf_grammar_and_documentation,
 )
 
-from app.model.models import Message
+from app.model import Message
 from app.schemas import GptResponseSchema, PhxAppOperation, DecisionInstruction
 from app.types.enum.gpt import Role
 from app.types.enum.http_status import HTTPStatus
