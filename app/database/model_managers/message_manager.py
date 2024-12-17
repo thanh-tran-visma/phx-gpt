@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Optional, List
 
 from sqlalchemy.orm import Session
@@ -29,6 +30,7 @@ class MessageManager:
             content=content,
             message_type=message_type,
             role=role,
+            created_at=datetime.now(timezone.utc).isoformat(),
         )
         self.db.add(new_message)
         self.db.commit()
