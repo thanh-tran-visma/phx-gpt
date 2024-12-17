@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import redis.asyncio as redis
 import json
 from app.config import REDIS_HOST, REDIS_PORT
@@ -14,7 +16,16 @@ class RedisClient:
 
     async def set(self, key: str, value: dict, ttl: int = 3600):
         """Set a value in Redis with an expiration time."""
-        await self.client.setex(key, ttl, json.dumps(value))
+
+        # Function to convert datetime objects to ISO 8601 strings
+        def datetime_converter(o):
+            if isinstance(o, datetime):
+                return o.isoformat()
+
+        # Serialize the value using json.dumps, with custom handling for datetime objects
+        await self.client.setex(
+            key, ttl, json.dumps(value, default=datetime_converter)
+        )
 
     async def get(self, key: str):
         """Get a value from Redis."""

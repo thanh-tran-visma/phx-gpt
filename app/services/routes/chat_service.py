@@ -63,6 +63,12 @@ class ChatService:
             await self.cache_service.cache_message(
                 user_conversation.id, bot_response
             )
+            self.db_manager.create_message(
+                user_conversation.id,
+                bot_response.content,
+                MessageType.RESPONSE,
+                Role.ASSISTANT,
+            )
             # Calculate the time taken
             end_time = time.time()
             time_taken = end_time - start_time

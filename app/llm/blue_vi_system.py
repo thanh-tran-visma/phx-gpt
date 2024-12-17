@@ -2,7 +2,6 @@ import logging
 from langchain_core.callbacks import StreamingStdOutCallbackHandler
 from langchain_huggingface import HuggingFaceEndpoint
 from app.config import GPT_ENDPOINT_URL
-from app.llm.blue_vi_assistant import BlueViGptAssistant
 from app.config.config_env import (
     HF_TOKEN,
     LLM_MAX_TOKEN,
@@ -28,12 +27,15 @@ class BlueViGptModel:
             callbacks = [StreamingStdOutCallbackHandler()]
             logging.info("Connecting to Hugging Face endpoint.")
             model = HuggingFaceEndpoint(
+                endpoint_url=GPT_ENDPOINT_URL,
                 huggingfacehub_api_token=HF_TOKEN,
                 max_new_tokens=LLM_MAX_TOKEN,
                 callbacks=callbacks,
                 streaming=False,
-                stop=["<|eot_id|>"],
-                endpoint_url=GPT_ENDPOINT_URL,
+                model_kwargs={
+                    "stop": ["<|eot_id|>"],
+                    "response_format": {"type": "json_object"}
+                },
             )
             logging.info("Model connected successfully. Model details:")
             logging.info(model)

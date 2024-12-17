@@ -44,7 +44,7 @@ class CacheService:
             data = {
                 "id": conversation.id,
                 "conversation_order": conversation.conversation_order,
-                "created_at": conversation.created_at.isoformat(),
+                "created_at": conversation.created_at,
                 "end_at": (
                     conversation.end_at.isoformat()
                     if conversation.end_at
@@ -86,7 +86,7 @@ class CacheService:
             {
                 "id": msg.id,
                 "content": msg.content,
-                "created_at": msg.created_at.isoformat(),
+                "created_at": msg.created_at,
                 "user_conversation_id": msg.user_conversation_id,
             }
             for msg in conversation_history
@@ -114,7 +114,7 @@ class CacheService:
             new_message = {
                 "id": message.id,
                 "content": message.content,
-                "created_at": message.created_at.isoformat(),
+                "created_at": message.created_at,
                 "user_conversation_id": message.user_conversation_id,
             }
         elif isinstance(message, GptResponseSchema):
@@ -122,7 +122,7 @@ class CacheService:
             new_message = {
                 "role": None,
                 "content": message.content,
-                "created_at": datetime.now(timezone.utc).isoformat(),
+                "created_at": datetime.now(timezone.utc),
                 "user_conversation_id": user_conversation_id,
             }
         else:

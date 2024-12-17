@@ -140,7 +140,7 @@ class BlueViAgent:
             logging.info(conversation_history)
             # Identify the instruction type
             decision_instruction_object = (
-                await self.model.assistant.identify_instruction_type(
+                self.model.assistant.identify_instruction_type(
                     conversation_history
                 )
             )

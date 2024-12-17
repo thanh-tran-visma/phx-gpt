@@ -2,10 +2,10 @@ import json
 import logging
 from typing import List, Optional, Tuple
 
+from langchain_core.output_parsers import PydanticOutputParser, SimpleJsonOutputParser
+from langchain_core.prompts import PromptTemplate
 from langchain_huggingface import ChatHuggingFace
-from llama_cpp_agent.gbnf_grammar_generator.gbnf_grammar_from_pydantic_models import (
-    generate_gbnf_grammar_and_documentation,
-)
+from pydantic import ValidationError
 
 from app.model import Message
 from app.schemas import GptResponseSchema, PhxAppOperation, DecisionInstruction
@@ -28,7 +28,7 @@ class BlueViGptAssistant:
         self.token_utils = TokenUtils(self.llm)
         self.chat = ChatHuggingFace(llm=self.llm, verbose=True)
 
-    async def generate_user_response_with_custom_instruction(
+    def generate_user_response_with_custom_instruction(
         self,
         conversation_history: List[Tuple[str, str]],
         instruction: Optional[str] = None,
@@ -85,7 +85,7 @@ class BlueViGptAssistant:
             [f"{role}: {content}" for role, content in conversation_history]
         )
 
-    async def get_anonymized_message(
+    def get_anonymized_message(
         self, user_message: str
     ) -> GptResponseSchema:
         """Anonymize the user message."""
@@ -96,48 +96,65 @@ class BlueViGptAssistant:
         response = self.chat.invoke(prompt)
         return convert_blue_vi_response_to_schema(response.content)
 
-    async def identify_instruction_type(
-        self, conversation_history: List[Message]
+    def identify_instruction_type(
+            self, conversation_history: List[Message]
     ) -> DecisionInstruction:
         """Identify the type of instruction based on the conversation history and the prompt context."""
-        gbnf_grammar, documentation = generate_gbnf_grammar_and_documentation(
-            [DecisionInstruction]
+
+        # Initialize the PydanticOutputParser with the DecisionInstruction model
+        parser = PydanticOutputParser(pydantic_object=DecisionInstruction)
+
+        # Create the prompt template
+        prompt = PromptTemplate(
+            template="Identify the most suitable instruction type.\n{format_instructions}\n{query}\n",
+            input_variables=["query"],
+            partial_variables={"format_instructions": parser.get_format_instructions()},
         )
 
-        instruction = f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_INSTRUCTION_DECISION.value} \n{documentation}"
-        messages = self.create_prompt(
-            [(Role.SYSTEM.value, instruction)] + conversation_history
-        )
-        response = self.chat.invoke(messages)
+        logging.info('Prompt in identify_instruction_type:')
+        logging.info(prompt)
 
-        result = convert_blue_vi_response_to_schema(response.content)
-        logging.info('result in identify_instruction_type')
-        logging.info(result)
+        # Initialize the SimpleJsonOutputParser
+        json_parser = SimpleJsonOutputParser()
 
-        if not result.content:
-            return DecisionInstruction()
+        # Compose the pipeline: Prompt -> Model -> JSON Parser
+        prompt_and_model = prompt | self.chat | json_parser
+
         try:
-            data: DecisionInstruction = json.loads(result.content)
-        except json.JSONDecodeError as e:
-            logging.error(
-                f"Error decoding JSON: {e}. Content: {result.content}"
-            )
-            return DecisionInstruction()
+            # Generate the output by invoking the model with the conversation history
+            output = prompt_and_model.invoke({"query": f"{conversation_history}"})
 
-        return data if data else DecisionInstruction()
+            logging.info('Raw output in identify_instruction_type:')
+            logging.info(output)
 
-    async def handle_phx_operation(
+            # Parse the output using PydanticOutputParser
+            parsed_result = parser.parse(output)
+
+            # Log parsed results
+            logging.info('Parsed result in identify_instruction_type:')
+            logging.info(parsed_result)
+
+            return parsed_result
+
+        except ValidationError as ve:
+            logging.error(f"Validation error while parsing output: {ve}")
+        except json.JSONDecodeError as jde:
+            logging.error(f"JSON decode error: {jde}")
+        except Exception as e:
+            logging.error(f"An unexpected error occurred: {e}")
+
+        # Fallback to a default DecisionInstruction object if an error occurs
+        return DecisionInstruction()
+
+
+    def handle_phx_operation(
         self, conversation_history: List[Tuple[str, str]], crud: CRUD
     ) -> PhxAppOperation:
         """Generates an operation schema based on the user's conversation history and model response."""
         # Log crud operation
         logging.info('crud in handle_phx_operation')
         logging.info(crud)
-
-        gbnf_grammar, documentation = generate_gbnf_grammar_and_documentation(
-            [PhxAppOperation]
-        )
-        instruction = f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_OPERATION_PROCESS.value}: \n\n{documentation}"
+        instruction = f"{BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_OPERATION_PROCESS.value}"
         messages = self.create_prompt(
             [(Role.SYSTEM.value, instruction)] + conversation_history
         )
