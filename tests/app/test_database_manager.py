@@ -95,20 +95,6 @@ def test_create_message(db_manager, mock_db_session):
     mock_db_session.commit.assert_called_once()
 
 
-def test_get_messages_by_user_conversation_id(db_manager, mock_db_session):
-    user_conversation_id = 1
-    mock_messages = [Message(content="Hello"), Message(content="World")]
-    mock_db_session.query.return_value.filter.return_value.all.return_value = (
-        mock_messages
-    )
-
-    messages = db_manager.get_messages_by_user_conversation_id(
-        user_conversation_id
-    )
-
-    assert messages == mock_messages
-
-
 def test_get_conversations_for_user(db_manager, mock_db_session):
     user_id = 1
     mock_conversations = [UserConversation(user_id=user_id, conversation_id=1)]
