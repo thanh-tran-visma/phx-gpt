@@ -10,9 +10,9 @@ class NewConversationService:
         self.db_manager = DatabaseManager(db)
         self.blue_vi_gpt_model = BlueViGptModel()
 
-    def handle_new_conversation(self, uuid: str):
+    def handle_new_conversation(self, uuid, user_name):
         # Create and/or retrieve the user
-        user = self.db_manager.create_user_if_not_exists(uuid)
+        user = self.db_manager.create_user_if_not_exists(uuid, user_name)
         if user is None:
             return {
                 "status": HTTPStatus.NOT_FOUND.value,

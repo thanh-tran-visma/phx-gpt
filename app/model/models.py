@@ -23,6 +23,7 @@ class User(Base):
         nullable=False,
         default=None,
     )
+    user_name = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
 
     # Relationship to UserConversation
