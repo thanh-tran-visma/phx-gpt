@@ -1,6 +1,5 @@
 uvicorn[standard]
 fastapi[all] ~= 0.115.2
-llama-cpp-python
 python-dotenv ~= 1.0.1
 pytest ~= 8.3.3
 datasets
@@ -21,13 +20,9 @@ black[jupyter]
 sqlalchemy-stubs
 pytest-asyncio
 requests>=2.32.3
-llama_cpp_agent
-langchain-core>=0.3.15
 aioredis>=2.0.1
 redis>=5.2.0
 transformers>=4.46.1
-langchain-text-splitters>=0.3.2
 sentencepiece
 protobuf
-langchain-community>=0.3.4
-langchain>=0.3.7
+openai>=1.55.0

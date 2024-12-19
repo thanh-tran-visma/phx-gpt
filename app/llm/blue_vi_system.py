@@ -1,11 +1,7 @@
 import logging
-from langchain_core.callbacks import StreamingStdOutCallbackHandler
-from langchain_huggingface import HuggingFaceEndpoint
+from openai import OpenAI
 from app.config import GPT_ENDPOINT_URL
-from app.config.config_env import (
-    HF_TOKEN,
-    LLM_MAX_TOKEN,
-)
+from app.config.config_env import HF_TOKEN, LLM_MAX_TOKEN
 from app.llm.blue_vi_assistant import BlueViGptAssistant
 
 
@@ -22,35 +18,35 @@ class BlueViGptModel:
 
     @staticmethod
     def load_model():
-        """Load the HuggingFace endpoint model with debug information."""
         try:
-            callbacks = [StreamingStdOutCallbackHandler()]
-            logging.info("Connecting to Hugging Face endpoint.")
-            model = HuggingFaceEndpoint(
-                endpoint_url=GPT_ENDPOINT_URL,
-                huggingfacehub_api_token=HF_TOKEN,
-                max_new_tokens=LLM_MAX_TOKEN,
-                callbacks=callbacks,
-                streaming=False,
-                model_kwargs={
-                    "stop": ["<|eot_id|>"],
-                    "response_format": {"type": "json_object"}
-                },
+            logging.info(
+                "Connecting to Hugging Face endpoint using OpenAI client."
             )
-            logging.info("Model connected successfully. Model details:")
-            logging.info(model)
-            return model
+            client = OpenAI(base_url=GPT_ENDPOINT_URL, api_key=HF_TOKEN)
+            logging.info(
+                "OpenAI client connected successfully. Configuring model settings."
+            )
+
+            return {
+                "client": client,
+                "model": "tgi",
+                "max_new_tokens": LLM_MAX_TOKEN,
+                "stop": ["<|eot_id|>"],
+                "response_format": "json",
+            }
         except Exception as e:
-            logging.error(f"Error connecting to Hugging Face: {e}")
+            logging.error(
+                f"Error connecting to Hugging Face using OpenAI client: {e}"
+            )
             raise RuntimeError(
-                "Failed to connect to HuggingFaceEndpoint."
+                "Failed to connect to the Hugging Face endpoint."
             ) from e
 
-    def close(self):
+    @staticmethod
+    def close():
         """Close and clean up resources."""
-        if hasattr(self.llm, "close"):
-            try:
-                self.llm.close()
-                logging.info("LLM resources closed successfully.")
-            except Exception as e:
-                logging.error(f"Error during LLM resource cleanup: {e}")
+        try:
+            logging.info("Closing OpenAI client resources.")
+            # No specific close method for OpenAI client, but placeholder for any resource cleanup.
+        except Exception as e:
+            logging.error(f"Error during OpenAI client resource cleanup: {e}")
