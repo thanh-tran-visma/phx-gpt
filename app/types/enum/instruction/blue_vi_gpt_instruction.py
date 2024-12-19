@@ -73,5 +73,5 @@ class BlueViInstructionEnum(str, Enum):
         "- **How**: Does it contain contact details like phone numbers or email addresses?\n\n"
         "Flag personal data only if identifiable details are included. Return True for identifiable information, False otherwise. "
         "Be cautious, as data may be inaccurate or incomplete.\n\n"
-        "Only analyze the last user message and note any possible inaccuracies."
+        "Analyze only the last user message and note any possible inaccuracies."
     )

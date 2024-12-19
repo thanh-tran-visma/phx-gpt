@@ -168,6 +168,8 @@ class BlueViGptAssistant:
             }
             for sender, content in conversation_history
         ]
+        logging.info('messages in _structured_model_response')
+        logging.info(messages)
         client = self.llm["client"]
         response = client.beta.chat.completions.parse(
             model=self.llm["model"],

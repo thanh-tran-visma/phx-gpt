@@ -12,7 +12,7 @@ from app.types.enum.gpt_response_handling import (
 from app.types.enum.instruction import InstructionList, CRUD
 
 from app.types.enum.http_status import HTTPStatus
-from app.utils import convert_conversation_history_to_tuples
+from app.utils import convert_conversation_history_to_tuples, TokenUtils
 
 
 class BlueViAgent:
@@ -20,6 +20,7 @@ class BlueViAgent:
         self, model, db_manager: DatabaseManager, cache_service: CacheService
     ):
         self.model = model
+        self.token_utils = TokenUtils(self.model)
         self.db_manager = db_manager
         self.cache_service = cache_service
         self.history_window_size = MAX_HISTORY_WINDOW_SIZE
@@ -35,9 +36,14 @@ class BlueViAgent:
             message.user_conversation_id
         )
         if cached_history:
+            logging.info("Fetched conversation history from Redis cache.")
             conversation_history_list = convert_conversation_history_to_tuples(
                 cached_history
             )
+            for role, content in conversation_history_list:
+                logging.info(
+                    f"Mapped Message -> Role: {role}, Content: {content}"
+                )
             return conversation_history_list
         else:
             # If not in cache, get from the database and store in Redis
@@ -46,14 +52,21 @@ class BlueViAgent:
                     message.user_conversation_id
                 )
             )
+            logging.info("Fetched conversation history from DB.")
             conversation_history_list = convert_conversation_history_to_tuples(
                 conversation_history
             )
+            for role, content in conversation_history_list:
+                logging.info(f"Message -> Role: {role}, Content: {content}")
+
             # Cache the fetched history for future use
             await self.cache_service.cache_conversation_history(
                 message.user_conversation_id, conversation_history
             )
-            return conversation_history_list
+            logging.info("Fetched conversation history from DB and cached it.")
+            return self.token_utils.trim_history_to_fit_tokens(
+                conversation_history_list
+            )
 
     def handle_operation_instruction(
         self,
@@ -122,6 +135,8 @@ class BlueViAgent:
         """Main entry point for handling a conversation."""
         try:
             conversation_history = await self.get_conversation_history(message)
+            logging.info('conversation_history in handle_conversation')
+            logging.info(conversation_history)
             decision_instruction_object = (
                 self.model.assistant.identify_instruction_type(
                     conversation_history

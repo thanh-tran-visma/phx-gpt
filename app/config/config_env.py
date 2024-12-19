@@ -35,7 +35,7 @@ class EnvConfig:
 
 HF_TOKEN = EnvConfig.get("HF_TOKEN")
 MODEL_NAME = EnvConfig.get("MODEL_NAME")
-GGUF_MODEL = EnvConfig.get("GGUF_MODEL")
+
 BLUEVI_GPT = EnvConfig.get("BLUEVI_GPT")
 BEARER_TOKEN = EnvConfig.get("BEARER_TOKEN")
 API_URL = EnvConfig.get("API_URL")

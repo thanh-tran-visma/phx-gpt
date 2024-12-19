@@ -1,8 +1,6 @@
 from .config_env import (
     HF_TOKEN,
     HF_TOKEN,
-    MODEL_NAME,
-    GGUF_MODEL,
     LLM_MAX_TOKEN,
     MAX_HISTORY_WINDOW_SIZE,
     BLUEVI_GPT,
@@ -16,4 +14,5 @@ from .config_env import (
     REDIS_HOST,
     REDIS_PORT,
     GPT_ENDPOINT_URL,
+    MODEL_NAME,
 )
