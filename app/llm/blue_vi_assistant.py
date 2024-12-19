@@ -1,6 +1,7 @@
 import logging
 from typing import List, Optional, Tuple, Type
 from pydantic import BaseModel
+from app.model import Message
 from app.schemas import GptResponseSchema, PhxAppOperation, DecisionInstruction
 from app.types.enum.gpt import Role
 from app.types.enum.http_status import HTTPStatus
@@ -8,7 +9,10 @@ from app.types.enum.instruction import CRUD
 from app.types.enum.instruction.blue_vi_gpt_instruction import (
     BlueViInstructionEnum,
 )
-from app.utils import convert_blue_vi_response_to_schema, TokenUtils
+from app.utils import (
+    convert_blue_vi_response_to_schema,
+    TokenUtils,
+)
 
 
 class BlueViGptAssistant:
@@ -26,24 +30,29 @@ class BlueViGptAssistant:
         try:
             system_instruction = (
                 instruction
-                or BlueViInstructionEnum.BLUE_VI_SYSTEM_DEFAULT_INSTRUCTION.value
+                if instruction
+                else BlueViInstructionEnum.BLUE_VI_SYSTEM_DEFAULT_INSTRUCTION.value
             )
+            if isinstance(system_instruction, Message):
+                system_instruction = system_instruction.content
             if isinstance(conversation_history, dict):
-                conversation_history = (
-                    self._prepare_conversation_history_from_dict(
-                        conversation_history
-                    )
-                )
-
+                role = Role.USER.value
+                content_list = conversation_history['content']
+                conversation_history = [
+                    (role, str(content)) for content in content_list
+                ]
+            # Generate the response using the common method
             return self._create_response(
                 conversation_history, system_instruction
             )
+
         except Exception as e:
             logging.error(
                 f"Unexpected error while generating chat response in assistant: {e}"
             )
-            return self._handle_error_response(
-                "Sorry, something went wrong while generating a response."
+            return GptResponseSchema(
+                status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
+                content="Sorry, something went wrong while generating a response.",
             )
 
     def get_anonymized_message(self, user_message: str) -> GptResponseSchema:
@@ -53,10 +62,12 @@ class BlueViGptAssistant:
                 [Role.USER.value, user_message],
                 BlueViInstructionEnum.BLUE_VI_SYSTEM_ANONYMIZE_DATA.value,
             )
+
         except Exception as e:
             logging.error(f"Error anonymizing message: {e}")
-            return self._handle_error_response(
-                "Unable to anonymize the message."
+            return GptResponseSchema(
+                status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
+                content="Unable to anonymize the message.",
             )
 
     def identify_instruction_type(
@@ -72,32 +83,71 @@ class BlueViGptAssistant:
     def handle_phx_operation(
         self, conversation_history: List[Tuple[str, str]], crud: CRUD
     ) -> BaseModel:
+        logging.info('crud in handle_phx_operation')
+        logging.info(crud)
         """Generate an operation schema based on the user's conversation history and model response."""
-        logging.info(f'CRUD operation in handle_phx_operation: {crud}')
-        return self._structured_model_response(
+        result = self._structured_model_response(
             conversation_history,
             BlueViInstructionEnum.BLUE_VI_SYSTEM_HANDLE_OPERATION_PROCESS.value,
             PhxAppOperation,
         )
+        return result
 
     def _create_response(
         self, conversation_history: List[Tuple[str, str]], instruction: str
     ) -> GptResponseSchema:
         """Generate a response from the model and return a GptResponseSchema."""
         try:
-            messages = self._prepare_messages(
-                conversation_history, instruction
-            )
+            messages = [
+                {"role": Role.SYSTEM.value, "content": instruction}
+            ] + [
+                {
+                    "role": (
+                        Role.USER.value
+                        if sender == Role.USER.value
+                        else Role.ASSISTANT.value
+                    ),
+                    "content": content,
+                }
+                for sender, content in conversation_history
+            ]
+
+            # Request the model's response
             client = self.llm["client"]
             response = client.chat.completions.create(
-                model=self.llm["model"], messages=messages
+                model=self.llm["model"],
+                messages=messages,
             )
 
-            return self._process_model_response(response)
+            # Validate and extract response
+            choice = next(
+                (
+                    c
+                    for c in response.choices
+                    if hasattr(c, 'message') and c.message
+                ),
+                None,
+            )
+            if choice and choice.message.content:
+                return convert_blue_vi_response_to_schema(
+                    choice.message.content
+                )
+
+            # Handle missing or invalid response
+            error_msg = (
+                "Error: Invalid choice structure or empty response text."
+            )
+            logging.error(error_msg)
+            return GptResponseSchema(
+                status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
+                content=error_msg,
+            )
+
         except Exception as e:
             logging.error(f"Error generating response: {e}")
-            return self._handle_error_response(
-                "Error occurred while generating response."
+            return GptResponseSchema(
+                status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
+                content="Error occurred while generating response.",
             )
 
     def _structured_model_response(
@@ -107,21 +157,7 @@ class BlueViGptAssistant:
         response_format: Type[BaseModel],
     ) -> BaseModel:
         """Helper method to generate a response from the model and return a dynamically structured response."""
-        messages = self._prepare_messages(conversation_history, instruction)
-        client = self.llm["client"]
-        response = client.beta.chat.completions.parse(
-            model=self.llm["model"],
-            messages=messages,
-            response_format=response_format,
-        )
-        return response.choices[0].message.parsed
-
-    @staticmethod
-    def _prepare_messages(
-        conversation_history: List[Tuple[str, str]], instruction: str
-    ) -> List[dict]:
-        """Prepare the messages list for the model request."""
-        return [{"role": Role.SYSTEM.value, "content": instruction}] + [
+        messages = [{"role": Role.SYSTEM.value, "content": instruction}] + [
             {
                 "role": (
                     Role.USER.value
@@ -132,37 +168,12 @@ class BlueViGptAssistant:
             }
             for sender, content in conversation_history
         ]
-
-    @staticmethod
-    def _prepare_conversation_history_from_dict(
-        conversation_history: dict,
-    ) -> List[Tuple[str, str]]:
-        """Prepare conversation history from dictionary structure."""
-        role = Role.USER.value
-        content_list = conversation_history.get('content', [])
-        return [(role, str(content)) for content in content_list]
-
-    def _process_model_response(self, response) -> GptResponseSchema:
-        """Process the model's response and return it as a GptResponseSchema."""
-        choice = next(
-            (
-                c
-                for c in response.choices
-                if hasattr(c, 'message') and c.message
-            ),
-            None,
+        client = self.llm["client"]
+        response = client.beta.chat.completions.parse(
+            model=self.llm["model"],
+            messages=messages,
+            response_format=response_format,
         )
-        if choice and choice.message.content:
-            return convert_blue_vi_response_to_schema(choice.message.content)
 
-        error_msg = "Error: Invalid choice structure or empty response text."
-        logging.error(error_msg)
-        return self._handle_error_response(error_msg)
-
-    @staticmethod
-    def _handle_error_response(error_msg: str) -> GptResponseSchema:
-        """Return a standardized error response."""
-        return GptResponseSchema(
-            status=HTTPStatus.INTERNAL_SERVER_ERROR.value,
-            content=error_msg,
-        )
+        structured_result = response.choices[0].message.parsed
+        return structured_result

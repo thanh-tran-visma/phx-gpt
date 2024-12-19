@@ -127,6 +127,8 @@ class BlueViAgent:
                     conversation_history
                 )
             )
+            logging.info('decision_instruction_object')
+            logging.info(decision_instruction_object)
             if decision_instruction_object.personal_data:
                 self.db_manager.flag_message(message.id)
             if (

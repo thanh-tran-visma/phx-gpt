@@ -51,7 +51,6 @@ You will need a Hugging Face access token to run this project. You can get your 
     ```bash
     alembic revision --autogenerate -m "init-db"
     ```
-   
    * Run migration
    ```bash
     alembic upgrade head
