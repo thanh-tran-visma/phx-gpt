@@ -210,25 +210,23 @@ class BlueViGptAssistant:
             )
 
     def _structured_model_response(
-            self,
-            conversation_history: List[Tuple[str, str]],
-            instruction: str,
-            response_format: Type[BaseModel]
+        self,
+        conversation_history: List[Tuple[str, str]],
+        instruction: str,
+        response_format: Type[BaseModel],
     ) -> BaseModel:
         """Helper method to generate a response from the model and return a dynamically structured response."""
-        messages = [
-                       {"role": Role.SYSTEM.value, "content": instruction}
-                   ] + [
-                       {
-                           "role": (
-                               Role.USER.value
-                               if sender == Role.USER.value
-                               else Role.ASSISTANT.value
-                           ),
-                           "content": content,
-                       }
-                       for sender, content in conversation_history
-                   ]
+        messages = [{"role": Role.SYSTEM.value, "content": instruction}] + [
+            {
+                "role": (
+                    Role.USER.value
+                    if sender == Role.USER.value
+                    else Role.ASSISTANT.value
+                ),
+                "content": content,
+            }
+            for sender, content in conversation_history
+        ]
 
         client = self.llm["client"]
         response = client.beta.chat.completions.parse(
@@ -237,10 +235,4 @@ class BlueViGptAssistant:
             stop=self.llm["stop"],
             response_format=response_format,
         )
-
-        result = response.choices[0].message
-        logging.info('result in _structured_model_response')
-        logging.info(result)
-        return result
-
-
+        return response_format(**response.choices[0].message)

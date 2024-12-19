@@ -119,7 +119,7 @@ class BlueViAgent:
         try:
             logging.info('conversation_history in handle_general_instruction')
             logging.info(conversation_history)
-            return await self.model.assistant.generate_user_response_with_custom_instruction(
+            return self.model.assistant.generate_user_response_with_custom_instruction(
                 conversation_history=conversation_history
             )
         except Exception as error:
