@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.api.router import router
-from app.llm.llm_model import BlueViGptModel
+from app.llm.blue_vi_system import BlueViGptModel
 from app.middleware.middleware import CustomMiddleware
 from contextlib import asynccontextmanager
 
@@ -12,7 +12,7 @@ async def lifespan(app: FastAPI):
     blue_vi_gpt = BlueViGptModel()
     app.state.model = blue_vi_gpt
     yield
-    # Shutdown event (currently no specific shutdown actions)
+    blue_vi_gpt.close()
     pass
 
 

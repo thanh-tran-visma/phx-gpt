@@ -5,6 +5,8 @@ from sqlalchemy import (
     TIMESTAMP,
     Enum,
     Text,
+    Boolean,
+    String,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -15,6 +17,14 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    user_name = Column(Text, nullable=False)
+    uuid = Column(
+        String(36),
+        unique=True,
+        nullable=False,
+        default=None,
+    )
+    user_name = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP, default=func.current_timestamp())
 
     # Relationship to UserConversation
@@ -27,13 +37,13 @@ class UserConversation(Base):
     __tablename__ = 'user_conversations'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+
     user_id = Column(
         Integer, ForeignKey('users.id'), nullable=False
     )  # ForeignKey to User
     conversation_id = Column(
         Integer, ForeignKey('conversations.id'), nullable=False
     )  # ForeignKey to Conversation
-    conversation_order = Column(Integer)
 
     user = relationship("User", back_populates="user_conversations")
     conversation = relationship(
@@ -71,3 +81,5 @@ class Message(Base):
     user_conversation = relationship(
         'UserConversation', back_populates='messages'
     )
+
+    sensitive_data_flag = Column(Boolean, nullable=False, default=False)

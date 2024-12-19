@@ -35,10 +35,16 @@ class EnvConfig:
 
 HF_TOKEN = EnvConfig.get("HF_TOKEN")
 MODEL_NAME = EnvConfig.get("MODEL_NAME")
-GGUF_MODEL = EnvConfig.get("GGUF_MODEL")
+
 BLUEVI_GPT = EnvConfig.get("BLUEVI_GPT")
 BEARER_TOKEN = EnvConfig.get("BEARER_TOKEN")
 API_URL = EnvConfig.get("API_URL")
+GPT_ENDPOINT_URL = EnvConfig.get("GPT_ENDPOINT_URL")
+LLM_MAX_TOKEN = EnvConfig.get_int("LLM_MAX_TOKEN", 2048)
+MAX_HISTORY_WINDOW_SIZE = EnvConfig.get_int("MAX_HISTORY_WINDOW_SIZE", 1024)
+
+REDIS_HOST = EnvConfig.get("REDIS_HOST")
+REDIS_PORT = EnvConfig.get_int("REDIS_PORT")
 
 DB_HOST = EnvConfig.get("DB_HOST", "localhost")
 DB_PORT = EnvConfig.get_int("DB_PORT", 3306)

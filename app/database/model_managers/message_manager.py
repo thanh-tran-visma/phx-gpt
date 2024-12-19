@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Optional, List
 
 from sqlalchemy.orm import Session
@@ -29,6 +30,7 @@ class MessageManager:
             content=content,
             message_type=message_type,
             role=role,
+            created_at=datetime.now(timezone.utc).isoformat(),
         )
         self.db.add(new_message)
         self.db.commit()
@@ -41,6 +43,8 @@ class MessageManager:
         return (
             self.db.query(Message)
             .filter(Message.user_conversation_id == user_conversation_id)
+            .order_by(Message.created_at.desc())
+            .limit(10)
             .all()
         )
 
@@ -53,3 +57,36 @@ class MessageManager:
             .filter(UserConversation.conversation_id == conversation_id)
             .all()
         )
+
+    def get_sensitive_messages(
+        self, user_conversation_id: int
+    ) -> List[Message]:
+        return (
+            self.db.query(Message)
+            .filter(Message.user_conversation_id == user_conversation_id)
+            .filter(Message.sensitive_data_flag)
+            .all()
+        )
+
+    def update_message_content(self, message_id: int, content: str):
+        message = (
+            self.db.query(Message).filter(Message.id == message_id).first()
+        )
+        if message:
+            message.content = content
+            message.sensitive_data_flag = False
+            self.db.commit()
+            self.db.refresh(message)
+            return None
+
+    def flag_message(self, message_id: int) -> Optional[Message]:
+        message = (
+            self.db.query(Message).filter(Message.id == message_id).first()
+        )
+        if message:
+            message.sensitive_data_flag = True
+            self.db.commit()
+            self.db.refresh(message)
+            return message
+        else:
+            return None

@@ -30,12 +30,11 @@ class UserConversationManager:
         )
 
     def create_user_conversation(
-        self, user_id: int, conversation_id: int, conversation_order: int
+        self, user_id: int, conversation_id: int
     ) -> Optional[UserConversation]:
         user_conversation = UserConversation(
             user_id=user_id,
             conversation_id=conversation_id,
-            conversation_order=conversation_order,
         )
         self.db.add(user_conversation)
         self.db.commit()

@@ -2,7 +2,7 @@ from fastapi import Request, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
 import logging
-from app.types.enum import HTTPStatus
+from app.types.enum.http_status import HTTPStatus
 from app.auth.auth import Auth
 from typing import Callable
 

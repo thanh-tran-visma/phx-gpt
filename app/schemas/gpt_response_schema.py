@@ -1,8 +1,16 @@
-from typing import Optional
+from typing import Optional, Dict, Any
+
 from pydantic import BaseModel
+
+from app.types.enum.instruction import InstructionList
 
 
 class GptResponseSchema(BaseModel):
-    content: str
-    tokens_used: Optional[int] = None
-    prompt_length: Optional[int] = None
+    status: int
+    content: str = "No response generated."
+    dynamic_json: Optional[Dict[str, Any]] = None
+    time_taken: Optional[float] = 0.0
+    operationType: Optional[str] = InstructionList.DEFAULT.value
+
+    class Config:
+        extra = 'allow'

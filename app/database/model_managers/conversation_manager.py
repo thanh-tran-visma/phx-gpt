@@ -1,14 +1,14 @@
 from typing import Optional
-
 from sqlalchemy.orm import Session
-from app.model import Conversation
+from sqlalchemy.sql import func
+from app.model import Conversation, UserConversation
 
 
 class ConversationManager:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_conversation_by_order(
+    def get_conversation_by_user_id_and_conversation_order(
         self, user_id: int, conversation_order: int
     ) -> Optional[Conversation]:
         return (
@@ -21,7 +21,7 @@ class ConversationManager:
         )
 
     def get_or_create_conversation(
-        self, user_id: int, conversation_order: int
+        self, user_id: int, conversation_order: Optional[int]
     ) -> Optional[Conversation]:
         conversation = (
             self.db.query(Conversation)
@@ -35,8 +35,6 @@ class ConversationManager:
             conversation = self.create_conversation(user_id)
 
         # Create UserConversation if it doesn't exist
-        from app.model import UserConversation
-
         user_conversation = (
             self.db.query(UserConversation)
             .filter(
@@ -49,7 +47,6 @@ class ConversationManager:
             user_conversation = UserConversation(
                 user_id=user_id,
                 conversation_id=conversation.id,
-                conversation_order=conversation_order,
             )
             self.db.add(user_conversation)
             self.db.commit()
@@ -72,3 +69,38 @@ class ConversationManager:
         self.db.commit()
 
         return new_conversation
+
+    def end_conversation(self, conversation_id: int) -> bool:
+        conversation = (
+            self.db.query(Conversation)
+            .filter(Conversation.id == conversation_id)
+            .first()
+        )
+        if not conversation:
+            return False
+        conversation.end_at = func.current_timestamp()
+        self.db.commit()
+        return True
+
+    def get_conversation_by_user_id(self, user_id):
+        return (
+            self.db.query(Conversation)
+            .filter(Conversation.user_id == user_id)
+            .all()
+        )
+
+    def get_newest_conversation(
+        self, user_id: int, conversation_order: Optional[int] = None
+    ) -> Optional[Conversation]:
+        query = self.db.query(Conversation).filter(
+            Conversation.user_id == user_id
+        )
+
+        if conversation_order is not None:
+            query = query.filter(
+                Conversation.conversation_order == conversation_order
+            )
+        else:
+            query = query.order_by(Conversation.conversation_order.desc())
+
+        return query.first()

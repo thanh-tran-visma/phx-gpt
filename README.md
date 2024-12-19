@@ -6,8 +6,7 @@ This project involves training or fine-tuning the **Llama-3.1-8B** model.
 
 ## Hugging Face Model
 
-- **Inference Model**: [Llama3.1-8B-blueVi-GPT](https://huggingface.co/ThanhTranVisma/Llama3.1-8B-blueVi-GPT)
-- **Lora**: [Llama3.1-8B-blueVi-GPT-lora](https://huggingface.co/ThanhTranVisma/Llama3.1-8B-blueVi-GPT-lora)
+- **Model**: [Llama3.1-8B-blueVi-GPT](https://huggingface.co/ThanhTranVisma/Llama-3.1-8B-blueVi)
 
 ## Hugging Face Access Token Required
 
@@ -44,11 +43,14 @@ You will need a Hugging Face access token to run this project. You can get your 
     ```
    
 6. **Migration**:
+    * Set the PYTHONPATH to the project root
+    ```bash
+    export PYTHONPATH=$(pwd)
+    ```
     * Create a new database migration script
     ```bash
     alembic revision --autogenerate -m "init-db"
     ```
-   
    * Run migration
    ```bash
     alembic upgrade head
