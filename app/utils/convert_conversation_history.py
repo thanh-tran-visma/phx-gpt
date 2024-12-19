@@ -1,3 +1,4 @@
+import logging
 from typing import List
 from app.model import Message
 from app.types.enum.gpt import Role
@@ -11,6 +12,11 @@ def convert_conversation_history_to_tuples(
     sorted_history = sorted(
         conversation_history, key=lambda msg: msg.created_at
     )
+    for message in sorted_history:
+        logging.info(
+            f"Message ID: {message.id}, Created At: {message.created_at}, Role: {message.role}, Content: {message.content}"
+        )
+
     return [
         (Role.USER if message.id else Role.ASSISTANT, message.content)
         for message in sorted_history

@@ -38,9 +38,9 @@ def test_chat_endpoint_creates_user_and_conversation(mock_client):
 
     # Define the user prompt data
     user_prompt_data = {
-        "uuid": "cfb6e466-8366-4f88-bdf9-3ae6984c0721",
+        "user_id": 1,
         "prompt": "Hello",
-        "conversation_order": 1,
+        "conversation_order": None,
     }
 
     # Mocking the response of the chat endpoint
@@ -65,9 +65,9 @@ def test_chat_endpoint_internal_server_error(mock_client):
     """Test chat endpoint for handling internal server errors."""
 
     user_prompt_data = {
-        "uuid": "cfb6e466-8366-4f88-bdf9-3ae6984c0721",
+        "user_id": 1,
         "prompt": "Hello",
-        "conversation_order": 1,
+        "conversation_order": None,
     }
 
     # Mocking the response of the chat endpoint to simulate an error
@@ -86,9 +86,9 @@ def test_chat_endpoint_invalid_user(mock_client):
     """Test chat endpoint for invalid user input."""
 
     user_prompt_data = {
-        "uuid": None,
+        "user_id": None,  # Invalid user ID
         "prompt": "Hello",
-        "conversation_order": 1,
+        "conversation_order": None,
     }
 
     # Mocking the validation to simulate a bad request
@@ -106,10 +106,7 @@ def test_chat_endpoint_invalid_user(mock_client):
 def test_chat_endpoint_missing_prompt(mock_client):
     """Test chat endpoint for missing prompt in request."""
 
-    user_prompt_data = {
-        "uuid": "cfb6e466-8366-4f88-bdf9-3ae6984c0721",
-        "conversation_order": 1,
-    }
+    user_prompt_data = {"user_id": 1, "conversation_order": None}
 
     # Mocking the validation to simulate a bad request
     mock_client.post.return_value = MagicMock(
@@ -127,9 +124,9 @@ def test_chat_endpoint_successful_user_creation(mock_client):
     """Test chat endpoint for successfully creating a user."""
 
     user_prompt_data = {
-        "uuid": "cfb6e466-8366-4f88-bdf9-3ae6984c0721",
+        "user_id": 1,
         "prompt": "Hello",
-        "conversation_order": 1,
+        "conversation_order": None,
     }
 
     # Mocking the response of user creation
