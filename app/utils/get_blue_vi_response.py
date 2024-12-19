@@ -5,7 +5,7 @@ from starlette.concurrency import run_in_threadpool
 from app.types.enum.gpt import Role
 
 
-def get_operation_format(
+def format_conversation_history_into_llama_expected_structure(
     conversation_history: List[Tuple[str, str]]
 ) -> List[dict]:
     """
@@ -63,12 +63,9 @@ async def get_blue_vi_response(
     """
     try:
         # Format the conversation history
-        messages = get_operation_format(conversation_history)
-        # Ensure the formatted messages meet the model's requirements
-        if not messages:
-            logging.error("No valid messages to process")
-            return {}
-
+        messages = format_conversation_history_into_llama_expected_structure(
+            conversation_history
+        )
         # Generate response using Llama in a thread pool
         logging.info("Generating response with Llama")
         response = await run_in_threadpool(

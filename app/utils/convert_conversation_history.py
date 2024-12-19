@@ -1,5 +1,6 @@
 from typing import List
 from app.model import Message
+from app.types.enum.gpt import Role
 
 
 def convert_conversation_history_to_tuples(
@@ -11,6 +12,6 @@ def convert_conversation_history_to_tuples(
         conversation_history, key=lambda msg: msg.created_at
     )
     return [
-        ("user" if message.id else "assistant", message.content)
+        (Role.USER if message.id else Role.ASSISTANT, message.content)
         for message in sorted_history
     ]

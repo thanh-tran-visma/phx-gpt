@@ -43,6 +43,10 @@ You will need a Hugging Face access token to run this project. You can get your 
     ```
    
 6. **Migration**:
+    * Set the PYTHONPATH to the project root
+    ```bash
+    export PYTHONPATH=$(pwd)
+    ```
     * Create a new database migration script
     ```bash
     alembic revision --autogenerate -m "init-db"
