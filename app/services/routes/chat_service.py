@@ -40,7 +40,7 @@ class ChatService:
                 user.id, conversation.id
             )
 
-            # Cache the user's prompt
+            # Create new user message in db
             user_message = self.db_manager.create_message(
                 user_conversation.id,
                 self.user.prompt,
@@ -52,6 +52,7 @@ class ChatService:
                     HTTPStatus.INTERNAL_SERVER_ERROR,
                     "Failed to store user message.",
                 )
+            # Cache it
             await self.cache_service.cache_message(
                 user_conversation.id, user_message
             )
@@ -60,6 +61,14 @@ class ChatService:
             bot_response = await self.agent.handle_conversation(
                 user.uuid, user_message
             )
+            # Create new bot response message in db
+            self.db_manager.create_message(
+                user_conversation.id,
+                bot_response.content,
+                MessageType.RESPONSE,
+                Role.ASSISTANT,
+            )
+            # Cache bot response
             await self.cache_service.cache_message(
                 user_conversation.id, bot_response
             )
@@ -73,8 +82,7 @@ class ChatService:
             end_time = time.time()
             time_taken = end_time - start_time
             bot_response.time_taken = time_taken
-            logging.info('bot_response')
-            logging.info(bot_response)
+
             return self.response_utils.success_response(
                 bot_response, conversation.conversation_order
             )

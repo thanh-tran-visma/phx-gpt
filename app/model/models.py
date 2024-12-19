@@ -17,6 +17,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    user_name = Column(Text, nullable=False)
     uuid = Column(
         String(36),
         unique=True,

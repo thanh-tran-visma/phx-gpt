@@ -31,11 +31,12 @@ def test_get_user(db_manager, mock_db_session):
 
 def test_create_user_if_not_exists_creates_user(db_manager, mock_db_session):
     uuid = 'cfb6e466-8366-4f88-bdf9-3ae6984c0716'
+    user_name = 'Test'
     mock_db_session.query.return_value.filter.return_value.first.return_value = (
         None
     )
 
-    new_user = db_manager.create_user_if_not_exists(uuid)
+    new_user = db_manager.create_user_if_not_exists(uuid, user_name)
 
     assert new_user is not None
     assert new_user.uuid == uuid
